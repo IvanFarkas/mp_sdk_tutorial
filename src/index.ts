@@ -5,7 +5,7 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { FBXLoader } from 'three/examples/jsm/loaders/FBXLoader';
 
-const sdkKey = '[SdkKey]';
+const sdkKey = 'hxdsz06gifrgmb0921kxs04aa';//rolando sdk key
 const sdkVersion = '3.9'; // https://matterport.github.io/showcase-sdk/sdk_release_notes.html
 
 // declare this file is a module
