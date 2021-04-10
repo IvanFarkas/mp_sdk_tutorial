@@ -61,7 +61,8 @@ class App {
 
         // using the latest server-side SDK version in the .connect function - https://matterport.github.io/showcase-sdk/sdk_release_notes.html
         _sdk = await _window.MP_SDK.connect(_showcase, sdkKey, sdkVersion);
-
+console.log("the bunny is here ...");        
+console.log(_sdk);
         _this.getModelEvent();
         //_this.getCameraEvent();
         _this.getFloorEvent();
@@ -94,7 +95,8 @@ class App {
         // _this.glTFModel();
 
         await _this.scene();
-        await _this.fbxModel();
+        //await _this.fbxModel();
+        await _this.glTFModel() 
         //_this.transform();
 
         // .then(function (model: any) {
