@@ -6,6 +6,7 @@ import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { FBXLoader } from 'three/examples/jsm/loaders/FBXLoader';
 
 const sdkKey = 'hxdsz06gifrgmb0921kxs04aa';//rolando sdk key
+//ebedly api key 20ca2acf0ca74e31b7e17a99ab2a2067
 const sdkVersion = '3.9'; // https://matterport.github.io/showcase-sdk/sdk_release_notes.html
 
 // declare this file is a module
