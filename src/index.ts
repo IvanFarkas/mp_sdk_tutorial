@@ -1,17 +1,17 @@
-import * as restSamples from './rest';
-import * as THREE from 'three' // Import the entire three.js core library
-import { Scene, Camera, PerspectiveCamera, WebGLRenderer } from 'three';
-import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
-import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
-import { FBXLoader } from 'three/examples/jsm/loaders/FBXLoader';
+import * as restSamples from "./rest";
+import * as THREE from "three"; // Import the entire three.js core library
+import { Scene, Camera, PerspectiveCamera, WebGLRenderer } from "three";
+import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
+import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
+import { FBXLoader } from "three/examples/jsm/loaders/FBXLoader";
 
-const sdkKey = 'hxdsz06gifrgmb0921kxs04aa';//rolando sdk key
+const sdkKey = "hxdsz06gifrgmb0921kxs04aa"; //rolando sdk key
 //ebedly api key 20ca2acf0ca74e31b7e17a99ab2a2067
 
-const sdkVersion = '3.9'; // https://matterport.github.io/showcase-sdk/sdk_release_notes.html
+const sdkVersion = "3.9"; // https://matterport.github.io/showcase-sdk/sdk_release_notes.html
 
 // declare this file is a module
-export { };
+export {};
 
 // augment window with the MP_SDK property
 declare global {
@@ -23,7 +23,7 @@ declare global {
 let _this: App;
 let _window: Window;
 let _sdk: any;
-let _showcase = document.getElementById('showcase') as HTMLIFrameElement;
+let _showcase = document.getElementById("showcase") as HTMLIFrameElement;
 
 console.log("showcase here ...");
 console.log(_showcase);
@@ -32,16 +32,16 @@ let _showcaseSize = {
   w: _showcase.clientWidth,
   h: _showcase.clientHeight,
 };
-let _renderer: WebGLRenderer
+let _renderer: WebGLRenderer;
 let _three: any;
 
 class App {
   _hitCnt: any;
-  _floors: any
-  _labels: any
-  _model: any
-  _snapshots: any
-  _modelDetails: any
+  _floors: any;
+  _labels: any;
+  _model: any;
+  _snapshots: any;
+  _modelDetails: any;
   _mattertag: any; // get a mattertag from the collection using: sdk.Mattertag.getData
   _cameraPose: any; // get pose using: sdk.Camera.pose.subscribe
 
@@ -61,15 +61,15 @@ class App {
 
   private async loadShowcase(this: App): Promise<void> {
     _this = this;
-    _showcase.addEventListener('load', async function () {
+    _showcase.addEventListener("load", async function () {
       try {
         _window = _showcase.contentWindow;
 
         // using the latest server-side SDK version in the .connect function - https://matterport.github.io/showcase-sdk/sdk_release_notes.html
         _sdk = await _window.MP_SDK.connect(_showcase, sdkKey, sdkVersion);
-console.log("the sdk is here ...");        
-console.log("the sdk is here ...");        
-console.log(_sdk);
+        console.log("the sdk is here ...");
+        console.log("the sdk is here ...");
+        console.log(_sdk);
         _this.getModelEvent();
         //_this.getCameraEvent();
         _this.getFloorEvent();
@@ -81,10 +81,13 @@ console.log(_sdk);
         const moveToOptions = {
           rotation: { x: 0, y: 0 }, //x: 30, y: -45
           transition: _sdk.Sweep.Transition.INSTANT,
-          transitionTime: 2000 // in milliseconds
-        }
+          transitionTime: 2000, // in milliseconds
+        };
 
-        console.log('%c  Hello Bundle SDK! ', 'background: #333333; color: #00dd00');
+        console.log(
+          "%c  Hello Bundle SDK! ",
+          "background: #333333; color: #00dd00"
+        );
         console.log(_sdk);
 
         _this.keyPressListener();
@@ -99,11 +102,11 @@ console.log(_sdk);
         _this.getZoom();
         // _this.getIntersection();
         // _this.moveTo();
-         //_this.glTFModel();
+        //_this.glTFModel();
 
         await _this.scene();
         await _this.fbxModel();
-       
+
         //_this.transform();
 
         // .then(function (model: any) {
@@ -120,11 +123,15 @@ console.log(_sdk);
         // })
         // .catch(function (error: any) { console.error(error); });
 
-        _this.restApiTest()
-          .then(function (model: any) { console.log('restApiTest'); })
-          .catch(function (error: any) { console.error(error); });
-      }
-      catch (e) {
+        _this
+          .restApiTest()
+          .then(function (model: any) {
+            console.log("restApiTest");
+          })
+          .catch(function (error: any) {
+            console.error(error);
+          });
+      } catch (e) {
         console.error(e);
         return;
       }
@@ -138,11 +145,13 @@ console.log(_sdk);
         _this._model = model;
         console.log(model);
       })
-      .catch(function (error: any) { console.error(error); });
+      .catch(function (error: any) {
+        console.error(error);
+      });
 
     const callback = (object: any) => {
       console.log(object);
-      console.log('Model loaded!');
+      console.log("Model loaded!");
     };
 
     // Start listening to the event.
@@ -155,13 +164,19 @@ console.log(_sdk);
   private getCameraEvent() {
     const callback = (object: any) => {
       console.log(object);
-      console.log('Camera moved!');
+      console.log("Camera moved!");
     };
 
     _sdk.on(_sdk.Camera.Event.MOVE, callback);
 
     _sdk.Camera.pose.subscribe(function (pose: any) {
-      console.log('Camera', pose.position, pose.rotation, pose.sweep, pose.mode);
+      console.log(
+        "Camera",
+        pose.position,
+        pose.rotation,
+        pose.sweep,
+        pose.mode
+      );
     });
   }
 
@@ -169,7 +184,7 @@ console.log(_sdk);
     _this = this;
     const callback = (object: any) => {
       console.log(object);
-      console.log('Floor event!');
+      console.log("Floor event!");
     };
 
     _sdk.on(_sdk.Floor.Event.CHANGE_START, callback);
@@ -185,42 +200,42 @@ console.log(_sdk);
     _sdk.Floor.getData()
       .then(function (floors: any) {
         _this._floors = floors;
-        console.log('Floor:', floors.currentFloor);
-        console.log('Total floos:', floors.totalFloors);
-        console.log('Name of first floor:', floors.floorNames[0]);
+        console.log("Floor:", floors.currentFloor);
+        console.log("Total floos:", floors.totalFloors);
+        console.log("Name of first floor:", floors.floorNames[0]);
       })
       .catch(function (error: any) {
-        console.error('Floors data retrieval error.');
+        console.error("Floors data retrieval error.");
       });
 
     _sdk.Floor.current.subscribe(function (floor: any) {
       if (floor.sequence === -1) {
-        console.log('Viewing all floors');
+        console.log("Viewing all floors");
       } else if (floor.sequence === undefined) {
         if (floor.id === undefined) {
-          console.log('Viewing an unplaced unaligned sweep');
+          console.log("Viewing an unplaced unaligned sweep");
         } else {
-          console.log('Transitioning between floors');
+          console.log("Transitioning between floors");
         }
       } else {
-        console.log('Floor id:', floor.id);
-        console.log('Floor index:', floor.sequence);
+        console.log("Floor id:", floor.id);
+        console.log("Floor index:", floor.sequence);
 
         //TODO: BUG: floor.name is empty
         //console.log('Floor name:', floor.name)
-        console.log('Floor name:', _this._floors.floorNames[floor.sequence])
+        console.log("Floor name:", _this._floors.floorNames[floor.sequence]);
       }
     });
   }
 
   private getSweepEvent() {
     _sdk.Sweep.current.subscribe(function (sweep: any) {
-      if (sweep.sid === '') {
-        console.log('Not currently stationed at a sweep position');
+      if (sweep.sid === "") {
+        console.log("Not currently stationed at a sweep position");
       } else {
-        console.log('Sweep sid:', sweep.sid);
-        console.log('Sweep position:', sweep.position);
-        console.log('Sweep on floor', sweep.floorInfo);
+        console.log("Sweep sid:", sweep.sid);
+        console.log("Sweep position:", sweep.position);
+        console.log("Sweep on floor", sweep.floorInfo);
       }
     });
 
@@ -229,36 +244,46 @@ console.log(_sdk);
         // console.log('Sweep added to the collection', index, item, collection);
       },
       onRemoved: function (index: number, item: any, collection: any) {
-        console.log('Sweep removed from the collection', index, item, collection);
+        console.log(
+          "Sweep removed from the collection",
+          index,
+          item,
+          collection
+        );
       },
       onUpdated: function (index: number, item: any, collection: any) {
-        console.log('Sweep updated in place in the collection', index, item, collection);
+        console.log(
+          "Sweep updated in place in the collection",
+          index,
+          item,
+          collection
+        );
       },
       onCollectionUpdated: function (collection: any) {
         // console.log('Sweep entire up-to-date collection', collection);
-      }
+      },
     });
   }
 
   private getTourEvent() {
     _sdk.on(_sdk.Tour.Event.STARTED, function () {
-      console.log('Tour started');
+      console.log("Tour started");
     });
     _sdk.on(_sdk.Tour.Event.STEPPED, function (index: any) {
-      console.log('Tour index:', index);
+      console.log("Tour index:", index);
     });
     _sdk.on(_sdk.Tour.Event.STOPPED, function () {
-      console.log('Tour stopped');
+      console.log("Tour stopped");
     });
     _sdk.on(_sdk.Tour.Event.ENDED, function () {
-      console.log('Tour ended');
+      console.log("Tour ended");
     });
 
     //TODO: Find a way to test if Tour exits
     if (false) {
       _sdk.Tour.getData()
         .then(function (tour: any) {
-          console.log('Tour has:', tour.length, 'stops');
+          console.log("Tour has:", tour.length, "stops");
           return _sdk.Tour.start(0);
         })
         .then(function () {
@@ -284,16 +309,13 @@ console.log(_sdk);
 
   private getSensorEvent() {
     //https://matterport.github.io/showcase-sdk/docs/sdk/reference/current/modules/sensor.html
-
     //TODO: Understand, implement. Looks very useful to set up space regions and anser inside, outside, near questions
   }
 
   private getRoomEvent() {
     //https://matterport.github.io/showcase-sdk/docs/sdk/reference/current/modules/room.html
-
     //TODO: tere is no Room in _sdk. What's showcase
     // showcase.Room.data.subscribe({
-
     // _sdk.Room.current.subscribe(function (room: any) {
     //   if (room.id === '') {
     //     console.log('Not currently stationed at a room');
@@ -305,7 +327,6 @@ console.log(_sdk);
     //     console.log('Room on floor', room.floorInfo);
     //   }
     // });
-
     // _sdk.Room.data.subscribe({
     //   onCollectionUpdated: function (collection: any) {
     //     console.log('Collection received. There are ', Object.keys(collection).length, 'rooms in the collection');
@@ -315,58 +336,69 @@ console.log(_sdk);
 
   private keyPressListener(): void {
     _this = this;
-    _window.addEventListener('keydown', (e: any) => {
-      var keyStr = ["Control", "Shift", "Alt", "Meta"].includes(e.key) ? "" : e.key + " ";
+    _window.addEventListener("keydown", (e: any) => {
+      var keyStr = ["Control", "Shift", "Alt", "Meta"].includes(e.key)
+        ? ""
+        : e.key + " ";
       var reportStr =
         "The " +
         (e.ctrlKey ? "Control " : "") +
         (e.shiftKey ? "Shift " : "") +
         (e.altKey ? "Alt " : "") +
         (e.metaKey ? "Meta " : "") +
-        keyStr + "key was pressed."
-        ;
+        keyStr +
+        "key was pressed.";
       console.log(reportStr);
 
       //--- Was a Ctrl-Alt-E combo pressed?
-      if (e.ctrlKey && e.altKey && e.key === "e") {  // case sensitive
+      if (e.ctrlKey && e.altKey && e.key === "e") {
+        // case sensitive
         _this._hitCnt = (_this._hitCnt || 0) + 1;
         console.log(`cnt: ${_this._hitCnt}`);
       }
 
       if (!e.repeat) {
         switch (e.key) {
-          case 'e':
+          case "e":
             console.log(`Camera.rotate`);
-            _sdk.Camera.rotate(10, 0, { speed: 10 }).then(function () { }).catch(function (error: any) { });
+            _sdk.Camera.rotate(10, 0, { speed: 10 })
+              .then(function () {})
+              .catch(function (error: any) {});
             break;
 
-          case 'q':
+          case "q":
             console.log(`Camera.pan`);
 
             // TODO: did not pan
-            _sdk.Camera.pan({ x: 1, z: 1 }).then(function () { }).catch(function (error: any) { });
+            _sdk.Camera.pan({ x: 1, z: 1 })
+              .then(function () {})
+              .catch(function (error: any) {});
             break;
 
-          case 't':
+          case "t":
             var sweepId = _this._model.sweeps[1].uuid;
             var moveToOptions = {
               rotation: { x: 0, y: 0 }, //x: 30, y: -45
               transition: _sdk.Sweep.Transition.INSTANT,
-              transitionTime: 2000 // in milliseconds
-            }
+              transitionTime: 2000, // in milliseconds
+            };
 
             this.moveToSweep(sweepId, moveToOptions);
             break;
 
-          case 'm':
+          case "m":
             console.log(`Camera.lookAtScreenCoords`);
-            _sdk.Camera.lookAtScreenCoords(500, 320).then(function () { }).catch(function (error: any) { });
+            _sdk.Camera.lookAtScreenCoords(500, 320)
+              .then(function () {})
+              .catch(function (error: any) {});
             break;
 
-          case 'z':
+          case "z":
             console.log(`Camera.zoomBy`);
 
-            _sdk.Camera.zoomBy(0.1).then(function (newZoom: any) { console.log('Camera zoomed to', newZoom); });
+            _sdk.Camera.zoomBy(0.1).then(function (newZoom: any) {
+              console.log("Camera zoomed to", newZoom);
+            });
             // sdk.Camera.zoomTo(2.0).then(function (newZoom: any) { console.log('Camera zoomed to', newZoom); });
             break;
 
@@ -374,86 +406,95 @@ console.log(_sdk);
             console.log(`Key "${e.key}" pressed  [event: keydown]`);
             break;
         }
-      }
-      else {
+      } else {
         console.log(`Key "${e.key}" repeating  [event: keydown]`);
       }
 
       e.stopPropagation();
-      e.preventDefault()
+      e.preventDefault();
     });
   }
 
   private getAppState() {
     _sdk.App.state.subscribe(function (appState: any) {
       // app state has changed
-      console.log('Application: ', appState.application);
-      console.log('Loaded at: ', appState.phaseTimes[_sdk.App.Phase.LOADING]);
-      console.log('Started at: ', appState.phaseTimes[_sdk.App.Phase.STARTING]);
+      console.log("Application: ", appState.application);
+      console.log("Loaded at: ", appState.phaseTimes[_sdk.App.Phase.LOADING]);
+      console.log("Started at: ", appState.phaseTimes[_sdk.App.Phase.STARTING]);
 
       switch (appState.phase) {
         case _sdk.App.Phase.LOADING:
-          console.log('Phase: ', appState.phase);
+          console.log("Phase: ", appState.phase);
           break;
 
         case _sdk.App.Phase.STARTING:
-          console.log('Phase: ', appState.phase);
+          console.log("Phase: ", appState.phase);
           break;
 
         case _sdk.App.Phase.PLAYING:
-          console.log('Phase: ', appState.phase);
+          console.log("Phase: ", appState.phase);
           break;
 
         case _sdk.App.Phase.UNINITIALIZED:
-          console.log('Phase: ', appState.phase);
+          console.log("Phase: ", appState.phase);
           break;
 
         case _sdk.App.Phase.WAITING:
-          console.log('Phase: ', appState.phase);
+          console.log("Phase: ", appState.phase);
           break;
 
         case _sdk.App.Phase.ERROR:
-          console.log('Phase: ', appState.phase);
+          console.log("Phase: ", appState.phase);
           break;
       }
     });
   }
 
   private settings() {
-    _sdk.Settings.update('labels', true)
-      .then(function (data: any) { console.log('Labels setting: ' + data); })
-      .catch(function (error: any) { });
+    _sdk.Settings.update("labels", true)
+      .then(function (data: any) {
+        console.log("Labels setting: " + data);
+      })
+      .catch(function (error: any) {});
 
-    _sdk.Settings.get('labels')
-      .then(function (data: any) { console.log(`Labels setting: ${data}`); })
-      .catch(function (error: any) { });
+    _sdk.Settings.get("labels")
+      .then(function (data: any) {
+        console.log(`Labels setting: ${data}`);
+      })
+      .catch(function (error: any) {});
 
-    _sdk.Settings.update('param1', 'param 1')
-      .then(function (data: any) { console.log('Labels setting: ' + data); })
-      .catch(function (error: any) { });
+    _sdk.Settings.update("param1", "param 1")
+      .then(function (data: any) {
+        console.log("Labels setting: " + data);
+      })
+      .catch(function (error: any) {});
 
-    _sdk.Settings.get('param1')
-      .then(function (data: any) { console.log(`Labels setting: ${data}`); })
-      .catch(function (error: any) { });
+    _sdk.Settings.get("param1")
+      .then(function (data: any) {
+        console.log(`Labels setting: ${data}`);
+      })
+      .catch(function (error: any) {});
 
     // sdk.Pointer.intersection.subscribe(function (intersectionData: any) {
   }
 
   private getTag() {
-    _sdk.Mattertag.add([{
-      label: "tag01",
-      description: "Tag 01",
-      anchorPosition: { x: 0, y: 0, z: 0, },
-      // make the Mattertag stick straight up and make it 0.30 meters (~1 foot) tall
-      stemVector: { x: 0, y: 0.30, z: 0, },
-      // blue disc
-      color: { r: 0.0, g: 0.0, b: 1.0, },
-      floorId: 0, // optional, if not specified the sdk will provide an estimate of the floor id for the anchor position provided.
-    }])
+    _sdk.Mattertag.add([
+      {
+        label: "tag01",
+        description: "Tag 01",
+        anchorPosition: { x: 0, y: 0, z: 0 },
+        // make the Mattertag stick straight up and make it 0.30 meters (~1 foot) tall
+        stemVector: { x: 0, y: 0.3, z: 0 },
+        // blue disc
+        color: { r: 0.0, g: 0.0, b: 1.0 },
+        floorId: 0, // optional, if not specified the sdk will provide an estimate of the floor id for the anchor position provided.
+      },
+    ]);
   }
 
   private getPose() {
-    let currentSweep = '';
+    let currentSweep = "";
     _this = this;
 
     _sdk.Camera.pose.subscribe(function (pose: any) {
@@ -471,10 +512,12 @@ console.log(_sdk);
     _sdk.Label.getData()
       .then(function (labels: any) {
         _this._labels = labels;
-        console.log('Labels:');
+        console.log("Labels:");
         console.log(labels);
       })
-      .catch(function (error: any) { console.error(error); });
+      .catch(function (error: any) {
+        console.error(error);
+      });
   }
 
   private getMattertag(): void {
@@ -483,7 +526,9 @@ console.log(_sdk);
         console.log("Mattertags:");
         console.log(mattertags);
       })
-      .catch(function (error: any) { console.error(error); });
+      .catch(function (error: any) {
+        console.error(error);
+      });
   }
 
   private getModelDetails(): void {
@@ -493,7 +538,9 @@ console.log(_sdk);
         _this._modelDetails = modelDetails;
         console.log(modelDetails);
       })
-      .catch(function (error: any) { console.error(error); });
+      .catch(function (error: any) {
+        console.error(error);
+      });
   }
 
   private getTour(): void {
@@ -501,7 +548,7 @@ console.log(_sdk);
     _sdk.Tour.getData()
       .then(function (snapshots: any) {
         _this._snapshots = snapshots;
-        console.log('Tour snapshots:');
+        console.log("Tour snapshots:");
         console.log(snapshots);
       })
       .catch(function (error: any) {
@@ -514,13 +561,15 @@ console.log(_sdk);
   }
 
   private getZoom() {
-    _sdk.Camera.zoom.subscribe(function (zoom: any) { console.log('Zoom: ', zoom.level); });
+    _sdk.Camera.zoom.subscribe(function (zoom: any) {
+      console.log("Zoom: ", zoom.level);
+    });
   }
 
   private getIntersection() {
     _sdk.Pointer.intersection.subscribe(function (intersectionData: any) {
-      console.log('Intersection position:', intersectionData.position);
-      console.log('Intersection normal:', intersectionData.normal);
+      console.log("Intersection position:", intersectionData.position);
+      console.log("Intersection normal:", intersectionData.normal);
     });
   }
 
@@ -537,18 +586,30 @@ console.log(_sdk);
       transition: transition,
       zoom,
     })
-      .then(function (nextMode: any) { console.log(`View mode: ${nextMode}`); })
-      .catch(function (error: any) { console.error(error); });
+      .then(function (nextMode: any) {
+        console.log(`View mode: ${nextMode}`);
+      })
+      .catch(function (error: any) {
+        console.error(error);
+      });
   }
 
   private moveToSweep(sweepId: any, moveToOptions: any): void {
     _sdk.Sweep.moveTo(sweepId, moveToOptions)
-      .then(function (sweepId: any) { console.log(`Arrived at sweep ${sweepId}`); })
-      .catch(function (error: any) { console.error(error); });
+      .then(function (sweepId: any) {
+        console.log(`Arrived at sweep ${sweepId}`);
+      })
+      .catch(function (error: any) {
+        console.error(error);
+      });
   }
 
   private async scene() {
-    await _sdk.Scene.configure(function (renderer: WebGLRenderer, three: any, effectComposer: any) {
+    await _sdk.Scene.configure(function (
+      renderer: WebGLRenderer,
+      three: any,
+      effectComposer: any
+    ) {
       _renderer = renderer;
       _three = three;
 
@@ -585,7 +646,7 @@ console.log(_sdk);
 
     // node.addComponent('mp.ambientLight', initial);
     // node.addComponent('mp.directionalLight', initial);
-    lights.addComponent('mp.lights');
+    lights.addComponent("mp.lights");
     lights.start();
   }
 
@@ -597,6 +658,7 @@ console.log(_sdk);
     //const url = 'https://gitcdn.link/repo/mrdoob/three.js/dev/examples/models/fbx/stanford-bunny.fbx';
     
     const url = 'http://localhost:8000/Parrot_Bebop_Drone.fbx'
+
     const initial = {
       url: url,
       visible: true,
@@ -606,7 +668,10 @@ console.log(_sdk);
     };
 
     // Store the fbx component since we will need to adjust it in the next step.
-    const component = modelNode.addComponent(_sdk.Scene.Component.FBX_LOADER, initial);
+    const component = modelNode.addComponent(
+      _sdk.Scene.Component.FBX_LOADER,
+      initial
+    );
 
     // Scale model - https://matterport.github.io/showcase-sdk/sdkbundle_tutorials_models.html#scale-your-model
     component.inputs.localScale = { x: 0.00002, y: 0.00002, z: 0.00002 };
@@ -624,7 +689,7 @@ console.log(_sdk);
     const tick = function () {
       requestAnimationFrame(tick);
       modelNode.obj3D.rotation.y += 0.02;
-    }
+    };
     tick();
   }
 
@@ -632,19 +697,23 @@ console.log(_sdk);
   private async transform() {
     this.light();
 
-    const url = 'https://github.com/CesiumGS/cesium/blob/master/Apps/SampleData/models/CesiumDrone/CesiumDrone.glb?raw=true'; //https://github.com/CesiumGS/cesium/blob/master/Apps/SampleData/models/CesiumMan/Cesium_Man.glb?raw=true
+    const url =
+      "https://github.com/CesiumGS/cesium/blob/master/Apps/SampleData/models/CesiumDrone/CesiumDrone.glb?raw=true"; //https://github.com/CesiumGS/cesium/blob/master/Apps/SampleData/models/CesiumMan/Cesium_Man.glb?raw=true
     const initial = {
       url: url,
       visible: true,
-      localPosition: { x: -.3, y: -1, z: .3 },
+      localPosition: { x: -0.3, y: -1, z: 0.3 },
       localRotation: { x: 0, y: 0, z: 0 },
-      localScale: { x: .2, y: .2, z: .2 },
+      localScale: { x: 0.2, y: 0.2, z: 0.2 },
     };
 
     // Create a scene node with a model component.
     // This node's transform will be changed by the transform control.
     const modelNode = await _sdk.Scene.createNode();
-    const component = modelNode.addComponent(_sdk.Scene.Component.GLTF_LOADER, initial);
+    const component = modelNode.addComponent(
+      _sdk.Scene.Component.GLTF_LOADER,
+      initial
+    );
     modelNode.start();
 
     // // Create a scene node with a transform control component.
@@ -667,21 +736,27 @@ console.log(_sdk);
 
     // Model
     const modelNode = await _sdk.Scene.createNode();
-    const url = 'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/2CylinderEngine/glTF-Draco/2CylinderEngine.gltf';
+    const url =
+      "https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/2CylinderEngine/glTF-Draco/2CylinderEngine.gltf";
     const initial = {
       url: url,
       visible: true,
-      localScale: { x: .5, y: .5, z: .5 },
-      localPosition: { x: .1, y: 0, z: 0 },
+      localScale: { x: 0.5, y: 0.5, z: 0.5 },
+      localPosition: { x: 0.1, y: 0, z: 0 },
       // localRotation: { x: 0, y: -130, z: 0 },
     };
 
-    const component = modelNode.addComponent(_sdk.Scene.Component.GLTF_LOADER, initial);
+    const component = modelNode.addComponent(
+      _sdk.Scene.Component.GLTF_LOADER,
+      initial
+    );
 
     // Transform Control
     // Create a scene node with a transform control component.
     const node = await _sdk.Scene.createNode();
-    const myControl = node.addComponent(_sdk.Scene.Component.TRANSFORM_CONTROLS);
+    const myControl = node.addComponent(
+      _sdk.Scene.Component.TRANSFORM_CONTROLS
+    );
     node.start();
 
     // Make the transform control visible so that the user can manipulate the control selection.
@@ -691,23 +766,35 @@ console.log(_sdk);
     myControl.inputs.selection = modelNode;
 
     // set 'translate' mode to position the selection.
-    myControl.inputs.mode = 'translate';
+    myControl.inputs.mode = "translate";
   }
 
   private getMeasurements() {
     _sdk.Measurements.data.subscribe({
       onAdded: function (index: any, item: any, collection: any) {
-        console.log('item added to the collection', index, item, collection);
+        console.log("item added to the collection", index, item, collection);
       },
       onRemoved: function (index: any, item: any, collection: any) {
-        console.log('item removed from the collection', index, item, collection);
+        console.log(
+          "item removed from the collection",
+          index,
+          item,
+          collection
+        );
       },
       onUpdated: function (index: any, item: any, collection: any) {
-        console.log('item updated in place in the collection', index, item, collection);
-      }
+        console.log(
+          "item updated in place in the collection",
+          index,
+          item,
+          collection
+        );
+      },
     });
 
-    _sdk.Measurements.mode.subscribe(function (measurementModeState: any) { console.log('isActive? ', measurementModeState.active); });
+    _sdk.Measurements.mode.subscribe(function (measurementModeState: any) {
+      console.log("isActive? ", measurementModeState.active);
+    });
 
     // var screenCoordinate = sdk.Conversion.worldToScreen(mattertag.anchorPosition, cameraPose, showcaseSize)
   }
