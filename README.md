@@ -26,3 +26,5 @@ Replace [SdkKey] to the SDK Key in:
 - [Examples](https://matterport.github.io/showcase-sdk/sdkbundle_examples_summary.html)
 - [Reference](https://matterport.github.io/showcase-sdk/docs/sdkbundle/reference/current/index.html)
 - [Scene](https://matterport.github.io/showcase-sdk/docs/sdkbundle/reference/current/modules/scene.html)
+
+[![Screenshot ](https://raw.githubusercontent.com/IvanFarkas/mp_sdk_tutorial/master/Captura.PNG)]
