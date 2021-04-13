@@ -7,6 +7,7 @@ import { FBXLoader } from 'three/examples/jsm/loaders/FBXLoader';
 
 const sdkKey = 'hxdsz06gifrgmb0921kxs04aa';//rolando sdk key
 //ebedly api key 20ca2acf0ca74e31b7e17a99ab2a2067
+
 const sdkVersion = '3.9'; // https://matterport.github.io/showcase-sdk/sdk_release_notes.html
 
 // declare this file is a module
@@ -23,6 +24,10 @@ let _this: App;
 let _window: Window;
 let _sdk: any;
 let _showcase = document.getElementById('showcase') as HTMLIFrameElement;
+
+console.log("showcase here ...");
+console.log(_showcase);
+
 let _showcaseSize = {
   w: _showcase.clientWidth,
   h: _showcase.clientHeight,
@@ -62,7 +67,8 @@ class App {
 
         // using the latest server-side SDK version in the .connect function - https://matterport.github.io/showcase-sdk/sdk_release_notes.html
         _sdk = await _window.MP_SDK.connect(_showcase, sdkKey, sdkVersion);
-console.log("the bunny is here ...");        
+console.log("the sdk is here ...");        
+console.log("the sdk is here ...");        
 console.log(_sdk);
         _this.getModelEvent();
         //_this.getCameraEvent();
@@ -588,9 +594,9 @@ console.log(_sdk);
 
     // Add component to the scene node - https://matterport.github.io/showcase-sdk/sdkbundle_tutorials_models.html#add-your-component-to-the-scene-node
     const modelNode = await _sdk.Scene.createNode();
-    const url = 'https://gitcdn.link/repo/mrdoob/three.js/dev/examples/models/fbx/stanford-bunny.fbx';
+    //const url = 'https://gitcdn.link/repo/mrdoob/three.js/dev/examples/models/fbx/stanford-bunny.fbx';
     //const url = 'https://threejs.org/examples/models/fbx/Samba Dancing.fbx';//samba dancer
-    //const url = 'http://localhost:8000/NewCounterStool.FBX'
+    const url = 'http://localhost:8000/NewCounterStool.FBX'
     const initial = {
       url: url,
       visible: true,
