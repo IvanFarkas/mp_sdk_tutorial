@@ -657,7 +657,7 @@ class App {
     const modelNode = await _sdk.Scene.createNode();
     // const url = 'https://gitcdn.link/repo/mrdoob/three.js/dev/examples/models/fbx/stanford-bunny.fbx';
     // const url = 'https://threejs.org/examples/models/fbx/Samba Dancing.fbx';//samba dancer
-    const url = "http://localhost:8000/assets/models/NewCounterStool.FBX";
+    const url = "https://github.com/IvanFarkas/mp_sdk_tutorial/blob/main/assets/models/NewCounterStool.FBX?raw=true";
     const initial = {
       url: url,
       visible: true,
