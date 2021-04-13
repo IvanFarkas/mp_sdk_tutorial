@@ -595,8 +595,8 @@ console.log(_sdk);
     // Add component to the scene node - https://matterport.github.io/showcase-sdk/sdkbundle_tutorials_models.html#add-your-component-to-the-scene-node
     const modelNode = await _sdk.Scene.createNode();
     //const url = 'https://gitcdn.link/repo/mrdoob/three.js/dev/examples/models/fbx/stanford-bunny.fbx';
-    //const url = 'https://threejs.org/examples/models/fbx/Samba Dancing.fbx';//samba dancer
-    const url = 'http://localhost:8000/NewCounterStool.FBX'
+    
+    const url = 'http://localhost:8000/Parrot_Bebop_Drone.fbx'
     const initial = {
       url: url,
       visible: true,
