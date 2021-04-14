@@ -658,7 +658,7 @@ class App {
     //const url = 'https://gitcdn.link/repo/mrdoob/three.js/dev/examples/models/fbx/stanford-bunny.fbx';
     //const url = 'http://localhost:8000/parrot_bebop_droneB.fbx';
     const url = 'http://localhost:8000/parrot_bebop_droneAnimated.fbx';
-
+    //const url = 'http://localhost:8000/parrot_bebop_droneAnimated6.fbx';
     const initial = {
       url: url,
       visible: true,
