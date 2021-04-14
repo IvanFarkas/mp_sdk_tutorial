@@ -25,7 +25,6 @@ let _window: Window;
 let _sdk: any;
 let _showcase = document.getElementById("showcase") as HTMLIFrameElement;
 
-console.log("showcase here ...");
 console.log(_showcase);
 
 let _showcaseSize = {
@@ -67,9 +66,7 @@ class App {
 
         // using the latest server-side SDK version in the .connect function - https://matterport.github.io/showcase-sdk/sdk_release_notes.html
         _sdk = await _window.MP_SDK.connect(_showcase, sdkKey, sdkVersion);
-        console.log("the sdk is here ...");
-        console.log("the sdk is here ...");
-        console.log(_sdk);
+       
         _this.getModelEvent();
         //_this.getCameraEvent();
         _this.getFloorEvent();
@@ -150,6 +147,8 @@ class App {
       });
 
     const callback = (object: any) => {
+//model.animations[0]).play()
+      console.log("is drone model?")      
       console.log(object);
       console.log("Model loaded!");
     };
@@ -683,6 +682,26 @@ class App {
 
     // Start it - https://matterport.github.io/showcase-sdk/sdkbundle_tutorials_models.html#start-it
     // Scene Nodes - https://matterport.github.io/showcase-sdk/sdkbundle_architecture.html#scene-nodes
+    //model.animations[0]).play()
+ console.log("chek if animations");
+ /*modelNode.obj3D.children[0].children[0].animations[0].play();
+ modelNode.obj3D.children[0].children[0].animations[1].play();
+ modelNode.obj3D.children[0].children[0].animations[2].play();
+ modelNode.obj3D.children[0].children[0].animations[3].play();
+ modelNode.obj3D.children[0].children[0].animations[4].play();
+ modelNode.obj3D.children[0].children[0].animations[5].play();
+ modelNode.obj3D.children[0].children[0].animations[6].play();
+ modelNode.obj3D.children[0].children[0].animations[7].play();
+ modelNode.obj3D.children[0].children[0].animations[8].play();
+ modelNode.obj3D.children[0].children[0].animations[9].play();
+ modelNode.obj3D.children[0].children[0].animations[10].play();
+ modelNode.obj3D.children[0].children[0].animations[11].play();
+ modelNode.obj3D.children[0].children[0].animations[12].play();
+ modelNode.obj3D.children[0].children[0].animations[13].play();
+ modelNode.obj3D.children[0].children[0].animations[14].play();
+ modelNode.obj3D.children[0].children[0].animations[15].play();*/
+
+ console.log(modelNode);   
     modelNode.start();
 
     // Animate it - https://matterport.github.io/showcase-sdk/sdkbundle_tutorials_models.html#animate-it
