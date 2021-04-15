@@ -656,8 +656,8 @@ class App {
     const modelNode = await _sdk.Scene.createNode();
     //const url = 'https://gitcdn.link/repo/mrdoob/three.js/dev/examples/models/fbx/stanford-bunny.fbx';
     //const url = 'http://localhost:8000/parrot_bebop_droneB.fbx';
-    const url = 'http://localhost:8000/parrot_bebop_droneAnimated.fbx';
-    //const url = 'http://localhost:8000/parrot_bebop_droneAnimated6.fbx';
+    //const url = 'http://localhost:8000/parrot_bebop_droneAnimated.fbx';
+    const url = 'http://localhost:8000/simpleAnimation.fbx';
     const initial = {
       url: url,
       visible: true,
@@ -684,6 +684,7 @@ class App {
     // Scene Nodes - https://matterport.github.io/showcase-sdk/sdkbundle_architecture.html#scene-nodes
     //model.animations[0]).play()
  console.log("chek if animations");
+ 
  /*modelNode.obj3D.children[0].children[0].animations[0].play();
  modelNode.obj3D.children[0].children[0].animations[1].play();
  modelNode.obj3D.children[0].children[0].animations[2].play();
@@ -701,8 +702,9 @@ class App {
  modelNode.obj3D.children[0].children[0].animations[14].play();
  modelNode.obj3D.children[0].children[0].animations[15].play();*/
 
- console.log(modelNode);   
+ //console.log(modelNode);   
     modelNode.start();
+    //modelNode.obj3D.children[0].animations[0].play();
 
     // Animate it - https://matterport.github.io/showcase-sdk/sdkbundle_tutorials_models.html#animate-it
     const tick = function () {
