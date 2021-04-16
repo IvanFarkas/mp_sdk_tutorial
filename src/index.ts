@@ -657,7 +657,7 @@ class App {
     //const url = 'https://gitcdn.link/repo/mrdoob/three.js/dev/examples/models/fbx/stanford-bunny.fbx';
     //const url = 'http://localhost:8000/parrot_bebop_droneB.fbx';
     //const url = 'http://localhost:8000/parrot_bebop_droneAnimated.fbx';
-    const url = 'http://localhost:8000/simpleAnimation.fbx';
+    const url = 'http://localhost:8000/verySimpleAnim.fbx';
     const initial = {
       url: url,
       visible: true,
@@ -702,9 +702,9 @@ class App {
  modelNode.obj3D.children[0].children[0].animations[14].play();
  modelNode.obj3D.children[0].children[0].animations[15].play();*/
 
- //console.log(modelNode);   
+ console.log(modelNode.obj3D);   
     modelNode.start();
-    //modelNode.obj3D.children[0].animations[0].play();
+    modelNode.obj3D.animations[0].play();
 
     // Animate it - https://matterport.github.io/showcase-sdk/sdkbundle_tutorials_models.html#animate-it
     const tick = function () {
