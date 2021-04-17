@@ -685,22 +685,18 @@ class App {
     //model.animations[0]).play()
  console.log("chek if animations");
  
- /*modelNode.obj3D.children[0].children[0].animations[0].play();
- modelNode.obj3D.children[0].children[0].animations[1].play();
- modelNode.obj3D.children[0].children[0].animations[2].play();
- modelNode.obj3D.children[0].children[0].animations[3].play();
- modelNode.obj3D.children[0].children[0].animations[4].play();
- modelNode.obj3D.children[0].children[0].animations[5].play();
- modelNode.obj3D.children[0].children[0].animations[6].play();
- modelNode.obj3D.children[0].children[0].animations[7].play();
- modelNode.obj3D.children[0].children[0].animations[8].play();
- modelNode.obj3D.children[0].children[0].animations[9].play();
- modelNode.obj3D.children[0].children[0].animations[10].play();
- modelNode.obj3D.children[0].children[0].animations[11].play();
- modelNode.obj3D.children[0].children[0].animations[12].play();
- modelNode.obj3D.children[0].children[0].animations[13].play();
- modelNode.obj3D.children[0].children[0].animations[14].play();
- modelNode.obj3D.children[0].children[0].animations[15].play();*/
+ 
+ let mixer: THREE.AnimationMixer
+ let modelReady = false;
+ let animationActions: THREE.AnimationAction[] = new Array()
+ let activeAction: THREE.AnimationAction
+ let lastAction: THREE.AnimationAction
+ const fbxLoader: FBXLoader = new FBXLoader();
+ mixer = new THREE.AnimationMixer(modelNode.obj3D);
+ let animationAction = mixer.clipAction((modelNode.obj3D as any).animations[0]);
+ animationActions.push(animationAction);
+ animationsFolder.add(animations, "default");
+ activeAction = animationActions[0];
 
  console.log(modelNode.obj3D);   
     modelNode.start();
