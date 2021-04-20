@@ -25,8 +25,6 @@ let _window: Window;
 let _sdk: any;
 let _showcase = document.getElementById("showcase") as HTMLIFrameElement;
 
-console.log(_showcase);
-
 let _showcaseSize = {
   w: _showcase.clientWidth,
   h: _showcase.clientHeight,
@@ -46,6 +44,10 @@ class App {
 
   constructor() {
     this.config();
+  }
+
+  private getThreeFromContext(){
+    console.log("get three from context ...");
   }
 
   private config(): void {
@@ -651,13 +653,15 @@ class App {
 
   private async fbxModel() {
     await this.light();
+    this.getThreeFromContext();  
+    _this = this;
 
     // Add component to the scene node - https://matterport.github.io/showcase-sdk/sdkbundle_tutorials_models.html#add-your-component-to-the-scene-node
     const modelNode = await _sdk.Scene.createNode();
     //const url = 'https://gitcdn.link/repo/mrdoob/three.js/dev/examples/models/fbx/stanford-bunny.fbx';
     //const url = 'http://localhost:8000/parrot_bebop_droneB.fbx';
     //const url = 'http://localhost:8000/parrot_bebop_droneAnimated.fbx';
-    const url = 'http://localhost:8000/verySimpleAnim.fbx';
+    const url = 'http://localhost:8000/verySimpleAnim.fbx';//anim tested verified
     const initial = {
       url: url,
       visible: true,
@@ -683,24 +687,16 @@ class App {
     // Start it - https://matterport.github.io/showcase-sdk/sdkbundle_tutorials_models.html#start-it
     // Scene Nodes - https://matterport.github.io/showcase-sdk/sdkbundle_architecture.html#scene-nodes
     //model.animations[0]).play()
- console.log("chek if animations");
- 
- 
- let mixer: THREE.AnimationMixer
- let modelReady = false;
- let animationActions: THREE.AnimationAction[] = new Array()
- let activeAction: THREE.AnimationAction
- let lastAction: THREE.AnimationAction
- const fbxLoader: FBXLoader = new FBXLoader();
- mixer = new THREE.AnimationMixer(modelNode.obj3D);
- let animationAction = mixer.clipAction((modelNode.obj3D as any).animations[0]);
- animationActions.push(animationAction);
- animationsFolder.add(animations, "default");
- activeAction = animationActions[0];
+ console.log("chek if animations three");
+/* Insert animation code here */ 
+//let mixer = new THREE.AnimationMixer(modelNode.obj3D);
+console.log(_sdk.Scene.Component);
+//console.log(_sdk.Scene);
 
+/* ends animation code */
  console.log(modelNode.obj3D);   
     modelNode.start();
-    modelNode.obj3D.animations[0].play();
+    
 
     // Animate it - https://matterport.github.io/showcase-sdk/sdkbundle_tutorials_models.html#animate-it
     const tick = function () {
