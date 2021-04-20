@@ -688,17 +688,17 @@ class App {
     // Scene Nodes - https://matterport.github.io/showcase-sdk/sdkbundle_architecture.html#scene-nodes
  
 /* Insert animation code here */ 
-/*let modelReady = false;
+let modelReady = false;
 let animationActions : THREE.AnimationAction[] = new Array();
 let activeAction: THREE.AnimationAction
 let lastAction: THREE.AnimationAction
 let mixer = new _three.AnimationMixer(modelNode.obj3D);
-let animationAction = mixer.clipAction(modelNode.obj3D.animations[0]);
+let animationAction = mixer.clipAction(modelNode.obj3D);
 console.log("begin animation actions");
 console.log(animationAction);
 animationAction.play();
 console.log("end animation actions");
-*/
+
 
 /* ends animation code */
 console.log("begin pure object 3d movement");
