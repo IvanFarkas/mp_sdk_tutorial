@@ -46,8 +46,13 @@ class App {
     this.config();
   }
 
+  /**
+   * useful to pull THREE context on async component creation
+   */
   private getThreeFromContext(){
     console.log("get three from context ...");
+    //console.log(_three);
+    return _three;
   }
 
   private config(): void {
@@ -651,7 +656,9 @@ class App {
 
   private async fbxModel() {
     await this.light();
-    this.getThreeFromContext();  
+    _three = this.getThreeFromContext();  
+    console.log("fbx model has a three");
+    console.log(_three);
     _this = this;
 
     // Add component to the scene node - https://matterport.github.io/showcase-sdk/sdkbundle_tutorials_models.html#add-your-component-to-the-scene-node
@@ -686,14 +693,12 @@ class App {
     // Scene Nodes - https://matterport.github.io/showcase-sdk/sdkbundle_architecture.html#scene-nodes
     //model.animations[0]).play()
  console.log("chek if animations three ...");
- //console.log(_this.scene);
 /* Insert animation code here */ 
 //let mixer = new THREE.AnimationMixer(modelNode.obj3D);
 //let mixer = new _sdk.Scene.Component.THREE.AnimationMixer();
-const three = modelNode.addComponent(
+/*let three = modelNode.addComponent(
   _sdk.Scene.Component.THREE
-);
-console.log(three);
+);*/
 /*let mixer = new THREE.AnimationMixer(modelNode.obj3D);
 console.log(_sdk.Scene.Component);
 
