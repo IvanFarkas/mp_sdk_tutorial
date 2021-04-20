@@ -698,7 +698,10 @@ console.log("ends pure object 3d movement");
       requestAnimationFrame(tick);
       modelNode.obj3D.rotation.y += 0.02;
       //Move Children objects by rotation sums is the easiest animation 
-      //modelNode.obj3D.children[0].children[0].children[3].rotation.z += 0.12;
+      //HelipadsBackRight
+      modelNode.obj3D.children[0].children[0].children[5].children[2].children[0].children[0].children[0].children[0].children[0].children[0].children[0].rotation.y += 0.35;
+      //HelipadsBackLeft
+      modelNode.obj3D.children[0].children[0].children[5].children[2].children[0].children[0].children[0].children[0].children[0].children[0].children[1].rotation.y += 0.35;
     };
     tick();
   }
