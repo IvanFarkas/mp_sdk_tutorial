@@ -148,9 +148,7 @@ class App {
         console.error(error);
       });
 
-    const callback = (object: any) => {
-//model.animations[0]).play()
-      console.log("is drone model?")      
+    const callback = (object: any) => {     
       console.log(object);
       console.log("Model loaded!");
     };
@@ -687,11 +685,29 @@ class App {
     // Start it - https://matterport.github.io/showcase-sdk/sdkbundle_tutorials_models.html#start-it
     // Scene Nodes - https://matterport.github.io/showcase-sdk/sdkbundle_architecture.html#scene-nodes
     //model.animations[0]).play()
- console.log("chek if animations three");
+ console.log("chek if animations three ...");
+ //console.log(_this.scene);
 /* Insert animation code here */ 
 //let mixer = new THREE.AnimationMixer(modelNode.obj3D);
+//let mixer = new _sdk.Scene.Component.THREE.AnimationMixer();
+const three = modelNode.addComponent(
+  _sdk.Scene.Component.THREE
+);
+console.log(three);
+/*let mixer = new THREE.AnimationMixer(modelNode.obj3D);
 console.log(_sdk.Scene.Component);
-//console.log(_sdk.Scene);
+
+let modelReady = false;
+let animationActions: THREE.AnimationAction[] = new Array()
+let activeAction: THREE.AnimationAction
+let lastAction: THREE.AnimationAction
+//const fbxLoader: FBXLoader = new FBXLoader();
+mixer = new THREE.AnimationMixer(modelNode.obj3D);
+let animationAction = mixer.clipAction((modelNode.obj3D as any).animations[0]);
+animationActions.push(animationAction);
+//animationsFolder.add(animations, "default");
+activeAction = animationActions[0];
+modelNode.obj3D.animations[0].play();*/
 
 /* ends animation code */
  console.log(modelNode.obj3D);   
