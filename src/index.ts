@@ -691,12 +691,11 @@ class App {
 
    
     modelNode.start();
-    
-
     // Animate it - https://matterport.github.io/showcase-sdk/sdkbundle_tutorials_models.html#animate-it
     const tick = function () {
       requestAnimationFrame(tick);
       modelNode.obj3D.rotation.y += 0.02;
+      //Move Children objects by rotation sums is the easiest animation 
       modelNode.obj3D.children[0].children[0].children[3].rotation.z += 0.12;
     };
     tick();
