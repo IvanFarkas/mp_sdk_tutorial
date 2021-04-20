@@ -660,8 +660,8 @@ class App {
     const modelNode = await _sdk.Scene.createNode();
     //const url = 'https://gitcdn.link/repo/mrdoob/three.js/dev/examples/models/fbx/stanford-bunny.fbx';
     //const url = 'http://localhost:8000/parrot_bebop_droneB.fbx';
-    //const url = 'http://localhost:8000/parrot_bebop_droneAnimated.fbx';
-    const url = 'http://localhost:8000/verySimpleAnim.fbx';//anim tested verified
+    const url = 'http://localhost:8000/parrot_bebop_droneAnimated.fbx';
+    //const url = 'http://localhost:8000/verySimpleAnim.fbx';//anim tested verified
     const initial = {
       url: url,
       visible: true,
@@ -688,7 +688,9 @@ class App {
     // Scene Nodes - https://matterport.github.io/showcase-sdk/sdkbundle_architecture.html#scene-nodes
  
 /* Insert animation code here */ 
-
+console.log("begin pure object 3d movement");
+console.log(modelNode.obj3D); 
+console.log("ends pure object 3d movement");
    
     modelNode.start();
     // Animate it - https://matterport.github.io/showcase-sdk/sdkbundle_tutorials_models.html#animate-it
@@ -696,7 +698,7 @@ class App {
       requestAnimationFrame(tick);
       modelNode.obj3D.rotation.y += 0.02;
       //Move Children objects by rotation sums is the easiest animation 
-      modelNode.obj3D.children[0].children[0].children[3].rotation.z += 0.12;
+      //modelNode.obj3D.children[0].children[0].children[3].rotation.z += 0.12;
     };
     tick();
   }
