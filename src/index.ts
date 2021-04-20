@@ -1,17 +1,10 @@
 import * as restSamples from "./rest";
-import * as THREE from "three"; // Import the entire three.js core library
-import { Scene, Camera, PerspectiveCamera, WebGLRenderer } from "three";
-import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
-import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
-import { FBXLoader } from "three/examples/jsm/loaders/FBXLoader";
+import * as THREE from "three";
 
 const sdkKey = "hxdsz06gifrgmb0921kxs04aa"; //rolando sdk key
 //ebedly api key 20ca2acf0ca74e31b7e17a99ab2a2067
 
 const sdkVersion = "3.9"; // https://matterport.github.io/showcase-sdk/sdk_release_notes.html
-
-// declare this file is a module
-export {};
 
 // augment window with the MP_SDK property
 declare global {
@@ -23,16 +16,12 @@ declare global {
 let _this: App;
 let _window: Window;
 let _sdk: any;
-let _showcase = document.getElementById("showcase") as HTMLIFrameElement;
-
-console.log(_showcase);
-
-let _showcaseSize = {
-  w: _showcase.clientWidth,
-  h: _showcase.clientHeight,
-};
-let _renderer: WebGLRenderer;
+let _renderer: THREE.WebGLRenderer;
 let _three: any;
+let _showcase = document.getElementById("showcase") as HTMLIFrameElement;
+_showcase.width = "100%";
+_showcase.height = "100%";
+
 
 class App {
   _hitCnt: any;
@@ -605,7 +594,7 @@ class App {
 
   private async scene() {
     await _sdk.Scene.configure(function (
-      renderer: WebGLRenderer,
+      renderer: THREE.WebGLRenderer,
       three: any,
       effectComposer: any
     ) {
