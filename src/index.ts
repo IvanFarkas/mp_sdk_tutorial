@@ -50,8 +50,6 @@ class App {
    * useful to pull THREE context on async component creation
    */
   private getThreeFromContext(){
-    console.log("get three from context ...");
-    //console.log(_three);
     return _three;
   }
 
@@ -657,10 +655,7 @@ class App {
   private async fbxModel() {
     await this.light();
     _three = this.getThreeFromContext();  
-    console.log("fbx model has a three");
-    console.log(_three);
     _this = this;
-
     // Add component to the scene node - https://matterport.github.io/showcase-sdk/sdkbundle_tutorials_models.html#add-your-component-to-the-scene-node
     const modelNode = await _sdk.Scene.createNode();
     //const url = 'https://gitcdn.link/repo/mrdoob/three.js/dev/examples/models/fbx/stanford-bunny.fbx';
@@ -691,28 +686,21 @@ class App {
 
     // Start it - https://matterport.github.io/showcase-sdk/sdkbundle_tutorials_models.html#start-it
     // Scene Nodes - https://matterport.github.io/showcase-sdk/sdkbundle_architecture.html#scene-nodes
-    //model.animations[0]).play()
- console.log("chek if animations three ...");
+ 
 /* Insert animation code here */ 
-//let mixer = new THREE.AnimationMixer(modelNode.obj3D);
-//let mixer = new _sdk.Scene.Component.THREE.AnimationMixer();
-/*let three = modelNode.addComponent(
-  _sdk.Scene.Component.THREE
-);*/
-/*let mixer = new THREE.AnimationMixer(modelNode.obj3D);
-console.log(_sdk.Scene.Component);
-
 let modelReady = false;
-let animationActions: THREE.AnimationAction[] = new Array()
+let animationActions : THREE.AnimationAction[] = new Array();
 let activeAction: THREE.AnimationAction
 let lastAction: THREE.AnimationAction
-//const fbxLoader: FBXLoader = new FBXLoader();
-mixer = new THREE.AnimationMixer(modelNode.obj3D);
-let animationAction = mixer.clipAction((modelNode.obj3D as any).animations[0]);
-animationActions.push(animationAction);
+let mixer = new _three.AnimationMixer(modelNode.obj3D);
+let animationAction = mixer.clipAction(modelNode.obj3D.animations[0]);
+console.log("begin animation actions");
+console.log(animationAction);
+animationAction.play();
+console.log("end animation actions");
+//animationActions.push(animationAction);
 //animationsFolder.add(animations, "default");
-activeAction = animationActions[0];
-modelNode.obj3D.animations[0].play();*/
+//activeAction = animationActions[0];
 
 /* ends animation code */
  console.log(modelNode.obj3D);   
