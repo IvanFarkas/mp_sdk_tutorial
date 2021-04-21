@@ -680,7 +680,7 @@ class App {
     component.inputs.localScale = { x: 0.00002, y: 0.00002, z: 0.00002 };
 
     // Position model within view - https://matterport.github.io/showcase-sdk/sdkbundle_tutorials_models.html#position-your-model-within-view
-    modelNode.obj3D.position.set(0, 2.2, 0); // drop ~3 feet
+    modelNode.obj3D.position.set(0, 0.08, 1.8); // well visible onInit
 
     // TODO: Question: How do I attach standard events to objects created with createNode()?
 
@@ -688,6 +688,17 @@ class App {
     // Scene Nodes - https://matterport.github.io/showcase-sdk/sdkbundle_architecture.html#scene-nodes
  
 /* Insert animation code here */ 
+// Create a scene node with a transform control component.
+const node = await _sdk.Scene.createNode();
+const myControl = node.addComponent('mp.transformControls');
+node.start();
+// Make the transform control visible so that the user can manipulate the control selection.
+myControl.inputs.visible = true;
+// Attach the model to the transform control
+myControl.inputs.selection = modelNode;
+// set 'translate' mode to position the selection.
+myControl.inputs.mode = 'translate';
+
 console.log("begin pure object 3d movement");
 console.log(modelNode.obj3D); 
 console.log("ends pure object 3d movement");
