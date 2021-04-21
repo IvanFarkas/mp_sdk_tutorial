@@ -660,7 +660,7 @@ class App {
     const modelNode = await _sdk.Scene.createNode();
     //const url = 'https://gitcdn.link/repo/mrdoob/three.js/dev/examples/models/fbx/stanford-bunny.fbx';
     //const url = 'http://localhost:8000/parrot_bebop_droneB.fbx';
-    const url = 'http://localhost:8000/parrot_bebop_droneAnimated.fbx';
+    const url = 'http://localhost:8000/parrot_bebop_droneAnimatedB.fbx';
     //const url = 'http://localhost:8000/verySimpleAnim.fbx';//anim tested verified
     const initial = {
       url: url,
@@ -680,7 +680,7 @@ class App {
     component.inputs.localScale = { x: 0.00002, y: 0.00002, z: 0.00002 };
 
     // Position model within view - https://matterport.github.io/showcase-sdk/sdkbundle_tutorials_models.html#position-your-model-within-view
-    modelNode.obj3D.position.set(0, -1.2, 0); // drop ~3 feet
+    modelNode.obj3D.position.set(0, 2.2, 0); // drop ~3 feet
 
     // TODO: Question: How do I attach standard events to objects created with createNode()?
 
@@ -699,9 +699,13 @@ console.log("ends pure object 3d movement");
       modelNode.obj3D.rotation.y += 0.02;
       //Move Children objects by rotation sums is the easiest animation 
       //HelipadsBackRight
-      modelNode.obj3D.children[0].children[0].children[5].children[2].children[0].children[0].children[0].children[0].children[0].children[0].children[0].rotation.y += 0.35;
+      modelNode.obj3D.children[0].children[0].children[1].children[4].children[0].rotation.y += 0.95;
       //HelipadsBackLeft
-      modelNode.obj3D.children[0].children[0].children[5].children[2].children[0].children[0].children[0].children[0].children[0].children[0].children[1].rotation.y += 0.35;
+      modelNode.obj3D.children[0].children[0].children[1].children[4].children[1].rotation.y += 0.95;
+      //HelipadsFrontRight
+      modelNode.obj3D.children[0].children[0].children[1].children[6].children[0].rotation.y += 0.95;
+      //HelipadsFrontLeft
+      modelNode.obj3D.children[0].children[0].children[1].children[6].children[1].rotation.y += 0.95;
     };
     tick();
   }
