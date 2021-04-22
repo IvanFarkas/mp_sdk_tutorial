@@ -88,7 +88,7 @@ class App {
         _this.getZoom();
         // _this.getIntersection();
         // _this.moveTo();
-        //_this.glTFModel();
+        await _this.glTFModel();
 
         await _this.scene();
         await _this.fbxModel();
@@ -645,7 +645,7 @@ class App {
     const modelNode = await _sdk.Scene.createNode();
     //const url = 'https://gitcdn.link/repo/mrdoob/three.js/dev/examples/models/fbx/stanford-bunny.fbx';
     //const url = 'http://localhost:8000/parrot_bebop_droneB.fbx';
-    const url = 'http://localhost:8000/parrot_bebop_droneAnimated.fbx';
+    const url = 'http://localhost:8000/assets/models/NewCounterStool.FBX';
     //const url = 'http://localhost:8000/parrot_bebop_droneAnimated6.fbx';
     const initial = {
       url: url,
@@ -662,16 +662,17 @@ class App {
     );
 
     // Scale model - https://matterport.github.io/showcase-sdk/sdkbundle_tutorials_models.html#scale-your-model
-    component.inputs.localScale = { x: 0.00002, y: 0.00002, z: 0.00002 };
+    // component.inputs.localScale = { x: 0.00002, y: 0.00002, z: 0.00002 };
 
     // Position model within view - https://matterport.github.io/showcase-sdk/sdkbundle_tutorials_models.html#position-your-model-within-view
-    modelNode.obj3D.position.set(0, -1.2, 0); // drop ~3 feet
+    // modelNode.obj3D.position.set(0, -1.2, 0); // drop ~3 feet
 
     // TODO: Question: How do I attach standard events to objects created with createNode()?
 
     // Start it - https://matterport.github.io/showcase-sdk/sdkbundle_tutorials_models.html#start-it
     // Scene Nodes - https://matterport.github.io/showcase-sdk/sdkbundle_architecture.html#scene-nodes
-    //model.animations[0]).play()
+    // modelNode.obj3D.children[0].animations[0].play()
+    
  console.log("chek if animations");
  /*modelNode.obj3D.children[0].children[0].animations[0].play();
  modelNode.obj3D.children[0].children[0].animations[1].play();
@@ -698,7 +699,7 @@ class App {
       requestAnimationFrame(tick);
       modelNode.obj3D.rotation.y += 0.02;
     };
-    tick();
+    // tick();
   }
 
   // TODO: Error: TransformControls: The attached 3D object must be a part of the scene graph.
@@ -744,13 +745,14 @@ class App {
 
     // Model
     const modelNode = await _sdk.Scene.createNode();
-    const url =
-      "https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/2CylinderEngine/glTF-Draco/2CylinderEngine.gltf";
+    // const url = "https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/2CylinderEngine/glTF-Draco/2CylinderEngine.gltf";
+    const url = 'http://localhost:8000/assets/models/Xbot.gltf';
+
     const initial = {
       url: url,
       visible: true,
       localScale: { x: 0.5, y: 0.5, z: 0.5 },
-      localPosition: { x: 0.1, y: 0, z: 0 },
+      // localPosition: { x: 0.1, y: 0, z: 0 },
       // localRotation: { x: 0, y: -130, z: 0 },
     };
 
@@ -762,19 +764,20 @@ class App {
     // Transform Control
     // Create a scene node with a transform control component.
     const node = await _sdk.Scene.createNode();
-    const myControl = node.addComponent(
-      _sdk.Scene.Component.TRANSFORM_CONTROLS
-    );
     node.start();
 
-    // Make the transform control visible so that the user can manipulate the control selection.
-    myControl.inputs.visible = true;
+    // const myControl = node.addComponent(
+    //   _sdk.Scene.Component.TRANSFORM_CONTROLS
+    // );
 
-    // Attach the model to the transform control
-    myControl.inputs.selection = modelNode;
+    // // Make the transform control visible so that the user can manipulate the control selection.
+    // myControl.inputs.visible = true;
 
-    // set 'translate' mode to position the selection.
-    myControl.inputs.mode = "translate";
+    // // Attach the model to the transform control
+    // myControl.inputs.selection = modelNode;
+
+    // // set 'translate' mode to position the selection.
+    // myControl.inputs.mode = "translate";
   }
 
   private getMeasurements() {
