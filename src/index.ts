@@ -4,6 +4,8 @@ import { Scene, Camera, PerspectiveCamera, WebGLRenderer } from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 import { FBXLoader } from "three/examples/jsm/loaders/FBXLoader";
+//import {ExportText} from "./animationLib/ExportText.js";
+const ExportText = require("./animationLib/ExportText.js");
 
 const sdkKey = "hxdsz06gifrgmb0921kxs04aa"; //rolando sdk key
 //ebedly api key 20ca2acf0ca74e31b7e17a99ab2a2067
@@ -50,6 +52,7 @@ class App {
    * useful to pull THREE context on async component creation
    */
   private getThreeFromContext(){
+    var ex = new ExportText();
     return _three;
   }
 
