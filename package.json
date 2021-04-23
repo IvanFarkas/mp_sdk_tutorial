@@ -23,6 +23,7 @@
     "process": "^0.11.10",
     "stream-browserify": "^3.0.0",
     "stream-http": "^3.1.1",
+    "three": "^0.128.0",
     "tls": "0.0.1",
     "typed-rest-client": "^1.8.3"
   },

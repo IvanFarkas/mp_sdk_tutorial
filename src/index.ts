@@ -32,9 +32,12 @@ class App {
   _modelDetails: any;
   _mattertag: any; // get a mattertag from the collection using: sdk.Mattertag.getData
   _cameraPose: any; // get pose using: sdk.Camera.pose.subscribe
+  _animMixer: any;
+  _clock: any;
 
   constructor() {
     this.config();
+
   }
 
   private config(): void {
@@ -76,6 +79,8 @@ class App {
         );
         console.log(_sdk);
 
+        _this._clock = new THREE.Clock();
+
         _this.keyPressListener();
         _this.getAppState();
         _this.getTag();
@@ -88,7 +93,7 @@ class App {
         _this.getZoom();
         // _this.getIntersection();
         // _this.moveTo();
-        await _this.glTFModel();
+        // await _this.glTFModel();
 
         await _this.scene();
         await _this.fbxModel();
@@ -136,7 +141,6 @@ class App {
       });
 
     const callback = (object: any) => {
-//model.animations[0]).play()
       console.log("is drone model?")      
       console.log(object);
       console.log("Model loaded!");
@@ -645,13 +649,13 @@ class App {
     const modelNode = await _sdk.Scene.createNode();
     //const url = 'https://gitcdn.link/repo/mrdoob/three.js/dev/examples/models/fbx/stanford-bunny.fbx';
     //const url = 'http://localhost:8000/parrot_bebop_droneB.fbx';
-    const url = 'http://localhost:8000/assets/models/NewCounterStool.FBX';
+    const url = 'http://localhost:8000/assets/models/tester.FBX';
     //const url = 'http://localhost:8000/parrot_bebop_droneAnimated6.fbx';
     const initial = {
       url: url,
       visible: true,
-      // localPosition: { x: 0, y: -1.4, z: 0 },
-      // localRotation: { x: 0, y: 0, z: 0 },
+      localPosition: { x: 0, y: -1.72, z: 0 },
+      localRotation: { x: 0, y: -90, z: 0 },
       // localScale: { x: 1, y: 1, z: 1 },
     };
 
@@ -673,33 +677,49 @@ class App {
     // Scene Nodes - https://matterport.github.io/showcase-sdk/sdkbundle_architecture.html#scene-nodes
     // modelNode.obj3D.children[0].animations[0].play()
     
- console.log("chek if animations");
- /*modelNode.obj3D.children[0].children[0].animations[0].play();
- modelNode.obj3D.children[0].children[0].animations[1].play();
- modelNode.obj3D.children[0].children[0].animations[2].play();
- modelNode.obj3D.children[0].children[0].animations[3].play();
- modelNode.obj3D.children[0].children[0].animations[4].play();
- modelNode.obj3D.children[0].children[0].animations[5].play();
- modelNode.obj3D.children[0].children[0].animations[6].play();
- modelNode.obj3D.children[0].children[0].animations[7].play();
- modelNode.obj3D.children[0].children[0].animations[8].play();
- modelNode.obj3D.children[0].children[0].animations[9].play();
- modelNode.obj3D.children[0].children[0].animations[10].play();
- modelNode.obj3D.children[0].children[0].animations[11].play();
- modelNode.obj3D.children[0].children[0].animations[12].play();
- modelNode.obj3D.children[0].children[0].animations[13].play();
- modelNode.obj3D.children[0].children[0].animations[14].play();
- modelNode.obj3D.children[0].children[0].animations[15].play();*/
-
- console.log(modelNode);   
     modelNode.start();
+
+    setTimeout(()=>{
+      const model = modelNode.obj3D.children[0].children[0];
+      const mixer = new THREE.AnimationMixer(model);
+      _this._animMixer = mixer;
+      const action = mixer.clipAction(model.animations[2]);
+			action.play();
+
+      const animCtrlDiv = document.createElement("div");
+      animCtrlDiv.style.position = "absolute";
+      animCtrlDiv.style.top = "10px";
+      animCtrlDiv.style.right = "10px";
+      animCtrlDiv.style.zIndex = "999";
+      animCtrlDiv.style.display = "flex";
+      animCtrlDiv.style.flexDirection = "column";
+      document.body.appendChild(animCtrlDiv);
+      
+      for(let i in model.animations){
+        const animButton = document.createElement("button");
+        animButton.style.height = "40px";
+        animButton.innerText = model.animations[i].name
+        
+        animButton.addEventListener('click', (e)=>{
+          for(let k in model.animations){
+            _this._animMixer.clipAction(model.animations[k]).stop();
+          }
+          const action = _this._animMixer.clipAction(model.animations[i]);
+			    action.play();
+        })
+        animCtrlDiv.appendChild(animButton)
+      }
+
+    }, 2000)
+    
 
     // Animate it - https://matterport.github.io/showcase-sdk/sdkbundle_tutorials_models.html#animate-it
     const tick = function () {
       requestAnimationFrame(tick);
-      modelNode.obj3D.rotation.y += 0.02;
+      if(_this._animMixer)
+        _this._animMixer.update(_this._clock.getDelta())
     };
-    // tick();
+    tick();
   }
 
   // TODO: Error: TransformControls: The attached 3D object must be a part of the scene graph.
@@ -746,13 +766,13 @@ class App {
     // Model
     const modelNode = await _sdk.Scene.createNode();
     // const url = "https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/2CylinderEngine/glTF-Draco/2CylinderEngine.gltf";
-    const url = 'http://localhost:8000/assets/models/Xbot.gltf';
+    const url = 'http://localhost:8000/assets/models/tester.gltf';
 
     const initial = {
       url: url,
       visible: true,
-      localScale: { x: 0.5, y: 0.5, z: 0.5 },
-      // localPosition: { x: 0.1, y: 0, z: 0 },
+      // localScale: { x: 5, y: 5, z: 5 },
+      localPosition: { x: 0.1, y: 0, z: 0 },
       // localRotation: { x: 0, y: -130, z: 0 },
     };
 
