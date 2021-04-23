@@ -4,8 +4,10 @@ import { Scene, Camera, PerspectiveCamera, WebGLRenderer } from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 import { FBXLoader } from "three/examples/jsm/loaders/FBXLoader";
-//import {ExportText} from "./animationLib/ExportText.js";
-const ExportText = require("./animationLib/ExportText.js");
+//FBX Animation Support Libs ...
+//import ExportText from "./animationLib/ExportText.js";
+import Boomerang from "./animationLib/Boomerang.js";
+import HorizontalRotator from "./animationLib/HorizontalRotator.js";
 
 const sdkKey = "hxdsz06gifrgmb0921kxs04aa"; //rolando sdk key
 //ebedly api key 20ca2acf0ca74e31b7e17a99ab2a2067
@@ -52,7 +54,6 @@ class App {
    * useful to pull THREE context on async component creation
    */
   private getThreeFromContext(){
-    var ex = new ExportText();
     return _three;
   }
 
@@ -705,7 +706,7 @@ myControl.inputs.mode = 'translate';
 //console.log("begin object3d log");
 //console.log(modelNode.obj3D); 
 //console.log("ends object3d log");
-
+//var ex = new ExportText();
    modelNode.start();
     // Animate it - https://matterport.github.io/showcase-sdk/sdkbundle_tutorials_models.html#animate-it
     const rotateHelipads = function(){
@@ -719,37 +720,16 @@ myControl.inputs.mode = 'translate';
       //HelipadsFrontLeft
       modelNode.obj3D.children[0].children[0].children[1].children[6].children[1].rotation.y += rotationSpeed;
     };
-
-    var quadcopterTranslationTurns = 2;
-    const translateQuadcopterOnZ = function(){
-      var initZ = 1.8;//closer point to camera
-      var translationMaxZ = -1.86;
-      var speed = 0.008;
-      
-      if((quadcopterTranslationTurns % 2) == 0 ){
-        if(modelNode.obj3D.position.z > translationMaxZ){
-          modelNode.obj3D.position.z -= speed;
-        } else {
-          quadcopterTranslationTurns += 1;
-        }
-      }else{
-        if(modelNode.obj3D.position.z < initZ){
-          modelNode.obj3D.position.z += speed;
-        } else {
-          quadcopterTranslationTurns += 1;
-        }
-      }
-      console.log("translating quadcopter ...");
-      console.log(modelNode.obj3D.position.z);
-    };
+    var quadcopterTranslation = new Boomerang(modelNode.obj3D);
+    var quadcopterRotation = new HorizontalRotator(modelNode.obj3D);
 
     const tick = function () {
       requestAnimationFrame(tick);
       //quadcopter onTick actions
       rotateHelipads();
-      translateQuadcopterOnZ();
-      modelNode.obj3D.rotation.y += 0.02;
-      //Move Children objects by rotation sums is the easiest animation 
+      quadcopterTranslation.ticker();
+      quadcopterRotation.ticker();
+      
     };
     tick();
   }

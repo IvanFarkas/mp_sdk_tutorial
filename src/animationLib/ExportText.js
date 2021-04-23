@@ -2,8 +2,8 @@
 /**
  * used to test export import of custom classes
  */
-export class ExportText { 
+export default class ExportText { 
     constructor() { 
-      console.log("export text instantiated");
+      console.log("HERE HEREexport text instantiated");
     } 
  }
