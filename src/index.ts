@@ -715,31 +715,30 @@ myControl.inputs.mode = 'translate';
       modelNode.obj3D.children[0].children[0].children[1].children[6].children[0].rotation.y += rotationSpeed;
       //HelipadsFrontLeft
       modelNode.obj3D.children[0].children[0].children[1].children[6].children[1].rotation.y += rotationSpeed;
-    }
+    };
 
-    
-
+    var quadcopterTranslationTurns = 2;
     const translateQuadcopterOnZ = function(){
-      var initZ = 0.08;
-      var translationMaxZ = -8.6;
-      var speed = 0.13;
-      var turns = 2;
-      if((turns % 2) == 0 ){
+      var initZ = 1.8;//closer point to camera
+      var translationMaxZ = -1.86;
+      var speed = 0.008;
+      
+      if((quadcopterTranslationTurns % 2) == 0 ){
         if(modelNode.obj3D.position.z > translationMaxZ){
           modelNode.obj3D.position.z -= speed;
         } else {
-          turns += 1;
+          quadcopterTranslationTurns += 1;
         }
       }else{
         if(modelNode.obj3D.position.z < initZ){
           modelNode.obj3D.position.z += speed;
         } else {
-          turns += 1;
+          quadcopterTranslationTurns += 1;
         }
       }
       console.log("translating quadcopter ...");
       console.log(modelNode.obj3D.position.z);
-    }
+    };
 
     const tick = function () {
       requestAnimationFrame(tick);
