@@ -699,24 +699,55 @@ myControl.inputs.selection = modelNode;
 // set 'translate' mode to position the selection.
 myControl.inputs.mode = 'translate';
 
-console.log("begin pure object 3d movement");
-console.log(modelNode.obj3D); 
-console.log("ends pure object 3d movement");
-   
-    modelNode.start();
+//console.log("begin object3d log");
+//console.log(modelNode.obj3D); 
+//console.log("ends object3d log");
+
+   modelNode.start();
     // Animate it - https://matterport.github.io/showcase-sdk/sdkbundle_tutorials_models.html#animate-it
+    const rotateHelipads = function(){
+      var rotationSpeed = 1.12;
+      //HelipadsBackRight
+      modelNode.obj3D.children[0].children[0].children[1].children[4].children[0].rotation.y += rotationSpeed;
+      //HelipadsBackLeft
+      modelNode.obj3D.children[0].children[0].children[1].children[4].children[1].rotation.y += rotationSpeed;
+      //HelipadsFrontRight
+      modelNode.obj3D.children[0].children[0].children[1].children[6].children[0].rotation.y += rotationSpeed;
+      //HelipadsFrontLeft
+      modelNode.obj3D.children[0].children[0].children[1].children[6].children[1].rotation.y += rotationSpeed;
+    }
+
+    
+
+    const translateQuadcopterOnZ = function(){
+      var initZ = 0.08;
+      var translationMaxZ = -8.6;
+      var speed = 0.13;
+      var turns = 2;
+      if((turns % 2) == 0 ){
+        if(modelNode.obj3D.position.z > translationMaxZ){
+          modelNode.obj3D.position.z -= speed;
+        } else {
+          turns += 1;
+        }
+      }else{
+        if(modelNode.obj3D.position.z < initZ){
+          modelNode.obj3D.position.z += speed;
+        } else {
+          turns += 1;
+        }
+      }
+      console.log("translating quadcopter ...");
+      console.log(modelNode.obj3D.position.z);
+    }
+
     const tick = function () {
       requestAnimationFrame(tick);
+      //quadcopter onTick actions
+      rotateHelipads();
+      translateQuadcopterOnZ();
       modelNode.obj3D.rotation.y += 0.02;
       //Move Children objects by rotation sums is the easiest animation 
-      //HelipadsBackRight
-      modelNode.obj3D.children[0].children[0].children[1].children[4].children[0].rotation.y += 0.95;
-      //HelipadsBackLeft
-      modelNode.obj3D.children[0].children[0].children[1].children[4].children[1].rotation.y += 0.95;
-      //HelipadsFrontRight
-      modelNode.obj3D.children[0].children[0].children[1].children[6].children[0].rotation.y += 0.95;
-      //HelipadsFrontLeft
-      modelNode.obj3D.children[0].children[0].children[1].children[6].children[1].rotation.y += 0.95;
     };
     tick();
   }
