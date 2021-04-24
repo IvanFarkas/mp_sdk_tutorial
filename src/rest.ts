@@ -3,13 +3,13 @@ import * as rm from 'typed-rest-client/RestClient';
 import * as cm from './common';
 
 // TODO: This should be in polyfill, but could not get it work, export, etc.
-global.Buffer = global.Buffer || require("buffer").Buffer;
+global.Buffer = global.Buffer || require('buffer').Buffer;
 
 interface HttpBinData {
   url: string;
   data: any;
   json: any;
-  args?: any
+  args?: any;
 }
 
 interface HelloObj {
@@ -18,7 +18,7 @@ interface HelloObj {
 
 let baseUrl: string = 'https://httpbin.org/';
 let client: rm.RestClient = new rm.RestClient('rest-samples', baseUrl);
-let hello: HelloObj = <HelloObj>{ message: "Hello World!" };
+let hello: HelloObj = <HelloObj>{ message: 'Hello World!' };
 let options: rm.IRequestOptions = cm.httpBinOptions();
 
 export async function run() {
@@ -26,8 +26,7 @@ export async function run() {
     await get();
     await post();
     await update();
-  }
-  catch (err) {
+  } catch (err) {
     console.error('Failed: ' + err.message);
   }
 }
@@ -42,7 +41,7 @@ async function get() {
     }
   };
 
-  // Get Resource: strong typing of resource(s) via generics.  
+  // Get Resource: strong typing of resource(s) via generics.
   // In this case httpbin.org has a response structure response.result carries the resource(s)
   cm.heading('REST GET');
   let response: rm.IRestResponse<cm.HttpBinData> = await client.get<cm.HttpBinData>('get', options);

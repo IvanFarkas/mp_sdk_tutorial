@@ -1,8 +1,9 @@
 const path = require('path');
+const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const CopyPlugin = require('copy-webpack-plugin');
-const webpack = require("webpack");
+const DotEnvPlugin = require('dotenv-webpack');
 
 module.exports = {
   stats: {
@@ -10,13 +11,13 @@ module.exports = {
   },
   mode: 'development',
   entry: {
-    app: './src/index.ts',
+    app: './src/index.ts'
   },
   devtool: 'source-map',
   resolve: {
     extensions: ['.js', '.ts'],
     alias: {
-      process: "process/browser"
+      process: 'process/browser'
     },
     fallback: {
       http: require.resolve('stream-http'),
@@ -24,7 +25,7 @@ module.exports = {
       buffer: require.resolve('buffer'),
       path: require.resolve('path-browserify'),
       stream: require.resolve('stream-browserify'),
-      zlib: require.resolve('browserify-zlib'),
+      zlib: require.resolve('browserify-zlib')
     }
   },
   plugins: [
@@ -39,12 +40,13 @@ module.exports = {
         {
           from: 'bundle',
           to: 'dist/bundle'
-        },
+        }
       ]
     }),
     new webpack.ProvidePlugin({
-      process: 'process/browser',
+      process: 'process/browser'
     }),
+    new DotEnvPlugin()
     // new webpack.DefinePlugin({
     //   'process.env.NODE_ENV': JSON.stringify('development')
     // }),
@@ -55,12 +57,12 @@ module.exports = {
       {
         test: /\.ts?$/,
         loader: 'ts-loader'
-      },
+      }
     ]
   },
   output: {
     filename: '[name].bundle.js',
-    path: path.resolve(__dirname, 'dist'),
+    path: path.resolve(__dirname, 'dist')
   },
   devServer: {
     //https: true
