@@ -1,10 +1,11 @@
-import * as restSamples from "./rest";
 import * as THREE from "three";
+import * as restSamples from "./rest";
 
-const sdkKey = "hxdsz06gifrgmb0921kxs04aa"; //rolando sdk key
-//ebedly api key 20ca2acf0ca74e31b7e17a99ab2a2067
-
-const sdkVersion = "3.9"; // https://matterport.github.io/showcase-sdk/sdk_release_notes.html
+// Read from .env file
+const NodeEnv = process.env.NODE_ENV;
+const ModelId = process.env.MODEL_ID;
+const SdkKey = process.env.SDK_KEY;
+const SdkVersion = process.env.SDK_VERSION; // https://matterport.github.io/showcase-sdk/sdk_release_notes.html
 
 // augment window with the MP_SDK property
 declare global {
@@ -14,14 +15,11 @@ declare global {
 }
 
 let _this: App;
+let _showcase: HTMLIFrameElement;
 let _window: Window;
 let _sdk: any;
 let _renderer: THREE.WebGLRenderer;
 let _three: any;
-let _showcase = document.getElementById("showcase") as HTMLIFrameElement;
-_showcase.width = "100%";
-_showcase.height = "100%";
-
 
 class App {
   _hitCnt: any;
@@ -37,10 +35,19 @@ class App {
 
   constructor() {
     this.config();
-
   }
 
   private config(): void {
+    console.log("NodeEnv:", NodeEnv)
+    console.log("ModelId:", ModelId)
+    console.log("SdkKey:", SdkKey)
+    console.log("SdkVersion:", SdkVersion)
+   
+    _showcase = <HTMLIFrameElement>document.getElementById("showcase");
+    _showcase.src = `/bundle/showcase.html?m=${ModelId}&applicationKey=${SdkKey}&play=1&qs=1&log=0`;
+    _showcase.width = "100%";
+    _showcase.height = "100%";
+
     // support application/json type post data
     // this.app.use(bodyParser.json());
 
@@ -57,7 +64,7 @@ class App {
         _window = _showcase.contentWindow;
 
         // using the latest server-side SDK version in the .connect function - https://matterport.github.io/showcase-sdk/sdk_release_notes.html
-        _sdk = await _window.MP_SDK.connect(_showcase, sdkKey, sdkVersion);
+        _sdk = await _window.MP_SDK.connect(_showcase, SdkKey, SdkVersion);
        
         _this.getModelEvent();
         //_this.getCameraEvent();
@@ -73,10 +80,7 @@ class App {
           transitionTime: 2000, // in milliseconds
         };
 
-        console.log(
-          "%c  Hello Bundle SDK! ",
-          "background: #333333; color: #00dd00"
-        );
+        console.log("%c  Hello Bundle SDK! ", "background: #333333; color: #00dd00");
         console.log(_sdk);
 
         _this._clock = new THREE.Clock();
@@ -648,9 +652,9 @@ class App {
     // Add component to the scene node - https://matterport.github.io/showcase-sdk/sdkbundle_tutorials_models.html#add-your-component-to-the-scene-node
     const modelNode = await _sdk.Scene.createNode();
     //const url = 'https://gitcdn.link/repo/mrdoob/three.js/dev/examples/models/fbx/stanford-bunny.fbx';
-    //const url = 'http://localhost:8000/parrot_bebop_droneB.fbx';
+    //const url = 'http://localhost:8000/assets/models/parrot_bebop_droneB.fbx';
     const url = 'http://localhost:8000/assets/models/tester.FBX';
-    //const url = 'http://localhost:8000/parrot_bebop_droneAnimated6.fbx';
+    //const url = 'http://localhost:8000/assets/models/parrot_bebop_droneAnimated6.fbx';
     const initial = {
       url: url,
       visible: true,
