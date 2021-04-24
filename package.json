@@ -2,8 +2,8 @@
   "name": "showcase-sdk-tutorial",
   "version": "1.0.0",
   "main": "index.ts",
-  "repository": "git@github.com:gbruce/showcase-sdk-tutorial.git",
-  "author": "Guillermo Bruce <guillermo@matterport.com>",
+  "repository": "git@github.com:IvanFarkas/mp_sdk_tutorial.git",
+  "author": "Ivan Farkas <Ivan.Farkas@3DHDSoft.com>",
   "license": "MIT",
   "scripts": {
     "start": "webpack serve --config ./webpack.config.js",
