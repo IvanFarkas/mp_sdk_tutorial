@@ -1,5 +1,5 @@
-import * as THREE from "three";
-import * as restSamples from "./rest";
+import * as THREE from 'three';
+import * as restSamples from './rest';
 
 // Read from .env file
 const NodeEnv = process.env.NODE_ENV;
@@ -38,15 +38,15 @@ class App {
   }
 
   private config(): void {
-    console.log("NodeEnv:", NodeEnv)
-    console.log("ModelId:", ModelId)
-    console.log("SdkKey:", SdkKey)
-    console.log("SdkVersion:", SdkVersion)
-   
-    _showcase = <HTMLIFrameElement>document.getElementById("showcase");
+    console.log('NodeEnv:', NodeEnv);
+    console.log('ModelId:', ModelId);
+    console.log('SdkKey:', SdkKey);
+    console.log('SdkVersion:', SdkVersion);
+
+    _showcase = <HTMLIFrameElement>document.getElementById('showcase');
     _showcase.src = `/bundle/showcase.html?m=${ModelId}&applicationKey=${SdkKey}&play=1&qs=1&log=0`;
-    _showcase.width = "100%";
-    _showcase.height = "100%";
+    _showcase.width = '100%';
+    _showcase.height = '100%';
 
     // support application/json type post data
     // this.app.use(bodyParser.json());
@@ -59,13 +59,13 @@ class App {
 
   private async loadShowcase(this: App): Promise<void> {
     _this = this;
-    _showcase.addEventListener("load", async function () {
+    _showcase.addEventListener('load', async function () {
       try {
         _window = _showcase.contentWindow;
 
         // using the latest server-side SDK version in the .connect function - https://matterport.github.io/showcase-sdk/sdk_release_notes.html
         _sdk = await _window.MP_SDK.connect(_showcase, SdkKey, SdkVersion);
-       
+
         _this.getModelEvent();
         //_this.getCameraEvent();
         _this.getFloorEvent();
@@ -77,10 +77,10 @@ class App {
         const moveToOptions = {
           rotation: { x: 0, y: 0 }, //x: 30, y: -45
           transition: _sdk.Sweep.Transition.INSTANT,
-          transitionTime: 2000, // in milliseconds
+          transitionTime: 2000 // in milliseconds
         };
 
-        console.log("%c  Hello Bundle SDK! ", "background: #333333; color: #00dd00");
+        console.log('%c  Hello Bundle SDK! ', 'background: #333333; color: #00dd00');
         console.log(_sdk);
 
         _this._clock = new THREE.Clock();
@@ -121,7 +121,7 @@ class App {
         _this
           .restApiTest()
           .then(function (model: any) {
-            console.log("restApiTest");
+            console.log('restApiTest');
           })
           .catch(function (error: any) {
             console.error(error);
@@ -145,9 +145,9 @@ class App {
       });
 
     const callback = (object: any) => {
-      console.log("is drone model?")      
+      console.log('is drone model?');
       console.log(object);
-      console.log("Model loaded!");
+      console.log('Model loaded!');
     };
 
     // Start listening to the event.
@@ -160,19 +160,13 @@ class App {
   private getCameraEvent() {
     const callback = (object: any) => {
       console.log(object);
-      console.log("Camera moved!");
+      console.log('Camera moved!');
     };
 
     _sdk.on(_sdk.Camera.Event.MOVE, callback);
 
     _sdk.Camera.pose.subscribe(function (pose: any) {
-      console.log(
-        "Camera",
-        pose.position,
-        pose.rotation,
-        pose.sweep,
-        pose.mode
-      );
+      console.log('Camera', pose.position, pose.rotation, pose.sweep, pose.mode);
     });
   }
 
@@ -180,7 +174,7 @@ class App {
     _this = this;
     const callback = (object: any) => {
       console.log(object);
-      console.log("Floor event!");
+      console.log('Floor event!');
     };
 
     _sdk.on(_sdk.Floor.Event.CHANGE_START, callback);
@@ -196,42 +190,42 @@ class App {
     _sdk.Floor.getData()
       .then(function (floors: any) {
         _this._floors = floors;
-        console.log("Floor:", floors.currentFloor);
-        console.log("Total floos:", floors.totalFloors);
-        console.log("Name of first floor:", floors.floorNames[0]);
+        console.log('Floor:', floors.currentFloor);
+        console.log('Total floos:', floors.totalFloors);
+        console.log('Name of first floor:', floors.floorNames[0]);
       })
       .catch(function (error: any) {
-        console.error("Floors data retrieval error.");
+        console.error('Floors data retrieval error.');
       });
 
     _sdk.Floor.current.subscribe(function (floor: any) {
       if (floor.sequence === -1) {
-        console.log("Viewing all floors");
+        console.log('Viewing all floors');
       } else if (floor.sequence === undefined) {
         if (floor.id === undefined) {
-          console.log("Viewing an unplaced unaligned sweep");
+          console.log('Viewing an unplaced unaligned sweep');
         } else {
-          console.log("Transitioning between floors");
+          console.log('Transitioning between floors');
         }
       } else {
-        console.log("Floor id:", floor.id);
-        console.log("Floor index:", floor.sequence);
+        console.log('Floor id:', floor.id);
+        console.log('Floor index:', floor.sequence);
 
         //TODO: BUG: floor.name is empty
         //console.log('Floor name:', floor.name)
-        console.log("Floor name:", _this._floors.floorNames[floor.sequence]);
+        console.log('Floor name:', _this._floors.floorNames[floor.sequence]);
       }
     });
   }
 
   private getSweepEvent() {
     _sdk.Sweep.current.subscribe(function (sweep: any) {
-      if (sweep.sid === "") {
-        console.log("Not currently stationed at a sweep position");
+      if (sweep.sid === '') {
+        console.log('Not currently stationed at a sweep position');
       } else {
-        console.log("Sweep sid:", sweep.sid);
-        console.log("Sweep position:", sweep.position);
-        console.log("Sweep on floor", sweep.floorInfo);
+        console.log('Sweep sid:', sweep.sid);
+        console.log('Sweep position:', sweep.position);
+        console.log('Sweep on floor', sweep.floorInfo);
       }
     });
 
@@ -240,46 +234,36 @@ class App {
         // console.log('Sweep added to the collection', index, item, collection);
       },
       onRemoved: function (index: number, item: any, collection: any) {
-        console.log(
-          "Sweep removed from the collection",
-          index,
-          item,
-          collection
-        );
+        console.log('Sweep removed from the collection', index, item, collection);
       },
       onUpdated: function (index: number, item: any, collection: any) {
-        console.log(
-          "Sweep updated in place in the collection",
-          index,
-          item,
-          collection
-        );
+        console.log('Sweep updated in place in the collection', index, item, collection);
       },
       onCollectionUpdated: function (collection: any) {
         // console.log('Sweep entire up-to-date collection', collection);
-      },
+      }
     });
   }
 
   private getTourEvent() {
     _sdk.on(_sdk.Tour.Event.STARTED, function () {
-      console.log("Tour started");
+      console.log('Tour started');
     });
     _sdk.on(_sdk.Tour.Event.STEPPED, function (index: any) {
-      console.log("Tour index:", index);
+      console.log('Tour index:', index);
     });
     _sdk.on(_sdk.Tour.Event.STOPPED, function () {
-      console.log("Tour stopped");
+      console.log('Tour stopped');
     });
     _sdk.on(_sdk.Tour.Event.ENDED, function () {
-      console.log("Tour ended");
+      console.log('Tour ended');
     });
 
     //TODO: Find a way to test if Tour exits
     if (false) {
       _sdk.Tour.getData()
         .then(function (tour: any) {
-          console.log("Tour has:", tour.length, "stops");
+          console.log('Tour has:', tour.length, 'stops');
           return _sdk.Tour.start(0);
         })
         .then(function () {
@@ -332,22 +316,13 @@ class App {
 
   private keyPressListener(): void {
     _this = this;
-    _window.addEventListener("keydown", (e: any) => {
-      var keyStr = ["Control", "Shift", "Alt", "Meta"].includes(e.key)
-        ? ""
-        : e.key + " ";
-      var reportStr =
-        "The " +
-        (e.ctrlKey ? "Control " : "") +
-        (e.shiftKey ? "Shift " : "") +
-        (e.altKey ? "Alt " : "") +
-        (e.metaKey ? "Meta " : "") +
-        keyStr +
-        "key was pressed.";
+    _window.addEventListener('keydown', (e: any) => {
+      var keyStr = ['Control', 'Shift', 'Alt', 'Meta'].includes(e.key) ? '' : e.key + ' ';
+      var reportStr = 'The ' + (e.ctrlKey ? 'Control ' : '') + (e.shiftKey ? 'Shift ' : '') + (e.altKey ? 'Alt ' : '') + (e.metaKey ? 'Meta ' : '') + keyStr + 'key was pressed.';
       console.log(reportStr);
 
       //--- Was a Ctrl-Alt-E combo pressed?
-      if (e.ctrlKey && e.altKey && e.key === "e") {
+      if (e.ctrlKey && e.altKey && e.key === 'e') {
         // case sensitive
         _this._hitCnt = (_this._hitCnt || 0) + 1;
         console.log(`cnt: ${_this._hitCnt}`);
@@ -355,14 +330,14 @@ class App {
 
       if (!e.repeat) {
         switch (e.key) {
-          case "e":
+          case 'e':
             console.log(`Camera.rotate`);
             _sdk.Camera.rotate(10, 0, { speed: 10 })
               .then(function () {})
               .catch(function (error: any) {});
             break;
 
-          case "q":
+          case 'q':
             console.log(`Camera.pan`);
 
             // TODO: did not pan
@@ -371,29 +346,29 @@ class App {
               .catch(function (error: any) {});
             break;
 
-          case "t":
+          case 't':
             var sweepId = _this._model.sweeps[1].uuid;
             var moveToOptions = {
               rotation: { x: 0, y: 0 }, //x: 30, y: -45
               transition: _sdk.Sweep.Transition.INSTANT,
-              transitionTime: 2000, // in milliseconds
+              transitionTime: 2000 // in milliseconds
             };
 
             this.moveToSweep(sweepId, moveToOptions);
             break;
 
-          case "m":
+          case 'm':
             console.log(`Camera.lookAtScreenCoords`);
             _sdk.Camera.lookAtScreenCoords(500, 320)
               .then(function () {})
               .catch(function (error: any) {});
             break;
 
-          case "z":
+          case 'z':
             console.log(`Camera.zoomBy`);
 
             _sdk.Camera.zoomBy(0.1).then(function (newZoom: any) {
-              console.log("Camera zoomed to", newZoom);
+              console.log('Camera zoomed to', newZoom);
             });
             // sdk.Camera.zoomTo(2.0).then(function (newZoom: any) { console.log('Camera zoomed to', newZoom); });
             break;
@@ -414,58 +389,58 @@ class App {
   private getAppState() {
     _sdk.App.state.subscribe(function (appState: any) {
       // app state has changed
-      console.log("Application: ", appState.application);
-      console.log("Loaded at: ", appState.phaseTimes[_sdk.App.Phase.LOADING]);
-      console.log("Started at: ", appState.phaseTimes[_sdk.App.Phase.STARTING]);
+      console.log('Application: ', appState.application);
+      console.log('Loaded at: ', appState.phaseTimes[_sdk.App.Phase.LOADING]);
+      console.log('Started at: ', appState.phaseTimes[_sdk.App.Phase.STARTING]);
 
       switch (appState.phase) {
         case _sdk.App.Phase.LOADING:
-          console.log("Phase: ", appState.phase);
+          console.log('Phase: ', appState.phase);
           break;
 
         case _sdk.App.Phase.STARTING:
-          console.log("Phase: ", appState.phase);
+          console.log('Phase: ', appState.phase);
           break;
 
         case _sdk.App.Phase.PLAYING:
-          console.log("Phase: ", appState.phase);
+          console.log('Phase: ', appState.phase);
           break;
 
         case _sdk.App.Phase.UNINITIALIZED:
-          console.log("Phase: ", appState.phase);
+          console.log('Phase: ', appState.phase);
           break;
 
         case _sdk.App.Phase.WAITING:
-          console.log("Phase: ", appState.phase);
+          console.log('Phase: ', appState.phase);
           break;
 
         case _sdk.App.Phase.ERROR:
-          console.log("Phase: ", appState.phase);
+          console.log('Phase: ', appState.phase);
           break;
       }
     });
   }
 
   private settings() {
-    _sdk.Settings.update("labels", true)
+    _sdk.Settings.update('labels', true)
       .then(function (data: any) {
-        console.log("Labels setting: " + data);
+        console.log('Labels setting: ' + data);
       })
       .catch(function (error: any) {});
 
-    _sdk.Settings.get("labels")
+    _sdk.Settings.get('labels')
       .then(function (data: any) {
         console.log(`Labels setting: ${data}`);
       })
       .catch(function (error: any) {});
 
-    _sdk.Settings.update("param1", "param 1")
+    _sdk.Settings.update('param1', 'param 1')
       .then(function (data: any) {
-        console.log("Labels setting: " + data);
+        console.log('Labels setting: ' + data);
       })
       .catch(function (error: any) {});
 
-    _sdk.Settings.get("param1")
+    _sdk.Settings.get('param1')
       .then(function (data: any) {
         console.log(`Labels setting: ${data}`);
       })
@@ -477,20 +452,20 @@ class App {
   private getTag() {
     _sdk.Mattertag.add([
       {
-        label: "tag01",
-        description: "Tag 01",
+        label: 'tag01',
+        description: 'Tag 01',
         anchorPosition: { x: 0, y: 0, z: 0 },
         // make the Mattertag stick straight up and make it 0.30 meters (~1 foot) tall
         stemVector: { x: 0, y: 0.3, z: 0 },
         // blue disc
         color: { r: 0.0, g: 0.0, b: 1.0 },
-        floorId: 0, // optional, if not specified the sdk will provide an estimate of the floor id for the anchor position provided.
-      },
+        floorId: 0 // optional, if not specified the sdk will provide an estimate of the floor id for the anchor position provided.
+      }
     ]);
   }
 
   private getPose() {
-    let currentSweep = "";
+    let currentSweep = '';
     _this = this;
 
     _sdk.Camera.pose.subscribe(function (pose: any) {
@@ -508,7 +483,7 @@ class App {
     _sdk.Label.getData()
       .then(function (labels: any) {
         _this._labels = labels;
-        console.log("Labels:");
+        console.log('Labels:');
         console.log(labels);
       })
       .catch(function (error: any) {
@@ -519,7 +494,7 @@ class App {
   private getMattertag(): void {
     _sdk.Mattertag.getData()
       .then(function (mattertags: any) {
-        console.log("Mattertags:");
+        console.log('Mattertags:');
         console.log(mattertags);
       })
       .catch(function (error: any) {
@@ -544,11 +519,11 @@ class App {
     _sdk.Tour.getData()
       .then(function (snapshots: any) {
         _this._snapshots = snapshots;
-        console.log("Tour snapshots:");
+        console.log('Tour snapshots:');
         console.log(snapshots);
       })
       .catch(function (error: any) {
-        if (error == "No tour data found") {
+        if (error == 'No tour data found') {
           console.info(error);
         } else {
           console.error(error);
@@ -558,14 +533,14 @@ class App {
 
   private getZoom() {
     _sdk.Camera.zoom.subscribe(function (zoom: any) {
-      console.log("Zoom: ", zoom.level);
+      console.log('Zoom: ', zoom.level);
     });
   }
 
   private getIntersection() {
     _sdk.Pointer.intersection.subscribe(function (intersectionData: any) {
-      console.log("Intersection position:", intersectionData.position);
-      console.log("Intersection normal:", intersectionData.normal);
+      console.log('Intersection position:', intersectionData.position);
+      console.log('Intersection normal:', intersectionData.normal);
     });
   }
 
@@ -580,7 +555,7 @@ class App {
       position: position,
       rotation: rotation,
       transition: transition,
-      zoom,
+      zoom
     })
       .then(function (nextMode: any) {
         console.log(`View mode: ${nextMode}`);
@@ -601,11 +576,7 @@ class App {
   }
 
   private async scene() {
-    await _sdk.Scene.configure(function (
-      renderer: THREE.WebGLRenderer,
-      three: any,
-      effectComposer: any
-    ) {
+    await _sdk.Scene.configure(function (renderer: THREE.WebGLRenderer, three: any, effectComposer: any) {
       _renderer = renderer;
       _three = three;
 
@@ -642,7 +613,7 @@ class App {
 
     // node.addComponent('mp.ambientLight', initial);
     // node.addComponent('mp.directionalLight', initial);
-    lights.addComponent("mp.lights");
+    lights.addComponent('mp.lights');
     lights.start();
   }
 
@@ -659,15 +630,12 @@ class App {
       url: url,
       visible: true,
       localPosition: { x: 0, y: -1.72, z: 0 },
-      localRotation: { x: 0, y: -90, z: 0 },
+      localRotation: { x: 0, y: -90, z: 0 }
       // localScale: { x: 1, y: 1, z: 1 },
     };
 
     // Store the fbx component since we will need to adjust it in the next step.
-    const component = modelNode.addComponent(
-      _sdk.Scene.Component.FBX_LOADER,
-      initial
-    );
+    const component = modelNode.addComponent(_sdk.Scene.Component.FBX_LOADER, initial);
 
     // Scale model - https://matterport.github.io/showcase-sdk/sdkbundle_tutorials_models.html#scale-your-model
     // component.inputs.localScale = { x: 0.00002, y: 0.00002, z: 0.00002 };
@@ -680,48 +648,45 @@ class App {
     // Start it - https://matterport.github.io/showcase-sdk/sdkbundle_tutorials_models.html#start-it
     // Scene Nodes - https://matterport.github.io/showcase-sdk/sdkbundle_architecture.html#scene-nodes
     // modelNode.obj3D.children[0].animations[0].play()
-    
+
     modelNode.start();
 
-    setTimeout(()=>{
+    setTimeout(() => {
       const model = modelNode.obj3D.children[0].children[0];
       const mixer = new THREE.AnimationMixer(model);
       _this._animMixer = mixer;
       const action = mixer.clipAction(model.animations[2]);
-			action.play();
+      action.play();
 
-      const animCtrlDiv = document.createElement("div");
-      animCtrlDiv.style.position = "absolute";
-      animCtrlDiv.style.top = "10px";
-      animCtrlDiv.style.right = "10px";
-      animCtrlDiv.style.zIndex = "999";
-      animCtrlDiv.style.display = "flex";
-      animCtrlDiv.style.flexDirection = "column";
+      const animCtrlDiv = document.createElement('div');
+      animCtrlDiv.style.position = 'absolute';
+      animCtrlDiv.style.top = '10px';
+      animCtrlDiv.style.right = '10px';
+      animCtrlDiv.style.zIndex = '999';
+      animCtrlDiv.style.display = 'flex';
+      animCtrlDiv.style.flexDirection = 'column';
       document.body.appendChild(animCtrlDiv);
-      
-      for(let i in model.animations){
-        const animButton = document.createElement("button");
-        animButton.style.height = "40px";
-        animButton.innerText = model.animations[i].name
-        
-        animButton.addEventListener('click', (e)=>{
-          for(let k in model.animations){
+
+      for (let i in model.animations) {
+        const animButton = document.createElement('button');
+        animButton.style.height = '40px';
+        animButton.innerText = model.animations[i].name;
+
+        animButton.addEventListener('click', (e) => {
+          for (let k in model.animations) {
             _this._animMixer.clipAction(model.animations[k]).stop();
           }
           const action = _this._animMixer.clipAction(model.animations[i]);
-			    action.play();
-        })
-        animCtrlDiv.appendChild(animButton)
+          action.play();
+        });
+        animCtrlDiv.appendChild(animButton);
       }
-
-    }, 2000)
-    
+    }, 2000);
 
     // Animate it - https://matterport.github.io/showcase-sdk/sdkbundle_tutorials_models.html#animate-it
     const tick = function () {
       requestAnimationFrame(tick);
-      if(_this._animMixer)
-        _this._animMixer.update(_this._clock.getDelta())
+      if (_this._animMixer) _this._animMixer.update(_this._clock.getDelta());
     };
     tick();
   }
@@ -730,23 +695,19 @@ class App {
   private async transform() {
     this.light();
 
-    const url =
-      "https://github.com/CesiumGS/cesium/blob/master/Apps/SampleData/models/CesiumDrone/CesiumDrone.glb?raw=true"; //https://github.com/CesiumGS/cesium/blob/master/Apps/SampleData/models/CesiumMan/Cesium_Man.glb?raw=true
+    const url = 'https://github.com/CesiumGS/cesium/blob/master/Apps/SampleData/models/CesiumDrone/CesiumDrone.glb?raw=true'; //https://github.com/CesiumGS/cesium/blob/master/Apps/SampleData/models/CesiumMan/Cesium_Man.glb?raw=true
     const initial = {
       url: url,
       visible: true,
       localPosition: { x: -0.3, y: -1, z: 0.3 },
       localRotation: { x: 0, y: 0, z: 0 },
-      localScale: { x: 0.2, y: 0.2, z: 0.2 },
+      localScale: { x: 0.2, y: 0.2, z: 0.2 }
     };
 
     // Create a scene node with a model component.
     // This node's transform will be changed by the transform control.
     const modelNode = await _sdk.Scene.createNode();
-    const component = modelNode.addComponent(
-      _sdk.Scene.Component.GLTF_LOADER,
-      initial
-    );
+    const component = modelNode.addComponent(_sdk.Scene.Component.GLTF_LOADER, initial);
     modelNode.start();
 
     // // Create a scene node with a transform control component.
@@ -776,14 +737,11 @@ class App {
       url: url,
       visible: true,
       // localScale: { x: 5, y: 5, z: 5 },
-      localPosition: { x: 0.1, y: 0, z: 0 },
+      localPosition: { x: 0.1, y: 0, z: 0 }
       // localRotation: { x: 0, y: -130, z: 0 },
     };
 
-    const component = modelNode.addComponent(
-      _sdk.Scene.Component.GLTF_LOADER,
-      initial
-    );
+    const component = modelNode.addComponent(_sdk.Scene.Component.GLTF_LOADER, initial);
 
     // Transform Control
     // Create a scene node with a transform control component.
@@ -807,28 +765,18 @@ class App {
   private getMeasurements() {
     _sdk.Measurements.data.subscribe({
       onAdded: function (index: any, item: any, collection: any) {
-        console.log("item added to the collection", index, item, collection);
+        console.log('item added to the collection', index, item, collection);
       },
       onRemoved: function (index: any, item: any, collection: any) {
-        console.log(
-          "item removed from the collection",
-          index,
-          item,
-          collection
-        );
+        console.log('item removed from the collection', index, item, collection);
       },
       onUpdated: function (index: any, item: any, collection: any) {
-        console.log(
-          "item updated in place in the collection",
-          index,
-          item,
-          collection
-        );
-      },
+        console.log('item updated in place in the collection', index, item, collection);
+      }
     });
 
     _sdk.Measurements.mode.subscribe(function (measurementModeState: any) {
-      console.log("isActive? ", measurementModeState.active);
+      console.log('isActive? ', measurementModeState.active);
     });
 
     // var screenCoordinate = sdk.Conversion.worldToScreen(mattertag.anchorPosition, cameraPose, showcaseSize)
