@@ -38,21 +38,17 @@ class App {
   }
 
   private config(): void {
+    // Print environment variables
     console.log('NodeEnv:', NodeEnv);
     console.log('ModelId:', ModelId);
     console.log('SdkKey:', SdkKey);
     console.log('SdkVersion:', SdkVersion);
 
+    // Set showcase IFrame attributes
     _showcase = <HTMLIFrameElement>document.getElementById('showcase');
     _showcase.src = `/bundle/showcase.html?m=${ModelId}&applicationKey=${SdkKey}&play=1&qs=1&log=0`;
     _showcase.width = '100%';
     _showcase.height = '100%';
-
-    // support application/json type post data
-    // this.app.use(bodyParser.json());
-
-    //support application/x-www-form-urlencoded post data
-    // this.app.use(bodyParser.urlencoded({ extended: false }));
 
     this.loadShowcase();
   }
@@ -100,22 +96,6 @@ class App {
 
         await _this.scene();
         await _this.fbxModel();
-
-        //_this.transform();
-
-        // .then((model: any) => {
-        //   // Start it - https://matterport.github.io/showcase-sdk/sdkbundle_tutorials_models.html#start-it
-        //   // Scene Nodes - https://matterport.github.io/showcase-sdk/sdkbundle_architecture.html#scene-nodes
-        //   model.start();
-
-        //   // Animate it - https://matterport.github.io/showcase-sdk/sdkbundle_tutorials_models.html#animate-it
-        //   const tick = () => {
-        //     requestAnimationFrame(tick);
-        //     model.obj3D.rotation.y += 0.02;
-        //   }
-        //   tick();
-        // })
-        // .catch((error: any) => { console.error(error); });
 
         _this
           .restApiTest()
