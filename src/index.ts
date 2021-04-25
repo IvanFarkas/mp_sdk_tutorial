@@ -59,7 +59,7 @@ class App {
 
   private async loadShowcase(this: App): Promise<void> {
     _this = this;
-    _showcase.addEventListener('load', async function () {
+    _showcase.addEventListener('load', async () => {
       try {
         _window = _showcase.contentWindow;
 
@@ -80,7 +80,6 @@ class App {
           transitionTime: 2000 // in milliseconds
         };
 
-        console.log('%c  Hello Bundle SDK! ', 'background: #333333; color: #00dd00');
         console.log(_sdk);
 
         _this._clock = new THREE.Clock();
@@ -104,26 +103,26 @@ class App {
 
         //_this.transform();
 
-        // .then(function (model: any) {
+        // .then((model: any) => {
         //   // Start it - https://matterport.github.io/showcase-sdk/sdkbundle_tutorials_models.html#start-it
         //   // Scene Nodes - https://matterport.github.io/showcase-sdk/sdkbundle_architecture.html#scene-nodes
         //   model.start();
 
         //   // Animate it - https://matterport.github.io/showcase-sdk/sdkbundle_tutorials_models.html#animate-it
-        //   const tick = function () {
+        //   const tick = () => {
         //     requestAnimationFrame(tick);
         //     model.obj3D.rotation.y += 0.02;
         //   }
         //   tick();
         // })
-        // .catch(function (error: any) { console.error(error); });
+        // .catch((error: any) => { console.error(error); });
 
         _this
           .restApiTest()
-          .then(function (model: any) {
+          .then((model: any) => {
             console.log('restApiTest');
           })
-          .catch(function (error: any) {
+          .catch((error: any) => {
             console.error(error);
           });
       } catch (e) {
@@ -136,11 +135,11 @@ class App {
   private getModelEvent() {
     _this = this;
     _sdk.Model.getData()
-      .then(function (model: any) {
+      .then((model: any) => {
         _this._model = model;
         console.log(model);
       })
-      .catch(function (error: any) {
+      .catch((error: any) => {
         console.error(error);
       });
 
@@ -165,7 +164,7 @@ class App {
 
     _sdk.on(_sdk.Camera.Event.MOVE, callback);
 
-    _sdk.Camera.pose.subscribe(function (pose: any) {
+    _sdk.Camera.pose.subscribe((pose: any) => {
       console.log('Camera', pose.position, pose.rotation, pose.sweep, pose.mode);
     });
   }
@@ -182,23 +181,23 @@ class App {
 
     //TODO: not getting Flooor data
     // _sdk.Floor.data.subscribe({
-    //   onAdded: function (collection: any) {
+    //   onAdded: (collection: any) => {
     //     console.log('Collection received. There are ', Object.keys(collection).length, 'Floors in the collection');
     //   }
     // });
 
     _sdk.Floor.getData()
-      .then(function (floors: any) {
+      .then((floors: any) => {
         _this._floors = floors;
         console.log('Floor:', floors.currentFloor);
         console.log('Total floos:', floors.totalFloors);
         console.log('Name of first floor:', floors.floorNames[0]);
       })
-      .catch(function (error: any) {
+      .catch((error: any) => {
         console.error('Floors data retrieval error.');
       });
 
-    _sdk.Floor.current.subscribe(function (floor: any) {
+    _sdk.Floor.current.subscribe((floor: any) => {
       if (floor.sequence === -1) {
         console.log('Viewing all floors');
       } else if (floor.sequence === undefined) {
@@ -219,7 +218,7 @@ class App {
   }
 
   private getSweepEvent() {
-    _sdk.Sweep.current.subscribe(function (sweep: any) {
+    _sdk.Sweep.current.subscribe((sweep: any) => {
       if (sweep.sid === '') {
         console.log('Not currently stationed at a sweep position');
       } else {
@@ -230,56 +229,56 @@ class App {
     });
 
     _sdk.Sweep.data.subscribe({
-      onAdded: function (index: number, item: any, collection: any) {
+      onAdded: (index: number, item: any, collection: any) => {
         // console.log('Sweep added to the collection', index, item, collection);
       },
-      onRemoved: function (index: number, item: any, collection: any) {
+      onRemoved: (index: number, item: any, collection: any) => {
         console.log('Sweep removed from the collection', index, item, collection);
       },
-      onUpdated: function (index: number, item: any, collection: any) {
+      onUpdated: (index: number, item: any, collection: any) => {
         console.log('Sweep updated in place in the collection', index, item, collection);
       },
-      onCollectionUpdated: function (collection: any) {
+      onCollectionUpdated: (collection: any) => {
         // console.log('Sweep entire up-to-date collection', collection);
       }
     });
   }
 
   private getTourEvent() {
-    _sdk.on(_sdk.Tour.Event.STARTED, function () {
+    _sdk.on(_sdk.Tour.Event.STARTED, () => {
       console.log('Tour started');
     });
-    _sdk.on(_sdk.Tour.Event.STEPPED, function (index: any) {
+    _sdk.on(_sdk.Tour.Event.STEPPED, (index: any) => {
       console.log('Tour index:', index);
     });
-    _sdk.on(_sdk.Tour.Event.STOPPED, function () {
+    _sdk.on(_sdk.Tour.Event.STOPPED, () => {
       console.log('Tour stopped');
     });
-    _sdk.on(_sdk.Tour.Event.ENDED, function () {
+    _sdk.on(_sdk.Tour.Event.ENDED, () => {
       console.log('Tour ended');
     });
 
     //TODO: Find a way to test if Tour exits
     if (false) {
       _sdk.Tour.getData()
-        .then(function (tour: any) {
+        .then((tour: any) => {
           console.log('Tour has:', tour.length, 'stops');
           return _sdk.Tour.start(0);
         })
-        .then(function () {
+        .then(() => {
           // console 'Tour started'
           // console -> 'Tour index 0'
           return _sdk.Tour.next();
         })
-        .then(function () {
+        .then(() => {
           // console -> 'Tour index 1'
           return _sdk.Tour.step(3);
         })
-        .then(function () {
+        .then(() => {
           // console -> 'Tour index 3'
           return _sdk.Tour.prev();
         })
-        .then(function () {
+        .then(() => {
           // console -> 'Tour index 2'
           // console -> 'Tour stopped'
           return _sdk.Tour.stop();
@@ -296,7 +295,7 @@ class App {
     //https://matterport.github.io/showcase-sdk/docs/sdk/reference/current/modules/room.html
     //TODO: tere is no Room in _sdk. What's showcase
     // showcase.Room.data.subscribe({
-    // _sdk.Room.current.subscribe(function (room: any) {
+    // _sdk.Room.current.subscribe((room: any) => {
     //   if (room.id === '') {
     //     console.log('Not currently stationed at a room');
     //   } else {
@@ -308,7 +307,7 @@ class App {
     //   }
     // });
     // _sdk.Room.data.subscribe({
-    //   onCollectionUpdated: function (collection: any) {
+    //   onCollectionUpdated: (collection: any) => {
     //     console.log('Collection received. There are ', Object.keys(collection).length, 'rooms in the collection');
     //   }
     // });
@@ -333,8 +332,8 @@ class App {
           case 'e':
             console.log(`Camera.rotate`);
             _sdk.Camera.rotate(10, 0, { speed: 10 })
-              .then(function () {})
-              .catch(function (error: any) {});
+              .then(() => {})
+              .catch((error: any) => {});
             break;
 
           case 'q':
@@ -342,8 +341,8 @@ class App {
 
             // TODO: did not pan
             _sdk.Camera.pan({ x: 1, z: 1 })
-              .then(function () {})
-              .catch(function (error: any) {});
+              .then(() => {})
+              .catch((error: any) => {});
             break;
 
           case 't':
@@ -360,17 +359,17 @@ class App {
           case 'm':
             console.log(`Camera.lookAtScreenCoords`);
             _sdk.Camera.lookAtScreenCoords(500, 320)
-              .then(function () {})
-              .catch(function (error: any) {});
+              .then(() => {})
+              .catch((error: any) => {});
             break;
 
           case 'z':
             console.log(`Camera.zoomBy`);
 
-            _sdk.Camera.zoomBy(0.1).then(function (newZoom: any) {
+            _sdk.Camera.zoomBy(0.1).then((newZoom: any) => {
               console.log('Camera zoomed to', newZoom);
             });
-            // sdk.Camera.zoomTo(2.0).then(function (newZoom: any) { console.log('Camera zoomed to', newZoom); });
+            // sdk.Camera.zoomTo(2.0).then((newZoom: any) => { console.log('Camera zoomed to', newZoom); });
             break;
 
           default:
@@ -387,7 +386,7 @@ class App {
   }
 
   private getAppState() {
-    _sdk.App.state.subscribe(function (appState: any) {
+    _sdk.App.state.subscribe((appState: any) => {
       // app state has changed
       console.log('Application: ', appState.application);
       console.log('Loaded at: ', appState.phaseTimes[_sdk.App.Phase.LOADING]);
@@ -423,30 +422,30 @@ class App {
 
   private settings() {
     _sdk.Settings.update('labels', true)
-      .then(function (data: any) {
+      .then((data: any) => {
         console.log('Labels setting: ' + data);
       })
-      .catch(function (error: any) {});
+      .catch((error: any) => {});
 
     _sdk.Settings.get('labels')
-      .then(function (data: any) {
+      .then((data: any) => {
         console.log(`Labels setting: ${data}`);
       })
-      .catch(function (error: any) {});
+      .catch((error: any) => {});
 
     _sdk.Settings.update('param1', 'param 1')
-      .then(function (data: any) {
+      .then((data: any) => {
         console.log('Labels setting: ' + data);
       })
-      .catch(function (error: any) {});
+      .catch((error: any) => {});
 
     _sdk.Settings.get('param1')
-      .then(function (data: any) {
+      .then((data: any) => {
         console.log(`Labels setting: ${data}`);
       })
-      .catch(function (error: any) {});
+      .catch((error: any) => {});
 
-    // sdk.Pointer.intersection.subscribe(function (intersectionData: any) {
+    // sdk.Pointer.intersection.subscribe((intersectionData: any) => {
   }
 
   private getTag() {
@@ -468,7 +467,7 @@ class App {
     let currentSweep = '';
     _this = this;
 
-    _sdk.Camera.pose.subscribe(function (pose: any) {
+    _sdk.Camera.pose.subscribe((pose: any) => {
       // Changes to the Camera pose have occurred.
       _this._cameraPose = pose;
       if (pose.sweep != currentSweep && pose.sweep != undefined) {
@@ -481,23 +480,23 @@ class App {
   private getLabels(): void {
     _this = this;
     _sdk.Label.getData()
-      .then(function (labels: any) {
+      .then((labels: any) => {
         _this._labels = labels;
         console.log('Labels:');
         console.log(labels);
       })
-      .catch(function (error: any) {
+      .catch((error: any) => {
         console.error(error);
       });
   }
 
   private getMattertag(): void {
     _sdk.Mattertag.getData()
-      .then(function (mattertags: any) {
+      .then((mattertags: any) => {
         console.log('Mattertags:');
         console.log(mattertags);
       })
-      .catch(function (error: any) {
+      .catch((error: any) => {
         console.error(error);
       });
   }
@@ -505,11 +504,11 @@ class App {
   private getModelDetails(): void {
     _this = this;
     _sdk.Model.getDetails()
-      .then(function (modelDetails: any) {
+      .then((modelDetails: any) => {
         _this._modelDetails = modelDetails;
         console.log(modelDetails);
       })
-      .catch(function (error: any) {
+      .catch((error: any) => {
         console.error(error);
       });
   }
@@ -517,12 +516,12 @@ class App {
   private getTour(): void {
     _this = this;
     _sdk.Tour.getData()
-      .then(function (snapshots: any) {
+      .then((snapshots: any) => {
         _this._snapshots = snapshots;
         console.log('Tour snapshots:');
         console.log(snapshots);
       })
-      .catch(function (error: any) {
+      .catch((error: any) => {
         if (error == 'No tour data found') {
           console.info(error);
         } else {
@@ -532,13 +531,13 @@ class App {
   }
 
   private getZoom() {
-    _sdk.Camera.zoom.subscribe(function (zoom: any) {
+    _sdk.Camera.zoom.subscribe((zoom: any) => {
       console.log('Zoom: ', zoom.level);
     });
   }
 
   private getIntersection() {
-    _sdk.Pointer.intersection.subscribe(function (intersectionData: any) {
+    _sdk.Pointer.intersection.subscribe((intersectionData: any) => {
       console.log('Intersection position:', intersectionData.position);
       console.log('Intersection normal:', intersectionData.normal);
     });
@@ -557,26 +556,26 @@ class App {
       transition: transition,
       zoom
     })
-      .then(function (nextMode: any) {
+      .then((nextMode: any) => {
         console.log(`View mode: ${nextMode}`);
       })
-      .catch(function (error: any) {
+      .catch((error: any) => {
         console.error(error);
       });
   }
 
   private moveToSweep(sweepId: any, moveToOptions: any): void {
     _sdk.Sweep.moveTo(sweepId, moveToOptions)
-      .then(function (sweepId: any) {
+      .then((sweepId: any) => {
         console.log(`Arrived at sweep ${sweepId}`);
       })
-      .catch(function (error: any) {
+      .catch((error: any) => {
         console.error(error);
       });
   }
 
   private async scene() {
-    await _sdk.Scene.configure(function (renderer: THREE.WebGLRenderer, three: any, effectComposer: any) {
+    await _sdk.Scene.configure((renderer: THREE.WebGLRenderer, three: any, effectComposer: any) => {
       _renderer = renderer;
       _three = three;
 
@@ -652,10 +651,11 @@ class App {
     modelNode.start();
 
     setTimeout(() => {
-      const model = modelNode.obj3D.children[0].children[0];
+      const model = modelNode.obj3D.children[0].children[0]; // TODO: please explain in comment what .children[0].children[0] is and provide links to resources
       const mixer = new THREE.AnimationMixer(model);
       _this._animMixer = mixer;
-      const action = mixer.clipAction(model.animations[2]);
+      const animationWalk = model.animations[4]; // Walk
+      const action = mixer.clipAction(animationWalk);
       action.play();
 
       const animCtrlDiv = document.createElement('div');
@@ -668,15 +668,20 @@ class App {
       document.body.appendChild(animCtrlDiv);
 
       for (let i in model.animations) {
+        const animation = model.animations[i];
         const animButton = document.createElement('button');
         animButton.style.height = '40px';
         animButton.innerText = model.animations[i].name;
 
         animButton.addEventListener('click', (e) => {
+          // Stop all animations
           for (let k in model.animations) {
-            _this._animMixer.clipAction(model.animations[k]).stop();
+            const animation = model.animations[k];
+            _this._animMixer.clipAction(animation).stop();
           }
-          const action = _this._animMixer.clipAction(model.animations[i]);
+
+          // Start animation
+          const action = _this._animMixer.clipAction(animation);
           action.play();
         });
         animCtrlDiv.appendChild(animButton);
@@ -684,9 +689,11 @@ class App {
     }, 2000);
 
     // Animate it - https://matterport.github.io/showcase-sdk/sdkbundle_tutorials_models.html#animate-it
-    const tick = function () {
+    const tick = () => {
       requestAnimationFrame(tick);
-      if (_this._animMixer) _this._animMixer.update(_this._clock.getDelta());
+      if (_this._animMixer) {
+        _this._animMixer.update(_this._clock.getDelta());
+      }
     };
     tick();
   }
@@ -764,18 +771,18 @@ class App {
 
   private getMeasurements() {
     _sdk.Measurements.data.subscribe({
-      onAdded: function (index: any, item: any, collection: any) {
+      onAdded: (index: any, item: any, collection: any) => {
         console.log('item added to the collection', index, item, collection);
       },
-      onRemoved: function (index: any, item: any, collection: any) {
+      onRemoved: (index: any, item: any, collection: any) => {
         console.log('item removed from the collection', index, item, collection);
       },
-      onUpdated: function (index: any, item: any, collection: any) {
+      onUpdated: (index: any, item: any, collection: any) => {
         console.log('item updated in place in the collection', index, item, collection);
       }
     });
 
-    _sdk.Measurements.mode.subscribe(function (measurementModeState: any) {
+    _sdk.Measurements.mode.subscribe((measurementModeState: any) => {
       console.log('isActive? ', measurementModeState.active);
     });
 
