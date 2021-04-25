@@ -1,5 +1,5 @@
 // https://github.com/microsoft/typed-rest-client/tree/master/samples
-import * as http from "http"
+import * as http from 'http';
 import * as restm from 'typed-rest-client/RestClient';
 
 // using httpbin.org.
@@ -52,6 +52,6 @@ export function httpBinOptions(): restm.IRequestOptions {
   let options: restm.IRequestOptions = <restm.IRequestOptions>{};
   options.responseProcessor = (obj: any) => {
     return obj['data'];
-  }
+  };
   return options;
 }
