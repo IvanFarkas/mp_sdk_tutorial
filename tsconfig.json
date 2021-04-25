@@ -16,7 +16,12 @@
     ],
     "typeRoots": [
       "node_modules/@types"
-    ]
+    ],
+    "paths": {
+      "three/examples/jsm/libs/dat.gui.module": [
+        "../../node_modules/@types/dat.gui"
+      ]
+    },
   },
   "include": [
     "src/**/*.ts"

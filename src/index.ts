@@ -1,5 +1,10 @@
 import * as THREE from 'three';
 import * as restSamples from './rest';
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
+import Stats from 'three/examples/jsm/libs/stats.module';
+
+// TODO: Fix to work like in Threejs-TS/src/client/client.ts line 6 - https://github.com/IvanFarkas/Threejs-TS/blob/dbb8bc6edde359d612a2b051c9b51b6e5ad8eefa/src/client/client.ts#L6
+// import { GUI } from 'three/examples/jsm/libs/dat.gui.module'
 
 // Read from .env file
 const NodeEnv = process.env.NODE_ENV;
@@ -18,8 +23,10 @@ let _this: App;
 let _showcase: HTMLIFrameElement;
 let _window: Window;
 let _sdk: any;
+let _scene: any;
 let _renderer: THREE.WebGLRenderer;
 let _three: any;
+let _stats: Stats;
 
 class App {
   _hitCnt: any;
@@ -50,6 +57,19 @@ class App {
     _showcase.width = '100%';
     _showcase.height = '100%';
 
+    // const gui = new GUI();
+
+    // Stats
+    _stats = this.createStats(_showcase);
+
+    // TODO: does it make sense to use in MP Shocase?
+    // OrbitControls
+    // const camera: THREE.PerspectiveCamera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+    // const renderer: THREE.WebGLRenderer = new THREE.WebGLRenderer();
+    // renderer.setSize(window.innerWidth, window.innerHeight);
+    // document.body.appendChild(renderer.domElement);
+    // const controls = new OrbitControls(camera, renderer.domElement);
+
     this.loadShowcase();
   }
 
@@ -62,6 +82,7 @@ class App {
         // using the latest server-side SDK version in the .connect function - https://matterport.github.io/showcase-sdk/sdk_release_notes.html
         _sdk = await _window.MP_SDK.connect(_showcase, SdkKey, SdkVersion);
 
+        _this.navMesh();
         _this.getModelEvent();
         //_this.getCameraEvent();
         _this.getFloorEvent();
@@ -110,6 +131,118 @@ class App {
         return;
       }
     });
+  }
+
+  private createStats(iFarme: HTMLIFrameElement) {
+    const stats = Stats();
+
+    stats.setMode(0);
+    stats.domElement.style.position = 'absolute';
+    stats.domElement.style.left = '0';
+    stats.domElement.style.top = '0';
+
+    // TODO: Make stats work. The scene is in the iframe. How do I get iframe stats in main browser window or showcase window?
+    let showcaseDoc = iFarme.contentWindow.document;
+    let statsDiv = showcaseDoc.body.appendChild(stats.domElement);
+
+    return stats;
+  }
+
+  private async navMesh() {
+    _scene = await _sdk.Scene.query(['scene']);
+    console.log('scene:', _scene);
+    this.toggleWireframe(_scene, true);
+  }
+
+  private toggleWireframe(scene: any, wireframe: boolean) {
+    let children = scene[0].children;
+    for (let i = 0; i < children.length; i++) {
+      const child: any = children[i];
+      console.log(child.type, child.name, child);
+
+      let children2 = child.children;
+      for (let j = 0; j < children2.length; j++) {
+        this.logSceneObjects(children2[j]);
+
+        let children3 = children2[j].children;
+        for (let k = 0; k < children3.length; k++) {
+          this.logSceneObjects(children3[k]);
+        }
+      }
+    }
+
+    // if (wireframe == false) {
+    //   // TODO: Why are we getting Error: TypeError: model.traverse is not a function
+    //   scene.traverse((child) => {
+    //     let mesh: THREE.Mesh = (<THREE.Mesh>child).isMesh ? <THREE.Mesh>child : null;
+
+    //     if (mesh != null) {
+    //       // Setup our wireframe
+    //       const wireframeGeometry = new THREE.WireframeGeometry(mesh.geometry);
+    //       const wireframeMaterial = new THREE.LineBasicMaterial({ color: 0xffffff });
+    //       const wireframe = new THREE.LineSegments(wireframeGeometry, wireframeMaterial);
+
+    //       wireframe.name = 'wireframe';
+    //       child.add(wireframe);
+    //     }
+    //   });
+    //   wireframe = true;
+    // } else {
+    //   // scene.remove(scene.getObjectByName('wireframe'));
+    //   wireframe = false;
+    // }
+  }
+
+  private logSceneObjects(object: any) {
+    switch (object.type) {
+      case 'Object3D':
+        if (object.name.startsWith('FloorMesh:')) {
+          console.log('\t', object.name, object);
+        } else {
+          console.log('\t', object.type, object.name, object);
+        }
+        break;
+
+      case 'Mesh':
+        if (object.name.startsWith('RoomMesh:')) {
+          console.log('\t\t', object.name, object);
+          if (object.name == 'RoomMesh:0-4') {
+            let geometry: THREE.BufferGeometry = object.geometry;
+            console.log('\t\t', geometry.name, geometry);
+
+            // Add Wireframe
+            const wireframeGeometry = new THREE.WireframeGeometry(geometry);
+            const wireframeMaterial = new THREE.LineBasicMaterial({ color: 0xffffff });
+            const wireframe = new THREE.LineSegments(wireframeGeometry, wireframeMaterial);
+
+            wireframe.name = 'wireframe';
+            object.add(wireframe);
+          }
+        } else {
+          console.log('\t', object.type, object.name, object);
+        }
+        break;
+
+      case 'Group':
+        console.log('\t\t', object.type, object.name, object);
+        break;
+
+      case 'PerspectiveCamera':
+        console.log('PerspectiveCamera', object.type, object.name, object);
+        break;
+
+      case 'AmbientLight':
+        console.log('AmbientLight', object.type, object.name, object);
+        break;
+
+      case 'DirectionalLight':
+        console.log('DirectionalLight', object.type, object.name, object);
+        break;
+
+      default:
+        console.log('Unknown', object.type, object.name, object);
+        break;
+    }
   }
 
   private getModelEvent() {
@@ -640,7 +773,7 @@ class App {
 
       const animCtrlDiv = document.createElement('div');
       animCtrlDiv.style.position = 'absolute';
-      animCtrlDiv.style.top = '10px';
+      animCtrlDiv.style.top = '200px';
       animCtrlDiv.style.right = '10px';
       animCtrlDiv.style.zIndex = '999';
       animCtrlDiv.style.display = 'flex';
