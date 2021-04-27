@@ -614,7 +614,7 @@ class App {
 
   private async fbxModel() {
     await this.light();
-    _three = this.getThreeFromContext();
+    //_three = this.getThreeFromContext();
     _this = this;
     // Add component to the scene node - https://matterport.github.io/showcase-sdk/sdkbundle_tutorials_models.html#add-your-component-to-the-scene-node
     const modelNode = await _sdk.Scene.createNode();
@@ -656,9 +656,9 @@ class App {
     // set 'translate' mode to position the selection.
     myControl.inputs.mode = 'translate';
 
-    //console.log("begin object3d log");
-    //console.log(modelNode.obj3D);
-    //console.log("ends object3d log");
+    console.log("begin object3d log");
+    console.log(modelNode.obj3D);
+    console.log("ends object3d log");
     //var ex = new ExportText();
     modelNode.start();
     // Animate it - https://matterport.github.io/showcase-sdk/sdkbundle_tutorials_models.html#animate-it
@@ -679,9 +679,11 @@ class App {
     const tick = function () {
       requestAnimationFrame(tick);
       //quadcopter onTick actions
-      rotateHelipads();
-      quadcopterTranslation.ticker();
-      quadcopterRotation.ticker();
+      if(modelNode.obj3D != null){
+        rotateHelipads();
+        quadcopterTranslation.ticker();
+        quadcopterRotation.ticker();
+      }
     };
     tick();
   }
