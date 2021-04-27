@@ -659,12 +659,20 @@ class App {
     console.log("begin object3d log");
     console.log(modelNode.obj3D);
     console.log("ends object3d log");
+
     //var ex = new ExportText();
-    modelNode.start();
+    await modelNode.start();
+
     // Animate it - https://matterport.github.io/showcase-sdk/sdkbundle_tutorials_models.html#animate-it
-    const rotateHelipads = function () {
+   /* const onInit = function(){
+console.log("on init ···###########3.....");
+    }*/
+    const rotateHelipads = function () {      
       var rotationSpeed = 1.12;
-      //HelipadsBackRight
+      if(typeof modelNode.obj3D.children[0].children[0].children[1].children[4].children[0] === "object"){
+        /* It is undefined */
+ console.log("THE OBJECT GOT DEFINED ...")       
+        //HelipadsBackRight
       modelNode.obj3D.children[0].children[0].children[1].children[4].children[0].rotation.y += rotationSpeed;
       //HelipadsBackLeft
       modelNode.obj3D.children[0].children[0].children[1].children[4].children[1].rotation.y += rotationSpeed;
@@ -672,6 +680,7 @@ class App {
       modelNode.obj3D.children[0].children[0].children[1].children[6].children[0].rotation.y += rotationSpeed;
       //HelipadsFrontLeft
       modelNode.obj3D.children[0].children[0].children[1].children[6].children[1].rotation.y += rotationSpeed;
+      }
     };
     var quadcopterTranslation = new Boomerang(modelNode.obj3D);
     var quadcopterRotation = new HorizontalRotator(modelNode.obj3D);
