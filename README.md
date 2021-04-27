@@ -9,15 +9,19 @@ yarn install
 
 ## Download and extract the latest Bundle SDK
 ```shell
-curl https://static.matterport.com/showcase-sdk/bundle/3.1.35.16-9-g01b2a7b60/showcase-bundle.zip -o bundle.zip
+curl https://static.matterport.com/showcase-sdk/bundle/3.1.38.10-15-g5a5323ef0/showcase-bundle.zip -o bundle.zip
 unzip bundle.zip -d ./bundle
+rm bundle.zip
 ```
 
-## Set SDK key
-Replace [SdkKey] to the SDK Key in:
+## Set Configuration in .env file
+Replace `[SdkKey]` to the SDK Key
 
-- [index.html](https://github.com/IvanFarkas/mp_sdk_tutorial/blob/main/index.html)
-- [/src/index.ts](https://github.com/IvanFarkas/mp_sdk_tutorial/blob/main/src/index.ts)
+```
+MODEL_ID=22Ub5eknCVx
+SDK_KEY=[SdkKey]
+SDK_VERSION="3.10"
+```
 
 ## Useful Links
 
@@ -26,5 +30,3 @@ Replace [SdkKey] to the SDK Key in:
 - [Examples](https://matterport.github.io/showcase-sdk/sdkbundle_examples_summary.html)
 - [Reference](https://matterport.github.io/showcase-sdk/docs/sdkbundle/reference/current/index.html)
 - [Scene](https://matterport.github.io/showcase-sdk/docs/sdkbundle/reference/current/modules/scene.html)
-
-[![Screenshot ](https://raw.githubusercontent.com/IvanFarkas/mp_sdk_tutorial/master/Captura.PNG)]
