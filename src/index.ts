@@ -693,9 +693,9 @@ inputNode.start();
 var dc = new DroneControls(modelNode.obj3D);
 inputComponent.spyOnEvent(dc);
 
-console.log("begin object3d log");
+/*console.log("begin object3d log");
 console.log(modelNode.obj3D);
-console.log("ends object3d log");
+console.log("ends object3d log");*/
 
 var controlsNotEnabled = true;
     const tick = function () {
@@ -705,10 +705,11 @@ var controlsNotEnabled = true;
         rotateHelipads();
         quadcopterTranslation.ticker();
         quadcopterRotation.ticker();
-        /*if(controlsNotEnabled && typeof modelNode.obj3D != "undefined"){
+       /* if(controlsNotEnabled && typeof modelNode.obj3D != "undefined"){
           console.log("MODEL IS DEFINED");
-          inputComponent.spyOnEvent(new DroneControls(modelNode.obj3D));
-          console.log(inputComponent);
+         // inputComponent.spyOnEvent(new DroneControls(modelNode.obj3D));
+         dc.obj3D = modelNode.obj3D;
+          //console.log(inputComponent);
           controlsNotEnabled = false;
         }*/
       }

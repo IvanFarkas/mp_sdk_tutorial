@@ -16,16 +16,16 @@
  export default class DroneControls { 
     
     constructor(obj3D) { 
-      this.obj3D;
+      this.obj3D = obj3D;
       this.eventType = 'INTERACTION.KEY';
       this.downKey = 71;//g key
       this.upKey = 89;//ykey
       this.rightKey = 72;//h key
       this.leftKey = 70;//f key
-      this.sideSteps = 0.008;
-      this.elevetionsteps = 0.008;
-      this.minElevation = 0;
-      this.maxElevation = 1;
+      this.sideSteps = 0.018;
+      this.elevetionsteps = 0.018;
+      this.minElevation = -1.201;
+      this.maxElevation = 1.34;
     } 
 
     onEvent(evt) {
@@ -46,14 +46,16 @@
 
     increaseElevation(){
         console.log("####increasing elevation");
-        console.log(this.obj3D);
-        console.log(typeof this.obj3D);
-        this.obj3D.position.z += this.elevetionsteps;
-        console.log(this.obj3D.position.z);
+        if(this.obj3D.position.y < this.maxElevation){
+            this.obj3D.position.y += this.elevetionsteps;
+        }
     }
 
     decreaseElevation(){
-        console.log("decreasing elevation");
+        console.log("####decreasing elevation");
+        if(this.obj3D.position.y > this.minElevation){
+            this.obj3D.position.y -= this.elevetionsteps;
+        }
     }
 
     moveLeft(){
