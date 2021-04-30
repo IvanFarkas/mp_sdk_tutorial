@@ -657,19 +657,6 @@ class App {
     // set 'translate' mode to position the selection.
     myControl.inputs.mode = 'translate';
 
-    //Creates an input node for Drone Controls
-    const inputNode = await _sdk.Scene.createNode();
-    const inputComponent = inputNode.addComponent('mp.input', {
-      eventsEnabled: true,
-      userNavigationEnabled: false,
-    });
-    inputNode.start();
-    inputComponent.spyOnEvent(new DroneControls(modelNode.obj3D));
-    
-    /*console.log("begin object3d log");
-    console.log(modelNode.obj3D);
-    console.log("ends object3d log");*/
-
     //var ex = new ExportText();
    
 
@@ -679,7 +666,7 @@ console.log("on init ···###########3.....");
     }*/
     const rotateHelipads = function () {      
       var rotationSpeed = 1.12;
-      if(typeof modelNode.obj3D.children[0].children[0].children[1].children[4].children[0] === "object"){
+      if(typeof modelNode.obj3D != "undefined"){
         /* It is undefined */
  //console.log("THE OBJECT GOT DEFINED ...")       
         //HelipadsBackRight
@@ -696,6 +683,21 @@ console.log("on init ···###########3.....");
     var quadcopterTranslation = new Boomerang(modelNode.obj3D);
     var quadcopterRotation = new HorizontalRotator(modelNode.obj3D);
 
+//Creates an input node for Drone Controls
+const inputNode = await _sdk.Scene.createNode();
+const inputComponent = inputNode.addComponent('mp.input', {
+  eventsEnabled: true,
+  userNavigationEnabled: false,
+});
+inputNode.start();
+var dc = new DroneControls(modelNode.obj3D);
+inputComponent.spyOnEvent(dc);
+
+console.log("begin object3d log");
+console.log(modelNode.obj3D);
+console.log("ends object3d log");
+
+var controlsNotEnabled = true;
     const tick = function () {
       requestAnimationFrame(tick);
       //quadcopter onTick actions
@@ -703,6 +705,12 @@ console.log("on init ···###########3.....");
         rotateHelipads();
         quadcopterTranslation.ticker();
         quadcopterRotation.ticker();
+        /*if(controlsNotEnabled && typeof modelNode.obj3D != "undefined"){
+          console.log("MODEL IS DEFINED");
+          inputComponent.spyOnEvent(new DroneControls(modelNode.obj3D));
+          console.log(inputComponent);
+          controlsNotEnabled = false;
+        }*/
       }
     };
     tick();

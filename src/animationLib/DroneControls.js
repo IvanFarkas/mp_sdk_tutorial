@@ -29,7 +29,7 @@
     } 
 
     onEvent(evt) {
-        console.log('HERE!!!!!received', evt.key);
+        //console.log('HERE!!!!! key received', evt.key);
         if(evt.key == this.upKey){
             this.increaseElevation();
         }
@@ -45,7 +45,11 @@
     }
 
     increaseElevation(){
-        console.log("increasing elevation");
+        console.log("####increasing elevation");
+        console.log(this.obj3D);
+        console.log(typeof this.obj3D);
+        this.obj3D.position.z += this.elevetionsteps;
+        console.log(this.obj3D.position.z);
     }
 
     decreaseElevation(){
