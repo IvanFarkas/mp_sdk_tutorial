@@ -8,6 +8,7 @@ import { FBXLoader } from 'three/examples/jsm/loaders/FBXLoader';
 //import ExportText from "./animationLib/ExportText.js";
 import Boomerang from './animationLib/Boomerang.js';
 import HorizontalRotator from './animationLib/HorizontalRotator.js';
+import DroneControls from './animationLib/DroneControls.js';
 
 // declare this file is a module
 export {};
@@ -656,12 +657,21 @@ class App {
     // set 'translate' mode to position the selection.
     myControl.inputs.mode = 'translate';
 
-    console.log("begin object3d log");
+    //Creates an input node for Drone Controls
+    const inputNode = await _sdk.Scene.createNode();
+    const inputComponent = inputNode.addComponent('mp.input', {
+      eventsEnabled: true,
+      userNavigationEnabled: false,
+    });
+    inputNode.start();
+    inputComponent.spyOnEvent(new DroneControls(modelNode.obj3D));
+    
+    /*console.log("begin object3d log");
     console.log(modelNode.obj3D);
-    console.log("ends object3d log");
+    console.log("ends object3d log");*/
 
     //var ex = new ExportText();
-    await modelNode.start();
+   
 
     // Animate it - https://matterport.github.io/showcase-sdk/sdkbundle_tutorials_models.html#animate-it
    /* const onInit = function(){
@@ -671,7 +681,7 @@ console.log("on init ···###########3.....");
       var rotationSpeed = 1.12;
       if(typeof modelNode.obj3D.children[0].children[0].children[1].children[4].children[0] === "object"){
         /* It is undefined */
- console.log("THE OBJECT GOT DEFINED ...")       
+ //console.log("THE OBJECT GOT DEFINED ...")       
         //HelipadsBackRight
       modelNode.obj3D.children[0].children[0].children[1].children[4].children[0].rotation.y += rotationSpeed;
       //HelipadsBackLeft
@@ -682,6 +692,7 @@ console.log("on init ···###########3.....");
       modelNode.obj3D.children[0].children[0].children[1].children[6].children[1].rotation.y += rotationSpeed;
       }
     };
+    modelNode.start();
     var quadcopterTranslation = new Boomerang(modelNode.obj3D);
     var quadcopterRotation = new HorizontalRotator(modelNode.obj3D);
 
