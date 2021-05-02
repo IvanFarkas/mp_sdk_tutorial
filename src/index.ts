@@ -9,6 +9,7 @@ import { FBXLoader } from 'three/examples/jsm/loaders/FBXLoader';
 import Boomerang from './animationLib/Boomerang.js';
 import HorizontalRotator from './animationLib/HorizontalRotator.js';
 import DroneControls from './animationLib/DroneControls.js';
+import HelipadsRotator from './animationLib/HelipadsRotator.js';
 
 // declare this file is a module
 export {};
@@ -658,28 +659,11 @@ class App {
     myControl.inputs.mode = 'translate';
 
     //var ex = new ExportText();
-   
-
     // Animate it - https://matterport.github.io/showcase-sdk/sdkbundle_tutorials_models.html#animate-it
-  
-    const rotateHelipads = function () {      
-      var rotationSpeed = 1.12;
-      if(typeof modelNode.obj3D != "undefined"){
-        /* It is undefined */
- //console.log("THE OBJECT GOT DEFINED ...")       
-        //HelipadsBackRight
-      modelNode.obj3D.children[0].children[0].children[1].children[4].children[0].rotation.y += rotationSpeed;
-      //HelipadsBackLeft
-      modelNode.obj3D.children[0].children[0].children[1].children[4].children[1].rotation.y += rotationSpeed;
-      //HelipadsFrontRight
-      modelNode.obj3D.children[0].children[0].children[1].children[6].children[0].rotation.y += rotationSpeed;
-      //HelipadsFrontLeft
-      modelNode.obj3D.children[0].children[0].children[1].children[6].children[1].rotation.y += rotationSpeed;
-      }
-    };
     modelNode.start();
     var quadcopterTranslation = new Boomerang(modelNode.obj3D);
     var quadcopterRotation = new HorizontalRotator(modelNode.obj3D);
+    var heliPadsRotation = new HelipadsRotator(modelNode.obj3D);
 
 //Creates an input node for Drone Controls
 const inputNode = await _sdk.Scene.createNode();
@@ -700,9 +684,9 @@ console.log("ends object3d log");*/
       requestAnimationFrame(tick);
       //quadcopter onTick actions
       if(modelNode.obj3D != null){
-        rotateHelipads();
         quadcopterTranslation.ticker();
         quadcopterRotation.ticker();
+        heliPadsRotation.ticker();
       }
     };
     tick();
