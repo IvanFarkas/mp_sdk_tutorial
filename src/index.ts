@@ -661,9 +661,7 @@ class App {
    
 
     // Animate it - https://matterport.github.io/showcase-sdk/sdkbundle_tutorials_models.html#animate-it
-   /* const onInit = function(){
-console.log("on init ···###########3.....");
-    }*/
+  
     const rotateHelipads = function () {      
       var rotationSpeed = 1.12;
       if(typeof modelNode.obj3D != "undefined"){
@@ -697,7 +695,7 @@ inputComponent.spyOnEvent(dc);
 console.log(modelNode.obj3D);
 console.log("ends object3d log");*/
 
-var controlsNotEnabled = true;
+
     const tick = function () {
       requestAnimationFrame(tick);
       //quadcopter onTick actions
@@ -705,13 +703,6 @@ var controlsNotEnabled = true;
         rotateHelipads();
         quadcopterTranslation.ticker();
         quadcopterRotation.ticker();
-       /* if(controlsNotEnabled && typeof modelNode.obj3D != "undefined"){
-          console.log("MODEL IS DEFINED");
-         // inputComponent.spyOnEvent(new DroneControls(modelNode.obj3D));
-         dc.obj3D = modelNode.obj3D;
-          //console.log(inputComponent);
-          controlsNotEnabled = false;
-        }*/
       }
     };
     tick();
