@@ -28,7 +28,17 @@
       this.maxElevation = 1.34;
       this.maxX = 1.512;
       this.minX = -0.216;
+      this.Boomerang = null;
+      this.boomerangIsSetUp = false;
+      this.accelerateBoomerangKey =53;//key 5
+      this.deaccelerateBoomerangKey =52;//key 4
     } 
+
+    setBoomerang(boomerang){
+        console.log('HERE!! setting boomerang', typeof boomerang);
+        this.Boomerang = boomerang;
+        this.boomerangIsSetUp = true;
+    }
 
     onEvent(evt) {
         //console.log('HERE!!!!! key received', evt.key);
@@ -43,6 +53,14 @@
         }
         if(evt.key == this.rightKey){
             this.moveRight();
+        }
+        if(this.boomerangIsSetUp){
+            if(evt.key == this.accelerateBoomerangKey){
+                this.Boomerang.increaseSpeed();
+            }
+            if(evt.key == this.deaccelerateBoomerangKey){
+                this.Boomerang.decreaseSpeed();
+            }
         }
     }
 
