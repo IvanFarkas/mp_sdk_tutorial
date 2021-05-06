@@ -65,7 +65,7 @@ module.exports = {
     path: path.resolve(__dirname, "dist"),
   },
   devServer: {
-    //https: true
+    // https: true,
     port: 8000,
   },
   externals: ["tls", "net", "fs"],

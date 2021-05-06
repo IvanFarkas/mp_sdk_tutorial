@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import * as restSamples from './rest';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
+import { ColladaExporter } from 'three/examples/jsm/exporters/ColladaExporter';
 import Stats from 'three/examples/jsm/libs/stats.module';
 
 // TODO: Fix to work like in Threejs-TS/src/client/client.ts line 6 - https://github.com/IvanFarkas/Threejs-TS/blob/dbb8bc6edde359d612a2b051c9b51b6e5ad8eefa/src/client/client.ts#L6
@@ -19,32 +20,23 @@ declare global {
   }
 }
 
-let _this: App;
-let _showcase: HTMLIFrameElement;
-let _window: Window;
-let _sdk: any;
-let _scene: any;
-let _renderer: THREE.WebGLRenderer;
-let _three: any;
-let _stats: Stats;
-
 class App {
-  _hitCnt: any;
-  _floors: any;
-  _labels: any;
-  _model: any;
-  _snapshots: any;
-  _modelDetails: any;
-  _mattertag: any; // get a mattertag from the collection using: sdk.Mattertag.getData
-  _cameraPose: any; // get pose using: sdk.Camera.pose.subscribe
-  _animMixer: any;
-  _clock: any;
+  window: Window;
+  showcaseElement: HTMLIFrameElement;
+  sdk: any;
+  mpFloors: any;
+  mpLabels: any;
+  mpModel: any;
+  mpSnapshots: any;
+  mpModelDetails: any;
+  mpCameraPose: any; // get pose using: sdk.Camera.pose.subscribe
+  threeScene: any;
+  threeStats: any;
+  threeRenderer: THREE.WebGLRenderer;
+  threeClock: any;
+  threeAnimMixer: any;
 
   constructor() {
-    this.config();
-  }
-
-  private config(): void {
     // Print environment variables
     console.log('NodeEnv:', NodeEnv);
     console.log('ModelId:', ModelId);
@@ -52,15 +44,13 @@ class App {
     console.log('SdkVersion:', SdkVersion);
 
     // Set showcase IFrame attributes
-    _showcase = <HTMLIFrameElement>document.getElementById('showcase');
-    _showcase.src = `/bundle/showcase.html?m=${ModelId}&applicationKey=${SdkKey}&play=1&qs=1&log=0`;
-    _showcase.width = '100%';
-    _showcase.height = '100%';
+    this.showcaseElement = <HTMLIFrameElement>document.getElementById('showcase');
+    this.showcaseElement.src = `/bundle/showcase.html?m=${ModelId}&applicationKey=${SdkKey}&play=1&qs=1&log=0`;
+    this.showcaseElement.width = '100%';
+    this.showcaseElement.height = '100%';
 
-    // const gui = new GUI();
-
-    // Stats
-    _stats = this.createStats(_showcase);
+    this.threeStats = this.createStats(this.showcaseElement);
+    this.threeClock = new THREE.Clock();
 
     // TODO: does it make sense to use in MP Shocase?
     // OrbitControls
@@ -74,58 +64,51 @@ class App {
   }
 
   private async loadShowcase(this: App): Promise<void> {
-    _this = this;
-    _showcase.addEventListener('load', async () => {
+    this.showcaseElement.addEventListener('load', async () => {
       try {
-        _window = _showcase.contentWindow;
-
+        this.window = this.showcaseElement.contentWindow;
         // using the latest server-side SDK version in the .connect function - https://matterport.github.io/showcase-sdk/sdk_release_notes.html
-        _sdk = await _window.MP_SDK.connect(_showcase, SdkKey, SdkVersion);
+        this.sdk = await this.window.MP_SDK.connect(this.showcaseElement, SdkKey, SdkVersion);
+        console.log('SDK :', this.sdk);
 
-        _this.navMesh();
-        _this.getModelEvent();
-        //_this.getCameraEvent();
-        _this.getFloorEvent();
-        _this.getSweepEvent();
-        _this.getTourEvent();
-        _this.getSensorEvent();
-        _this.getRoomEvent();
+        await this.configScene();
 
-        const moveToOptions = {
-          rotation: { x: 0, y: 0 }, //x: 30, y: -45
-          transition: _sdk.Sweep.Transition.INSTANT,
-          transitionTime: 2000 // in milliseconds
-        };
+        this.navMesh();
+        this.getModelEvent();
+        //this.getCameraEvent();
+        this.getFloorEvent();
+        this.getSweepEvent();
+        this.getTourEvent();
+        this.getSensorEvent();
+        this.getRoomEvent();
 
-        console.log(_sdk);
+        this.keyPressListener();
+        this.getAppState();
+        this.getTag();
+        this.getPose();
+        this.settings();
+        this.getModelDetails();
+        this.getLabels();
+        this.getTour();
+        this.getMattertag();
+        this.getZoom();
+        this.getIntersection();
+        // this.moveMPCamera();
 
-        _this._clock = new THREE.Clock();
+        //Add additional 3D objects
+        this.addGLTFModel();
+        this.addFBXModel();
 
-        _this.keyPressListener();
-        _this.getAppState();
-        _this.getTag();
-        _this.getPose();
-        _this.settings();
-        _this.getModelDetails();
-        _this.getLabels();
-        _this.getTour();
-        _this.getMattertag();
-        _this.getZoom();
-        // _this.getIntersection();
-        // _this.moveTo();
-        // await _this.glTFModel();
+        //Add lights
+        this.addLights();
 
-        await _this.scene();
-        await _this.fbxModel();
-
-        _this
-          .restApiTest()
-          .then((model: any) => {
-            console.log('restApiTest');
-          })
-          .catch((error: any) => {
-            console.error(error);
-          });
+        // this.restApiTest()
+        //   .then((model: any) => {
+        //     console.log('restApiTest');
+        //   })
+        //   .catch((error: any) => {
+        //     console.error(error);
+        //   });
       } catch (e) {
         console.error(e);
         return;
@@ -135,7 +118,6 @@ class App {
 
   private createStats(iFarme: HTMLIFrameElement) {
     const stats = Stats();
-
     stats.setMode(0);
     stats.domElement.style.position = 'absolute';
     stats.domElement.style.left = '0';
@@ -149,16 +131,17 @@ class App {
   }
 
   private async navMesh() {
-    _scene = await _sdk.Scene.query(['scene']);
-    console.log('scene:', _scene);
-    this.toggleWireframe(_scene, true);
+    this.threeScene = await this.sdk.Scene.query(['scene']);
+    this.threeScene = this.threeScene[0];
+    console.log('Scene:', this.threeScene);
+
+    this.toggleWireframe(this.threeScene, true);
   }
 
   private toggleWireframe(scene: any, wireframe: boolean) {
-    let children = scene[0].children;
-    for (let i = 0; i < children.length; i++) {
-      const child: any = children[i];
-      console.log(child.type, child.name, child);
+    for (let i = 0; i < scene.children.length; i++) {
+      const child: any = scene.children[i];
+      // console.log(child.type, child.name, child);
 
       let children2 = child.children;
       for (let j = 0; j < children2.length; j++) {
@@ -246,11 +229,10 @@ class App {
   }
 
   private getModelEvent() {
-    _this = this;
-    _sdk.Model.getData()
+    this.sdk.Model.getData()
       .then((model: any) => {
-        _this._model = model;
-        console.log(model);
+        this.mpModel = model;
+        console.log('Model', model);
       })
       .catch((error: any) => {
         console.error(error);
@@ -263,10 +245,10 @@ class App {
     };
 
     // Start listening to the event.
-    _sdk.on(_sdk.Model.Event.MODEL_LOADED, callback);
+    this.sdk.on(this.sdk.Model.Event.MODEL_LOADED, callback);
 
     // Stop listening to the event.
-    //_sdk.off(_sdk.Model.Event.MODEL_LOADED, callback);
+    //this.sdk.off(this.sdk.Model.Event.MODEL_LOADED, callback);
   }
 
   private getCameraEvent() {
@@ -275,33 +257,32 @@ class App {
       console.log('Camera moved!');
     };
 
-    _sdk.on(_sdk.Camera.Event.MOVE, callback);
+    this.sdk.on(this.sdk.Camera.Event.MOVE, callback);
 
-    _sdk.Camera.pose.subscribe((pose: any) => {
+    this.sdk.Camera.pose.subscribe((pose: any) => {
       console.log('Camera', pose.position, pose.rotation, pose.sweep, pose.mode);
     });
   }
 
   private getFloorEvent() {
-    _this = this;
     const callback = (object: any) => {
       console.log(object);
       console.log('Floor event!');
     };
 
-    _sdk.on(_sdk.Floor.Event.CHANGE_START, callback);
-    _sdk.on(_sdk.Floor.Event.CHANGE_END, callback);
+    this.sdk.on(this.sdk.Floor.Event.CHANGE_START, callback);
+    this.sdk.on(this.sdk.Floor.Event.CHANGE_END, callback);
 
     //TODO: not getting Flooor data
-    // _sdk.Floor.data.subscribe({
+    // this.sdk.Floor.data.subscribe({
     //   onAdded: (collection: any) => {
     //     console.log('Collection received. There are ', Object.keys(collection).length, 'Floors in the collection');
     //   }
     // });
 
-    _sdk.Floor.getData()
+    this.sdk.Floor.getData()
       .then((floors: any) => {
-        _this._floors = floors;
+        this.mpFloors = floors;
         console.log('Floor:', floors.currentFloor);
         console.log('Total floos:', floors.totalFloors);
         console.log('Name of first floor:', floors.floorNames[0]);
@@ -310,7 +291,7 @@ class App {
         console.error('Floors data retrieval error.');
       });
 
-    _sdk.Floor.current.subscribe((floor: any) => {
+    this.sdk.Floor.current.subscribe((floor: any) => {
       if (floor.sequence === -1) {
         console.log('Viewing all floors');
       } else if (floor.sequence === undefined) {
@@ -325,13 +306,13 @@ class App {
 
         //TODO: BUG: floor.name is empty
         //console.log('Floor name:', floor.name)
-        console.log('Floor name:', _this._floors.floorNames[floor.sequence]);
+        console.log('Floor name:', this.mpFloors.floorNames[floor.sequence]);
       }
     });
   }
 
   private getSweepEvent() {
-    _sdk.Sweep.current.subscribe((sweep: any) => {
+    this.sdk.Sweep.current.subscribe((sweep: any) => {
       if (sweep.sid === '') {
         console.log('Not currently stationed at a sweep position');
       } else {
@@ -341,7 +322,7 @@ class App {
       }
     });
 
-    _sdk.Sweep.data.subscribe({
+    this.sdk.Sweep.data.subscribe({
       onAdded: (index: number, item: any, collection: any) => {
         // console.log('Sweep added to the collection', index, item, collection);
       },
@@ -358,43 +339,43 @@ class App {
   }
 
   private getTourEvent() {
-    _sdk.on(_sdk.Tour.Event.STARTED, () => {
+    this.sdk.on(this.sdk.Tour.Event.STARTED, () => {
       console.log('Tour started');
     });
-    _sdk.on(_sdk.Tour.Event.STEPPED, (index: any) => {
+    this.sdk.on(this.sdk.Tour.Event.STEPPED, (index: any) => {
       console.log('Tour index:', index);
     });
-    _sdk.on(_sdk.Tour.Event.STOPPED, () => {
+    this.sdk.on(this.sdk.Tour.Event.STOPPED, () => {
       console.log('Tour stopped');
     });
-    _sdk.on(_sdk.Tour.Event.ENDED, () => {
+    this.sdk.on(this.sdk.Tour.Event.ENDED, () => {
       console.log('Tour ended');
     });
 
     //TODO: Find a way to test if Tour exits
     if (false) {
-      _sdk.Tour.getData()
+      this.sdk.Tour.getData()
         .then((tour: any) => {
           console.log('Tour has:', tour.length, 'stops');
-          return _sdk.Tour.start(0);
+          return this.sdk.Tour.start(0);
         })
         .then(() => {
           // console 'Tour started'
           // console -> 'Tour index 0'
-          return _sdk.Tour.next();
+          return this.sdk.Tour.next();
         })
         .then(() => {
           // console -> 'Tour index 1'
-          return _sdk.Tour.step(3);
+          return this.sdk.Tour.step(3);
         })
         .then(() => {
           // console -> 'Tour index 3'
-          return _sdk.Tour.prev();
+          return this.sdk.Tour.prev();
         })
         .then(() => {
           // console -> 'Tour index 2'
           // console -> 'Tour stopped'
-          return _sdk.Tour.stop();
+          return this.sdk.Tour.stop();
         });
     }
   }
@@ -406,9 +387,9 @@ class App {
 
   private getRoomEvent() {
     //https://matterport.github.io/showcase-sdk/docs/sdk/reference/current/modules/room.html
-    //TODO: tere is no Room in _sdk. What's showcase
+    //TODO: tere is no Room in this.sdk. What's showcase
     // showcase.Room.data.subscribe({
-    // _sdk.Room.current.subscribe((room: any) => {
+    // this.sdk.Room.current.subscribe((room: any) => {
     //   if (room.id === '') {
     //     console.log('Not currently stationed at a room');
     //   } else {
@@ -419,7 +400,7 @@ class App {
     //     console.log('Room on floor', room.floorInfo);
     //   }
     // });
-    // _sdk.Room.data.subscribe({
+    // this.sdk.Room.data.subscribe({
     //   onCollectionUpdated: (collection: any) => {
     //     console.log('Collection received. There are ', Object.keys(collection).length, 'rooms in the collection');
     //   }
@@ -427,8 +408,7 @@ class App {
   }
 
   private keyPressListener(): void {
-    _this = this;
-    _window.addEventListener('keydown', (e: any) => {
+    this.window.addEventListener('keydown', (e: any) => {
       var keyStr = ['Control', 'Shift', 'Alt', 'Meta'].includes(e.key) ? '' : e.key + ' ';
       var reportStr = 'The ' + (e.ctrlKey ? 'Control ' : '') + (e.shiftKey ? 'Shift ' : '') + (e.altKey ? 'Alt ' : '') + (e.metaKey ? 'Meta ' : '') + keyStr + 'key was pressed.';
       console.log(reportStr);
@@ -436,15 +416,13 @@ class App {
       //--- Was a Ctrl-Alt-E combo pressed?
       if (e.ctrlKey && e.altKey && e.key === 'e') {
         // case sensitive
-        _this._hitCnt = (_this._hitCnt || 0) + 1;
-        console.log(`cnt: ${_this._hitCnt}`);
       }
 
       if (!e.repeat) {
         switch (e.key) {
           case 'e':
             console.log(`Camera.rotate`);
-            _sdk.Camera.rotate(10, 0, { speed: 10 })
+            this.sdk.Camera.rotate(10, 0, { speed: 10 })
               .then(() => {})
               .catch((error: any) => {});
             break;
@@ -453,16 +431,16 @@ class App {
             console.log(`Camera.pan`);
 
             // TODO: did not pan
-            _sdk.Camera.pan({ x: 1, z: 1 })
+            this.sdk.Camera.pan({ x: 1, z: 1 })
               .then(() => {})
               .catch((error: any) => {});
             break;
 
           case 't':
-            var sweepId = _this._model.sweeps[1].uuid;
+            var sweepId = this.mpModel.sweeps[1].uuid;
             var moveToOptions = {
               rotation: { x: 0, y: 0 }, //x: 30, y: -45
-              transition: _sdk.Sweep.Transition.INSTANT,
+              transition: this.sdk.Sweep.Transition.INSTANT,
               transitionTime: 2000 // in milliseconds
             };
 
@@ -471,7 +449,7 @@ class App {
 
           case 'm':
             console.log(`Camera.lookAtScreenCoords`);
-            _sdk.Camera.lookAtScreenCoords(500, 320)
+            this.sdk.Camera.lookAtScreenCoords(500, 320)
               .then(() => {})
               .catch((error: any) => {});
             break;
@@ -479,7 +457,7 @@ class App {
           case 'z':
             console.log(`Camera.zoomBy`);
 
-            _sdk.Camera.zoomBy(0.1).then((newZoom: any) => {
+            this.sdk.Camera.zoomBy(0.1).then((newZoom: any) => {
               console.log('Camera zoomed to', newZoom);
             });
             // sdk.Camera.zoomTo(2.0).then((newZoom: any) => { console.log('Camera zoomed to', newZoom); });
@@ -499,34 +477,34 @@ class App {
   }
 
   private getAppState() {
-    _sdk.App.state.subscribe((appState: any) => {
+    this.sdk.App.state.subscribe((appState: any) => {
       // app state has changed
       console.log('Application: ', appState.application);
-      console.log('Loaded at: ', appState.phaseTimes[_sdk.App.Phase.LOADING]);
-      console.log('Started at: ', appState.phaseTimes[_sdk.App.Phase.STARTING]);
+      console.log('Loaded at: ', appState.phaseTimes[this.sdk.App.Phase.LOADING]);
+      console.log('Started at: ', appState.phaseTimes[this.sdk.App.Phase.STARTING]);
 
       switch (appState.phase) {
-        case _sdk.App.Phase.LOADING:
+        case this.sdk.App.Phase.LOADING:
           console.log('Phase: ', appState.phase);
           break;
 
-        case _sdk.App.Phase.STARTING:
+        case this.sdk.App.Phase.STARTING:
           console.log('Phase: ', appState.phase);
           break;
 
-        case _sdk.App.Phase.PLAYING:
+        case this.sdk.App.Phase.PLAYING:
           console.log('Phase: ', appState.phase);
           break;
 
-        case _sdk.App.Phase.UNINITIALIZED:
+        case this.sdk.App.Phase.UNINITIALIZED:
           console.log('Phase: ', appState.phase);
           break;
 
-        case _sdk.App.Phase.WAITING:
+        case this.sdk.App.Phase.WAITING:
           console.log('Phase: ', appState.phase);
           break;
 
-        case _sdk.App.Phase.ERROR:
+        case this.sdk.App.Phase.ERROR:
           console.log('Phase: ', appState.phase);
           break;
       }
@@ -534,25 +512,25 @@ class App {
   }
 
   private settings() {
-    _sdk.Settings.update('labels', true)
+    this.sdk.Settings.update('labels', true)
       .then((data: any) => {
         console.log('Labels setting: ' + data);
       })
       .catch((error: any) => {});
 
-    _sdk.Settings.get('labels')
+    this.sdk.Settings.get('labels')
       .then((data: any) => {
         console.log(`Labels setting: ${data}`);
       })
       .catch((error: any) => {});
 
-    _sdk.Settings.update('param1', 'param 1')
+    this.sdk.Settings.update('param1', 'param 1')
       .then((data: any) => {
         console.log('Labels setting: ' + data);
       })
       .catch((error: any) => {});
 
-    _sdk.Settings.get('param1')
+    this.sdk.Settings.get('param1')
       .then((data: any) => {
         console.log(`Labels setting: ${data}`);
       })
@@ -562,7 +540,7 @@ class App {
   }
 
   private getTag() {
-    _sdk.Mattertag.add([
+    this.sdk.Mattertag.add([
       {
         label: 'tag01',
         description: 'Tag 01',
@@ -578,23 +556,21 @@ class App {
 
   private getPose() {
     let currentSweep = '';
-    _this = this;
 
-    _sdk.Camera.pose.subscribe((pose: any) => {
+    this.sdk.Camera.pose.subscribe((pose: any) => {
       // Changes to the Camera pose have occurred.
-      _this._cameraPose = pose;
+      this.mpCameraPose = pose;
       if (pose.sweep != currentSweep && pose.sweep != undefined) {
-        console.log(pose);
+        console.log('Pose :', pose);
       }
       currentSweep = pose.sweep;
     });
   }
 
   private getLabels(): void {
-    _this = this;
-    _sdk.Label.getData()
+    this.sdk.Label.getData()
       .then((labels: any) => {
-        _this._labels = labels;
+        this.mpLabels = labels;
         console.log('Labels:');
         console.log(labels);
       })
@@ -604,7 +580,7 @@ class App {
   }
 
   private getMattertag(): void {
-    _sdk.Mattertag.getData()
+    this.sdk.Mattertag.getData()
       .then((mattertags: any) => {
         console.log('Mattertags:');
         console.log(mattertags);
@@ -615,11 +591,10 @@ class App {
   }
 
   private getModelDetails(): void {
-    _this = this;
-    _sdk.Model.getDetails()
+    this.sdk.Model.getDetails()
       .then((modelDetails: any) => {
-        _this._modelDetails = modelDetails;
-        console.log(modelDetails);
+        this.mpModelDetails = modelDetails;
+        console.log('ModelDetails:', modelDetails);
       })
       .catch((error: any) => {
         console.error(error);
@@ -627,12 +602,10 @@ class App {
   }
 
   private getTour(): void {
-    _this = this;
-    _sdk.Tour.getData()
+    this.sdk.Tour.getData()
       .then((snapshots: any) => {
-        _this._snapshots = snapshots;
-        console.log('Tour snapshots:');
-        console.log(snapshots);
+        this.mpSnapshots = snapshots;
+        console.log('Tour snapshots:', snapshots);
       })
       .catch((error: any) => {
         if (error == 'No tour data found') {
@@ -644,26 +617,26 @@ class App {
   }
 
   private getZoom() {
-    _sdk.Camera.zoom.subscribe((zoom: any) => {
+    this.sdk.Camera.zoom.subscribe((zoom: any) => {
       console.log('Zoom: ', zoom.level);
     });
   }
 
   private getIntersection() {
-    _sdk.Pointer.intersection.subscribe((intersectionData: any) => {
+    this.sdk.Pointer.intersection.subscribe((intersectionData: any) => {
       console.log('Intersection position:', intersectionData.position);
       console.log('Intersection normal:', intersectionData.normal);
     });
   }
 
-  private moveTo(): void {
-    const mode = _sdk.Mode.Mode.FLOORPLAN;
+  private moveMPCamera(): void {
+    const mode = this.sdk.Mode.Mode.FLOORPLAN;
     const position = { x: 0, y: 0, z: 0 };
     const rotation = { x: -90, y: 0 };
-    const transition = _sdk.Mode.TransitionType.FLY;
+    const transition = this.sdk.Mode.TransitionType.FLY;
     const zoom = 5;
 
-    _sdk.Mode.moveTo(mode, {
+    this.sdk.Mode.moveMPCamera(mode, {
       position: position,
       rotation: rotation,
       transition: transition,
@@ -678,7 +651,7 @@ class App {
   }
 
   private moveToSweep(sweepId: any, moveToOptions: any): void {
-    _sdk.Sweep.moveTo(sweepId, moveToOptions)
+    this.sdk.Sweep.moveMPCamera(sweepId, moveToOptions)
       .then((sweepId: any) => {
         console.log(`Arrived at sweep ${sweepId}`);
       })
@@ -687,10 +660,9 @@ class App {
       });
   }
 
-  private async scene() {
-    await _sdk.Scene.configure((renderer: THREE.WebGLRenderer, three: any, effectComposer: any) => {
-      _renderer = renderer;
-      _three = three;
+  private async configScene() {
+    await this.sdk.Scene.configure((renderer: THREE.WebGLRenderer, three: any, effectComposer: any) => {
+      this.threeRenderer = renderer;
 
       // configure PBR
       renderer.physicallyCorrectLights = true;
@@ -706,48 +678,67 @@ class App {
     });
   }
 
-  private async light() {
+  private async addLights() {
     // Setup your scene - https://matterport.github.io/showcase-sdk/sdkbundle_tutorials_models.html#setup-your-scene
-    const lights = await _sdk.Scene.createNode();
-    // var initial = {
-    //   enabled: true,
-    //   color: { r: 0.2, g: 0.2, b: 0.2 },
-    //   intensity: 0.8,
-    // };
-    // var initial = {
-    //   enabled: false,
-    //   debug: false,
-    //   intensity: 0.8,
-    //   color: { r: 0, g: 1, b: 0 },
-    //   position: { x: 0, y: 1, z: 0 },
-    //   target: { x: 0, y: 0, z: 0 },
-    // };
+    const lights = await this.sdk.Scene.createNode();
+    {
+      const initial = {
+        enabled: true,
+        color: { r: 0.85, g: 0.9, b: 0.97 },
+        intensity: 1.5
+      };
+      lights.addComponent('mp.ambientLight', initial);
+    }
+    {
+      const initial = {
+        enabled: true,
+        debug: false,
+        intensity: 2,
+        color: { r: 1, g: 1, b: 1 },
+        position: { x: -0.2, y: 1, z: -0.1 },
+        target: { x: 0, y: 0, z: 0 }
+      };
+      lights.addComponent('mp.directionalLight', initial);
+    }
 
-    // node.addComponent('mp.ambientLight', initial);
-    // node.addComponent('mp.directionalLight', initial);
-    lights.addComponent('mp.lights');
+    // {
+    //   lights.addComponent('mp.lights');
+    // }
+
     lights.start();
   }
 
-  private async fbxModel() {
-    await this.light();
+  private async addTransformControlToNode(iNode: any) {
+    // Transform Control
+    // https://matterport.github.io/showcase-sdk/sdkbundle_components_transformcontrols.html
+    const node = await this.sdk.Scene.createNode();
+    const myControl = node.addComponent('mp.transformControls');
+    node.start();
 
+    // Make the transform control visible so that the user can manipulate the control selection.
+    myControl.inputs.visible = true;
+    // Attach the model to the transform control
+    myControl.inputs.selection = iNode;
+    // set 'translate' mode to position the selection.
+    myControl.inputs.mode = 'translate';
+  }
+
+  private async addFBXModel() {
     // Add component to the scene node - https://matterport.github.io/showcase-sdk/sdkbundle_tutorials_models.html#add-your-component-to-the-scene-node
-    const modelNode = await _sdk.Scene.createNode();
-    //const url = 'https://gitcdn.link/repo/mrdoob/three.js/dev/examples/models/fbx/stanford-bunny.fbx';
-    //const url = 'http://localhost:8000/assets/models/parrot_bebop_droneB.fbx';
+    const modelNode = await this.sdk.Scene.createNode();
+    this.addTransformControlToNode(modelNode);
+
     const url = 'http://localhost:8000/assets/models/tester.fbx';
-    //const url = 'http://localhost:8000/assets/models/parrot_bebop_droneAnimated6.fbx';
     const initial = {
       url: url,
       visible: true,
-      localPosition: { x: 0, y: -1.72, z: 0 },
+      localPosition: { x: 0, y: 0, z: 0 },
       localRotation: { x: 0, y: -90, z: 0 }
       // localScale: { x: 1, y: 1, z: 1 },
     };
 
     // Store the fbx component since we will need to adjust it in the next step.
-    const component = modelNode.addComponent(_sdk.Scene.Component.FBX_LOADER, initial);
+    const component = modelNode.addComponent(this.sdk.Scene.Component.FBX_LOADER, initial);
 
     // Scale model - https://matterport.github.io/showcase-sdk/sdkbundle_tutorials_models.html#scale-your-model
     // component.inputs.localScale = { x: 0.00002, y: 0.00002, z: 0.00002 };
@@ -761,12 +752,13 @@ class App {
     // Scene Nodes - https://matterport.github.io/showcase-sdk/sdkbundle_architecture.html#scene-nodes
     // modelNode.obj3D.children[0].animations[0].play()
 
+    modelNode.position.set(0, -1.72, 0);
     modelNode.start();
 
     setTimeout(() => {
       const model = modelNode.obj3D.children[0].children[0]; // TODO: please explain in comment what .children[0].children[0] is and provide links to resources
       const mixer = new THREE.AnimationMixer(model);
-      _this._animMixer = mixer;
+      this.threeAnimMixer = mixer;
       const animationWalk = model.animations[4]; // Walk
       const action = mixer.clipAction(animationWalk);
       action.play();
@@ -790,11 +782,11 @@ class App {
           // Stop all animations
           for (let k in model.animations) {
             const animation = model.animations[k];
-            _this._animMixer.clipAction(animation).stop();
+            this.threeAnimMixer.clipAction(animation).stop();
           }
 
           // Start animation
-          const action = _this._animMixer.clipAction(animation);
+          const action = this.threeAnimMixer.clipAction(animation);
           action.play();
         });
         animCtrlDiv.appendChild(animButton);
@@ -804,86 +796,32 @@ class App {
     // Animate it - https://matterport.github.io/showcase-sdk/sdkbundle_tutorials_models.html#animate-it
     const tick = () => {
       requestAnimationFrame(tick);
-      if (_this._animMixer) {
-        _this._animMixer.update(_this._clock.getDelta());
+      if (this.threeAnimMixer) {
+        this.threeAnimMixer.update(this.threeClock.getDelta());
       }
     };
     tick();
   }
 
-  // TODO: Error: TransformControls: The attached 3D object must be a part of the scene graph.
-  private async transform() {
-    this.light();
-
-    const url = 'https://github.com/CesiumGS/cesium/blob/master/Apps/SampleData/models/CesiumDrone/CesiumDrone.glb?raw=true'; //https://github.com/CesiumGS/cesium/blob/master/Apps/SampleData/models/CesiumMan/Cesium_Man.glb?raw=true
-    const initial = {
-      url: url,
-      visible: true,
-      localPosition: { x: -0.3, y: -1, z: 0.3 },
-      localRotation: { x: 0, y: 0, z: 0 },
-      localScale: { x: 0.2, y: 0.2, z: 0.2 }
-    };
-
-    // Create a scene node with a model component.
-    // This node's transform will be changed by the transform control.
-    const modelNode = await _sdk.Scene.createNode();
-    const component = modelNode.addComponent(_sdk.Scene.Component.GLTF_LOADER, initial);
-    modelNode.start();
-
-    // // Create a scene node with a transform control component.
-    // const node = await sdk.Scene.createNode();
-    // const myControl = node.addComponent(sdk.Scene.Component.TRANSFORM_CONTROLS);
-    // node.start();
-
-    // // Make the transform control visible so that the user can manipulate the control selection.
-    // myControl.inputs.visible = true;
-
-    // // Attach the model to the transform control
-    // myControl.inputs.selection = modelNode;
-
-    // // set 'translate' mode to position the selection.
-    // myControl.inputs.mode = 'translate';
-  }
-
-  private async glTFModel() {
-    this.light();
-
+  private async addGLTFModel() {
     // Model
-    const modelNode = await _sdk.Scene.createNode();
-    // const url = "https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/2CylinderEngine/glTF-Draco/2CylinderEngine.gltf";
-    const url = 'http://localhost:8000/assets/models/tester.gltf';
+    const node = await this.sdk.Scene.createNode();
+    this.addTransformControlToNode(node);
 
     const initial = {
-      url: url,
+      url: 'http://localhost:8000/assets/models/SheenChair.glb',
       visible: true,
       // localScale: { x: 5, y: 5, z: 5 },
-      localPosition: { x: 0.1, y: 0, z: 0 }
+      localPosition: { x: 0, y: 0, z: 0 }
       // localRotation: { x: 0, y: -130, z: 0 },
     };
-
-    const component = modelNode.addComponent(_sdk.Scene.Component.GLTF_LOADER, initial);
-
-    // Transform Control
-    // Create a scene node with a transform control component.
-    const node = await _sdk.Scene.createNode();
+    const component = node.addComponent(this.sdk.Scene.Component.GLTF_LOADER, initial);
+    node.position.set(1, -1.5, 0.7);
     node.start();
-
-    // const myControl = node.addComponent(
-    //   _sdk.Scene.Component.TRANSFORM_CONTROLS
-    // );
-
-    // // Make the transform control visible so that the user can manipulate the control selection.
-    // myControl.inputs.visible = true;
-
-    // // Attach the model to the transform control
-    // myControl.inputs.selection = modelNode;
-
-    // // set 'translate' mode to position the selection.
-    // myControl.inputs.mode = "translate";
   }
 
   private getMeasurements() {
-    _sdk.Measurements.data.subscribe({
+    this.sdk.Measurements.data.subscribe({
       onAdded: (index: any, item: any, collection: any) => {
         console.log('item added to the collection', index, item, collection);
       },
@@ -895,7 +833,7 @@ class App {
       }
     });
 
-    _sdk.Measurements.mode.subscribe((measurementModeState: any) => {
+    this.sdk.Measurements.mode.subscribe((measurementModeState: any) => {
       console.log('isActive? ', measurementModeState.active);
     });
 
