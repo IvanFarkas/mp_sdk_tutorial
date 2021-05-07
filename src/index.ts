@@ -1,8 +1,8 @@
 import * as THREE from 'three';
 import * as restSamples from './rest';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
-import { ColladaExporter } from 'three/examples/jsm/exporters/ColladaExporter';
 import Stats from 'three/examples/jsm/libs/stats.module';
+import { exportScene } from './core/Exporter';
 
 // TODO: Fix to work like in Threejs-TS/src/client/client.ts line 6 - https://github.com/IvanFarkas/Threejs-TS/blob/dbb8bc6edde359d612a2b051c9b51b6e5ad8eefa/src/client/client.ts#L6
 // import { GUI } from 'three/examples/jsm/libs/dat.gui.module'
@@ -30,7 +30,7 @@ class App {
   mpSnapshots: any;
   mpModelDetails: any;
   mpCameraPose: any; // get pose using: sdk.Camera.pose.subscribe
-  threeScene: any;
+  threeScene: THREE.Scene;
   threeStats: any;
   threeRenderer: THREE.WebGLRenderer;
   threeClock: any;
@@ -73,7 +73,6 @@ class App {
 
         await this.configScene();
 
-        this.navMesh();
         this.getModelEvent();
         //this.getCameraEvent();
         this.getFloorEvent();
@@ -96,11 +95,13 @@ class App {
         // this.moveMPCamera();
 
         //Add additional 3D objects
-        this.addGLTFModel();
-        this.addFBXModel();
+        // this.addGLTFModel();
+        // this.addFBXModel();
 
         //Add lights
         this.addLights();
+
+        this.navMesh();
 
         // this.restApiTest()
         //   .then((model: any) => {
@@ -131,11 +132,12 @@ class App {
   }
 
   private async navMesh() {
-    this.threeScene = await this.sdk.Scene.query(['scene']);
-    this.threeScene = this.threeScene[0];
-    console.log('Scene:', this.threeScene);
+    const scenes = await this.sdk.Scene.query(['scene']);
+    this.threeScene = scenes[0];
 
-    this.toggleWireframe(this.threeScene, true);
+    // this.toggleWireframe(this.threeScene, true);
+
+    exportScene(this.threeScene);
   }
 
   private toggleWireframe(scene: any, wireframe: boolean) {
@@ -180,18 +182,18 @@ class App {
     switch (object.type) {
       case 'Object3D':
         if (object.name.startsWith('FloorMesh:')) {
-          console.log('\t', object.name, object);
+          // console.log('\t', object.name, object);
         } else {
-          console.log('\t', object.type, object.name, object);
+          // console.log('\t', object.type, object.name, object);
         }
         break;
 
       case 'Mesh':
         if (object.name.startsWith('RoomMesh:')) {
-          console.log('\t\t', object.name, object);
+          // console.log('\t\t', object.name, object);
           if (object.name == 'RoomMesh:0-4') {
             let geometry: THREE.BufferGeometry = object.geometry;
-            console.log('\t\t', geometry.name, geometry);
+            // console.log('\t\t', geometry.name, geometry);
 
             // Add Wireframe
             const wireframeGeometry = new THREE.WireframeGeometry(geometry);
@@ -202,28 +204,28 @@ class App {
             object.add(wireframe);
           }
         } else {
-          console.log('\t', object.type, object.name, object);
+          // console.log('\t', object.type, object.name, object);
         }
         break;
 
       case 'Group':
-        console.log('\t\t', object.type, object.name, object);
+        // console.log('\t\t', object.type, object.name, object);
         break;
 
       case 'PerspectiveCamera':
-        console.log('PerspectiveCamera', object.type, object.name, object);
+        // console.log('PerspectiveCamera', object.type, object.name, object);
         break;
 
       case 'AmbientLight':
-        console.log('AmbientLight', object.type, object.name, object);
+        // console.log('AmbientLight', object.type, object.name, object);
         break;
 
       case 'DirectionalLight':
-        console.log('DirectionalLight', object.type, object.name, object);
+        // console.log('DirectionalLight', object.type, object.name, object);
         break;
 
       default:
-        console.log('Unknown', object.type, object.name, object);
+        // console.log('Unknown', object.type, object.name, object);
         break;
     }
   }
@@ -624,8 +626,8 @@ class App {
 
   private getIntersection() {
     this.sdk.Pointer.intersection.subscribe((intersectionData: any) => {
-      console.log('Intersection position:', intersectionData.position);
-      console.log('Intersection normal:', intersectionData.normal);
+      // console.log('Intersection position:', intersectionData.position);
+      // console.log('Intersection normal:', intersectionData.normal);
     });
   }
 
