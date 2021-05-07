@@ -96,12 +96,14 @@ class App {
 
         //Add additional 3D objects
         // this.addGLTFModel();
-        // this.addFBXModel();
+        this.addFBXModel();
+
+        this.addNavMesh();
 
         //Add lights
         this.addLights();
 
-        this.navMesh();
+        // this.navMesh();
 
         // this.restApiTest()
         //   .then((model: any) => {
@@ -819,6 +821,21 @@ class App {
     };
     const component = node.addComponent(this.sdk.Scene.Component.GLTF_LOADER, initial);
     node.position.set(1, -1.5, 0.7);
+    node.start();
+  }
+
+  private async addNavMesh() {
+    // Model
+    const node = await this.sdk.Scene.createNode();
+
+    const initial = {
+      url: 'http://localhost:8000/assets/models/navMeshes/navMesh.glb',
+      visible: true,
+      // localScale: { x: 5, y: 5, z: 5 },
+      localPosition: { x: 0, y: 0, z: 0 }
+      // localRotation: { x: 0, y: -130, z: 0 },
+    };
+    const component = node.addComponent(this.sdk.Scene.Component.GLTF_LOADER, initial);
     node.start();
   }
 
