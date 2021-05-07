@@ -630,43 +630,43 @@ class App {
 
     modelNode.start();
 
-    setTimeout(() => {
-      const model = modelNode.obj3D.children[0].children[0]; // TODO: please explain in comment what .children[0].children[0] is and provide links to resources
-      const mixer = new THREE.AnimationMixer(model);
-      _this._animMixer = mixer;
-      const animationWalk = model.animations[4]; // Walk
-      const action = mixer.clipAction(animationWalk);
-      action.play();
+    // setTimeout(() => {
+    //   const model = modelNode.obj3D.children[0].children[0]; // TODO: please explain in comment what .children[0].children[0] is and provide links to resources
+    //   const mixer = new THREE.AnimationMixer(model);
+    //   _this._animMixer = mixer;
+    //   const animationWalk = model.animations[4]; // Walk
+    //   const action = mixer.clipAction(animationWalk);
+    //   action.play();
 
-      const animCtrlDiv = document.createElement('div');
-      animCtrlDiv.style.position = 'absolute';
-      animCtrlDiv.style.top = '10px';
-      animCtrlDiv.style.right = '10px';
-      animCtrlDiv.style.zIndex = '999';
-      animCtrlDiv.style.display = 'flex';
-      animCtrlDiv.style.flexDirection = 'column';
-      document.body.appendChild(animCtrlDiv);
+    //   const animCtrlDiv = document.createElement('div');
+    //   animCtrlDiv.style.position = 'absolute';
+    //   animCtrlDiv.style.top = '10px';
+    //   animCtrlDiv.style.right = '10px';
+    //   animCtrlDiv.style.zIndex = '999';
+    //   animCtrlDiv.style.display = 'flex';
+    //   animCtrlDiv.style.flexDirection = 'column';
+    //   document.body.appendChild(animCtrlDiv);
 
-      for (let i in model.animations) {
-        const animation = model.animations[i];
-        const animButton = document.createElement('button');
-        animButton.style.height = '40px';
-        animButton.innerText = model.animations[i].name;
+    //   for (let i in model.animations) {
+    //     const animation = model.animations[i];
+    //     const animButton = document.createElement('button');
+    //     animButton.style.height = '40px';
+    //     animButton.innerText = model.animations[i].name;
 
-        animButton.addEventListener('click', (e) => {
-          // Stop all animations
-          for (let k in model.animations) {
-            const animation = model.animations[k];
-            _this._animMixer.clipAction(animation).stop();
-          }
+    //     animButton.addEventListener('click', (e) => {
+    //       // Stop all animations
+    //       for (let k in model.animations) {
+    //         const animation = model.animations[k];
+    //         _this._animMixer.clipAction(animation).stop();
+    //       }
 
-          // Start animation
-          const action = _this._animMixer.clipAction(animation);
-          action.play();
-        });
-        animCtrlDiv.appendChild(animButton);
-      }
-    }, 2000);
+    //       // Start animation
+    //       const action = _this._animMixer.clipAction(animation);
+    //       action.play();
+    //     });
+    //     animCtrlDiv.appendChild(animButton);
+    //   }
+    // }, 2000);
 
     // Animate it - https://matterport.github.io/showcase-sdk/sdkbundle_tutorials_models.html#animate-it
     const tick = () => {
