@@ -32,8 +32,8 @@
       this.boomerangIsSetUp = false;
       this.accelerateBoomerangKey =53;//key 5
       this.deaccelerateBoomerangKey =52;//key 4
-      this.forwardKey = 51;//key 3
-      this.backwardKey = 50;//key2 
+      this.forwardKey = 67;//key c
+      this.backwardKey = 88;//key x
       this.deepSteps = 0.018;
     } 
 
