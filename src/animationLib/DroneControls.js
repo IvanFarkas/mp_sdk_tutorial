@@ -33,7 +33,8 @@
       this.accelerateBoomerangKey =53;//key 5
       this.deaccelerateBoomerangKey =52;//key 4
       this.forwardKey = 51;//key 3
-      this.backwardKey = 50;//key2
+      this.backwardKey = 50;//key2 
+      this.deepSteps = 0.018;
     } 
 
     setBoomerang(boomerang){
@@ -55,6 +56,12 @@
         }
         if(evt.key == this.rightKey){
             this.moveRight();
+        }
+        if(evt.key == this.forwardKey){
+            this.moveForward();
+        } 
+        if(evt.key == this.backwardKey){
+            this.moveBackward();
         }
         if(this.boomerangIsSetUp){
             if(evt.key == this.accelerateBoomerangKey){
@@ -92,5 +99,17 @@
         if(this.obj3D.position.x < this.maxX){
             this.obj3D.position.x += this.sideSteps;
         }
+    }
+
+    moveForward(){
+        console.log("moving forward");
+            this.obj3D.position.z += this.deepSteps;
+        
+    }
+
+    moveBackward(){
+        console.log("moving backward");
+            this.obj3D.position.z -= this.deepSteps;
+        
     }
 }

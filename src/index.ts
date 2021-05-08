@@ -5,8 +5,6 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { FBXLoader } from 'three/examples/jsm/loaders/FBXLoader';
 //FBX Animation Support Libs ...
-//import ExportText from "./animationLib/ExportText.js";
-import Boomerang from './animationLib/Boomerang.js';
 import HorizontalRotator from './animationLib/HorizontalRotator.js';
 import DroneControls from './animationLib/DroneControls.js';
 import HelipadsRotator from './animationLib/HelipadsRotator.js';
@@ -661,7 +659,7 @@ class App {
     //var ex = new ExportText();
     // Animate it - https://matterport.github.io/showcase-sdk/sdkbundle_tutorials_models.html#animate-it
     modelNode.start();
-    var quadcopterTranslation = new Boomerang(modelNode.obj3D);
+    
     var quadcopterRotation = new HorizontalRotator(modelNode.obj3D);
     var heliPadsRotation = new HelipadsRotator(modelNode.obj3D);
 
@@ -673,7 +671,7 @@ const inputComponent = inputNode.addComponent('mp.input', {
 });
 inputNode.start();
 var dc = new DroneControls(modelNode.obj3D);
-dc.setBoomerang(quadcopterTranslation);//enabling speed control keys
+//dc.setBoomerang(quadcopterTranslation);//enabling speed control keys
 inputComponent.spyOnEvent(dc);
 
 /*console.log("begin object3d log");
@@ -685,7 +683,6 @@ console.log("ends object3d log");*/
       requestAnimationFrame(tick);
       //quadcopter onTick actions
       if(modelNode.obj3D != null){
-        quadcopterTranslation.ticker();
         quadcopterRotation.ticker();
         heliPadsRotation.ticker();
       }
