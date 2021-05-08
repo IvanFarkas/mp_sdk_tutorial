@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import * as restSamples from './rest';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import Stats from 'three/examples/jsm/libs/stats.module';
+import { Pathfinding } from './core/pathfinding/Pathfinding';
 import { exportScene } from './core/Exporter';
 
 // TODO: Fix to work like in Threejs-TS/src/client/client.ts line 6 - https://github.com/IvanFarkas/Threejs-TS/blob/dbb8bc6edde359d612a2b051c9b51b6e5ad8eefa/src/client/client.ts#L6
@@ -71,7 +72,19 @@ class App {
         this.sdk = await this.window.MP_SDK.connect(this.showcaseElement, SdkKey, SdkVersion);
         console.log('SDK :', this.sdk);
 
+        const scenes = await this.sdk.Scene.query(['scene']);
+        this.threeScene = scenes[0];
+
         await this.configScene();
+
+        //Add additional 3D objects
+        // this.addGLTFModel();
+        this.addFBXModel();
+
+        this.addNavMesh();
+
+        //Add lights
+        this.addLights();
 
         this.getModelEvent();
         //this.getCameraEvent();
@@ -93,15 +106,6 @@ class App {
         this.getZoom();
         this.getIntersection();
         // this.moveMPCamera();
-
-        //Add additional 3D objects
-        // this.addGLTFModel();
-        this.addFBXModel();
-
-        this.addNavMesh();
-
-        //Add lights
-        this.addLights();
 
         // this.navMesh();
 
@@ -134,9 +138,6 @@ class App {
   }
 
   private async navMesh() {
-    const scenes = await this.sdk.Scene.query(['scene']);
-    this.threeScene = scenes[0];
-
     // this.toggleWireframe(this.threeScene, true);
 
     exportScene(this.threeScene);
@@ -837,6 +838,24 @@ class App {
     };
     const component = node.addComponent(this.sdk.Scene.Component.GLTF_LOADER, initial);
     node.start();
+    setTimeout(() => {
+      node.obj3D.traverse((child: any) => {
+        if (child.type === 'Mesh' && child.name ==="navMesh") {
+          console.log("navMesh", child)
+          // Create level.
+          const pathfinding = new Pathfinding();
+          const ZONE = 'level1';
+          pathfinding.setZoneData(ZONE, Pathfinding.createZone(child.geometry));
+
+          // Find path from A to B.
+          const posA = new THREE.Vector3(0, 0, 0);
+          const posB = new THREE.Vector3(0, 0, 2);
+          const groupID = pathfinding.getGroup(ZONE, posA);
+          const path = pathfinding.findPath(posA, posB, ZONE, groupID);
+          console.log('path>>>>', path);
+        }
+      });
+    }, 2000);
   }
 
   private getMeasurements() {
