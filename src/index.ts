@@ -618,10 +618,7 @@ class App {
     _this = this;
     // Add component to the scene node - https://matterport.github.io/showcase-sdk/sdkbundle_tutorials_models.html#add-your-component-to-the-scene-node
     const modelNode = await _sdk.Scene.createNode();
-    //const url = 'https://gitcdn.link/repo/mrdoob/three.js/dev/examples/models/fbx/stanford-bunny.fbx';
-    //const url = 'http://localhost:8000/assets/models/parrot_bebop_droneB.fbx';
     const url = 'http://localhost:8000/assets/models/parrot_bebop_droneAnimatedB.fbx';
-    //const url = 'http://localhost:8000/assets/models/verySimpleAnim.fbx'; // Anim tested verified
     const initial = {
       url: url,
       visible: true

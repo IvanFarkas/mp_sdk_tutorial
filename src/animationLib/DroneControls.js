@@ -24,8 +24,8 @@
       this.leftKey = 70;//f key
       this.sideSteps = 0.018;
       this.elevetionsteps = 0.018;
-      this.minElevation = -1.201;
-      this.maxElevation = 1.34;
+      this.minElevation = 0;//-1.201;
+      this.maxElevation = 0;//1.34;
       this.maxX = 1.512;
       this.minX = -0.216;
       this.Boomerang = null;
@@ -35,10 +35,18 @@
       this.forwardKey = 67;//key c
       this.backwardKey = 88;//key x
       this.deepSteps = 0.018;
+      this.initialYPos = 0.08;
+      this.elevationRange = 1.26;
+      this.calculateElevation();
     } 
 
+    calculateElevation(){
+        this.maxElevation = this.obj3D.position.y + this.elevationRange;
+        this.minElevation = this.obj3D.position.y - this.elevationRange;
+    }
+
     setBoomerang(boomerang){
-        console.log('HERE!! setting boomerang', typeof boomerang);
+        //console.log('HERE!! setting boomerang', typeof boomerang);
         this.Boomerang = boomerang;
         this.boomerangIsSetUp = true;
     }
