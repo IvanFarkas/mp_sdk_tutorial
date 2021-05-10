@@ -103,7 +103,15 @@
                 } else {
                     this.horizontalRotator.start();
                 }
-            } 
+            }
+            //changes rotation side 
+            if(evt.key == this.changeRotatorSideKey){
+                if(this.horizontalRotator.isClockWise){
+                    this.horizontalRotator.setRotationSide(false);
+                }else{
+                    this.horizontalRotator.setRotationSide(true);
+                }
+            }
         }
     }
 
