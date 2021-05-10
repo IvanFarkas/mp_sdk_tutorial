@@ -40,7 +40,16 @@
       this.elevationRange = 1.26;
       this.calculateElevationLimits();
       this.calculateSideLimits();
+      this.horizontalRotator = null;
+      this.horizontalRotatorIsSet = false;
+      this.startStopRotatorKey =86;//v
+      this.changeRotatorSideKey = 66;//b
     } 
+
+    setHorizontalRotator(rotatorObj){
+        this.horizontalRotator = rotatorObj;
+        this.horizontalRotatorIsSet = true;
+    }
 
     calculateElevationLimits(){
         this.maxElevation = this.obj3D.position.y + this.elevationRange;
@@ -85,6 +94,16 @@
             if(evt.key == this.deaccelerateBoomerangKey){
                 this.Boomerang.decreaseSpeed();
             }
+        }
+        if(this.horizontalRotatorIsSet){
+            //Start Stops rotator
+            if(evt.key == this.startStopRotatorKey){
+                if(this.horizontalRotator.isStarted){
+                    this.horizontalRotator.stop()
+                } else {
+                    this.horizontalRotator.start();
+                }
+            } 
         }
     }
 

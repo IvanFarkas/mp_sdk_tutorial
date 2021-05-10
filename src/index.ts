@@ -669,6 +669,7 @@ const inputComponent = inputNode.addComponent('mp.input', {
 inputNode.start();
 var dc = new DroneControls(modelNode.obj3D);
 //dc.setBoomerang(quadcopterTranslation);//enabling speed control keys
+dc.setHorizontalRotator(quadcopterRotation);//enabling rotation control keys
 inputComponent.spyOnEvent(dc);
 
 /*console.log("begin object3d log");
