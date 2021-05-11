@@ -1,9 +1,8 @@
 import * as THREE from 'three';
 import * as restSamples from './rest';
-import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import Stats from 'three/examples/jsm/libs/stats.module';
-import { Pathfinding } from './core/pathfinding/Pathfinding';
-import { exportScene } from './core/Exporter';
+import ExportScene from './core/ExportScene';
+import ToggleWireframe from './core/ToggleWireframe';
 
 // TODO: Fix to work like in Threejs-TS/src/client/client.ts line 6 - https://github.com/IvanFarkas/Threejs-TS/blob/dbb8bc6edde359d612a2b051c9b51b6e5ad8eefa/src/client/client.ts#L6
 // import { GUI } from 'three/examples/jsm/libs/dat.gui.module'
@@ -53,14 +52,6 @@ class App {
     this.threeStats = this.createStats(this.showcaseElement);
     this.threeClock = new THREE.Clock();
 
-    // TODO: does it make sense to use in MP Shocase?
-    // OrbitControls
-    // const camera: THREE.PerspectiveCamera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-    // const renderer: THREE.WebGLRenderer = new THREE.WebGLRenderer();
-    // renderer.setSize(window.innerWidth, window.innerHeight);
-    // document.body.appendChild(renderer.domElement);
-    // const controls = new OrbitControls(camera, renderer.domElement);
-
     this.loadShowcase();
   }
 
@@ -77,17 +68,10 @@ class App {
 
         await this.configScene();
 
-        //Add additional 3D objects
-        // this.addGLTFModel();
-        this.addFBXModel();
-
-        this.addNavMesh();
-
-        //Add lights
         this.addLights();
 
         this.getModelEvent();
-        //this.getCameraEvent();
+        this.getCameraEvent();
         this.getFloorEvent();
         this.getSweepEvent();
         this.getTourEvent();
@@ -107,7 +91,12 @@ class App {
         this.getIntersection();
         // this.moveMPCamera();
 
-        // this.navMesh();
+        // ToggleWireframe(this.threeScene, true);
+        // ExportScene(this.threeScene);
+
+        this.addGLTFModel();
+        this.addFBXModel();
+        this.addNavMesh();
 
         // this.restApiTest()
         //   .then((model: any) => {
@@ -137,102 +126,6 @@ class App {
     return stats;
   }
 
-  private async navMesh() {
-    // this.toggleWireframe(this.threeScene, true);
-
-    exportScene(this.threeScene);
-  }
-
-  private toggleWireframe(scene: any, wireframe: boolean) {
-    for (let i = 0; i < scene.children.length; i++) {
-      const child: any = scene.children[i];
-      // console.log(child.type, child.name, child);
-
-      let children2 = child.children;
-      for (let j = 0; j < children2.length; j++) {
-        this.logSceneObjects(children2[j]);
-
-        let children3 = children2[j].children;
-        for (let k = 0; k < children3.length; k++) {
-          this.logSceneObjects(children3[k]);
-        }
-      }
-    }
-
-    // if (wireframe == false) {
-    //   // TODO: Why are we getting Error: TypeError: model.traverse is not a function
-    //   scene.traverse((child) => {
-    //     let mesh: THREE.Mesh = (<THREE.Mesh>child).isMesh ? <THREE.Mesh>child : null;
-
-    //     if (mesh != null) {
-    //       // Setup our wireframe
-    //       const wireframeGeometry = new THREE.WireframeGeometry(mesh.geometry);
-    //       const wireframeMaterial = new THREE.LineBasicMaterial({ color: 0xffffff });
-    //       const wireframe = new THREE.LineSegments(wireframeGeometry, wireframeMaterial);
-
-    //       wireframe.name = 'wireframe';
-    //       child.add(wireframe);
-    //     }
-    //   });
-    //   wireframe = true;
-    // } else {
-    //   // scene.remove(scene.getObjectByName('wireframe'));
-    //   wireframe = false;
-    // }
-  }
-
-  private logSceneObjects(object: any) {
-    switch (object.type) {
-      case 'Object3D':
-        if (object.name.startsWith('FloorMesh:')) {
-          // console.log('\t', object.name, object);
-        } else {
-          // console.log('\t', object.type, object.name, object);
-        }
-        break;
-
-      case 'Mesh':
-        if (object.name.startsWith('RoomMesh:')) {
-          // console.log('\t\t', object.name, object);
-          if (object.name == 'RoomMesh:0-4') {
-            let geometry: THREE.BufferGeometry = object.geometry;
-            // console.log('\t\t', geometry.name, geometry);
-
-            // Add Wireframe
-            const wireframeGeometry = new THREE.WireframeGeometry(geometry);
-            const wireframeMaterial = new THREE.LineBasicMaterial({ color: 0xffffff });
-            const wireframe = new THREE.LineSegments(wireframeGeometry, wireframeMaterial);
-
-            wireframe.name = 'wireframe';
-            object.add(wireframe);
-          }
-        } else {
-          // console.log('\t', object.type, object.name, object);
-        }
-        break;
-
-      case 'Group':
-        // console.log('\t\t', object.type, object.name, object);
-        break;
-
-      case 'PerspectiveCamera':
-        // console.log('PerspectiveCamera', object.type, object.name, object);
-        break;
-
-      case 'AmbientLight':
-        // console.log('AmbientLight', object.type, object.name, object);
-        break;
-
-      case 'DirectionalLight':
-        // console.log('DirectionalLight', object.type, object.name, object);
-        break;
-
-      default:
-        // console.log('Unknown', object.type, object.name, object);
-        break;
-    }
-  }
-
   private getModelEvent() {
     this.sdk.Model.getData()
       .then((model: any) => {
@@ -244,9 +137,9 @@ class App {
       });
 
     const callback = (object: any) => {
-      console.log('is drone model?');
+      console.log('>>> New model');
       console.log(object);
-      console.log('Model loaded!');
+      console.log('>>> New model was loaded!');
     };
 
     // Start listening to the event.
@@ -629,8 +522,7 @@ class App {
 
   private getIntersection() {
     this.sdk.Pointer.intersection.subscribe((intersectionData: any) => {
-      // console.log('Intersection position:', intersectionData.position);
-      // console.log('Intersection normal:', intersectionData.normal);
+      console.log('Intersection', intersectionData);
     });
   }
 
@@ -733,13 +625,12 @@ class App {
     const modelNode = await this.sdk.Scene.createNode();
     this.addTransformControlToNode(modelNode);
 
-    const url = 'http://localhost:8000/assets/models/tester.fbx';
     const initial = {
-      url: url,
+      url: 'http://localhost:8000/assets/models/tester.fbx',
       visible: true,
       localPosition: { x: 0, y: 0, z: 0 },
-      localRotation: { x: 0, y: -90, z: 0 }
-      // localScale: { x: 1, y: 1, z: 1 },
+      localRotation: { x: 0, y: -90, z: 0 },
+      localScale: { x: 1, y: 1, z: 1 }
     };
 
     // Store the fbx component since we will need to adjust it in the next step.
@@ -814,11 +705,11 @@ class App {
     this.addTransformControlToNode(node);
 
     const initial = {
-      url: 'http://localhost:8000/assets/models/SheenChair.glb',
-      visible: true,
-      // localScale: { x: 5, y: 5, z: 5 },
-      localPosition: { x: 0, y: 0, z: 0 }
-      // localRotation: { x: 0, y: -130, z: 0 },
+      url: 'http://localhost:8000/assets/models/SheenChair.glb'
+      // visible: true,
+      // localScale: { x: 1, y: 1, z: 1 },
+      // localPosition: { x: 0, y: 0, z: 0 },
+      // localRotation: { x: 0, y: 0, z: 0 }
     };
     const component = node.addComponent(this.sdk.Scene.Component.GLTF_LOADER, initial);
     node.position.set(1, -1.5, 0.7);
@@ -830,29 +721,21 @@ class App {
     const node = await this.sdk.Scene.createNode();
 
     const initial = {
-      url: 'http://localhost:8000/assets/models/navMeshes/navMesh.glb',
-      visible: true,
-      // localScale: { x: 5, y: 5, z: 5 },
-      localPosition: { x: 0, y: 0, z: 0 }
-      // localRotation: { x: 0, y: -130, z: 0 },
+      url: 'http://localhost:8000/assets/models/navMeshes/navMesh.glb'
+      // visible: true,
+      // localScale: { x: 1, y: 1, z: 1 },
+      // localPosition: { x: 0, y: 0, z: 0 },
+      // localRotation: { x: 0, y: 0, z: 0 }
     };
     const component = node.addComponent(this.sdk.Scene.Component.GLTF_LOADER, initial);
     node.start();
     setTimeout(() => {
       node.obj3D.traverse((child: any) => {
-        if (child.type === 'Mesh' && child.name ==="navMesh") {
-          console.log("navMesh", child)
-          // Create level.
-          const pathfinding = new Pathfinding();
-          const ZONE = 'level1';
-          pathfinding.setZoneData(ZONE, Pathfinding.createZone(child.geometry));
-
-          // Find path from A to B.
-          const posA = new THREE.Vector3(0, 0, 0);
-          const posB = new THREE.Vector3(0, 0, 2);
-          const groupID = pathfinding.getGroup(ZONE, posA);
-          const path = pathfinding.findPath(posA, posB, ZONE, groupID);
-          console.log('path>>>>', path);
+        if (child.type === 'Mesh' && child.name === 'navMesh') {
+          console.log('navMesh', child);
+          child.material.transparent = true;
+          child.material.opacity = 0;
+          child.material.needsUpdate = true;
         }
       });
     }, 2000);

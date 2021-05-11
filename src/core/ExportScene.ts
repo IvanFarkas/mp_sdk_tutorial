@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import { GLTFExporter } from 'three/examples/jsm/exporters/GLTFExporter';
 
-export function exportScene(scene: THREE.Scene) {
+export default function ExportScene(scene: THREE.Scene) {
   //Export scene
   setTimeout(() => {
     let roomObject: THREE.Object3D = null;
