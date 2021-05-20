@@ -4,12 +4,12 @@
 // Implements the astar search algorithm in javascript using a binary heap.
 
 class BinaryHeap {
-  constructor (scoreFunction) {
+  constructor(scoreFunction) {
     this.content = [];
     this.scoreFunction = scoreFunction;
   }
 
-  push (element) {
+  push(element) {
     // Add the new element to the end of the array.
     this.content.push(element);
 
@@ -17,7 +17,7 @@ class BinaryHeap {
     this.sinkDown(this.content.length - 1);
   }
 
-  pop () {
+  pop() {
     // Store the first element so we can return it later.
     const result = this.content[0];
     // Get the element at the end of the array.
@@ -31,7 +31,7 @@ class BinaryHeap {
     return result;
   }
 
-  remove (node) {
+  remove(node) {
     const i = this.content.indexOf(node);
 
     // When it is found, the process seen in 'pop' is repeated
@@ -49,15 +49,15 @@ class BinaryHeap {
     }
   }
 
-  size () {
+  size() {
     return this.content.length;
   }
 
-  rescoreElement (node) {
+  rescoreElement(node) {
     this.sinkDown(this.content.indexOf(node));
   }
 
-  sinkDown (n) {
+  sinkDown(n) {
     // Fetch the element that has to be sunk.
     const element = this.content[n];
 
@@ -80,7 +80,7 @@ class BinaryHeap {
     }
   }
 
-  bubbleUp (n) {
+  bubbleUp(n) {
     // Look up the target element and its score.
     const length = this.content.length,
       element = this.content[n],
@@ -128,7 +128,6 @@ class BinaryHeap {
       }
     }
   }
-
 }
 
 export { BinaryHeap };

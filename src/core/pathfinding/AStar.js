@@ -2,7 +2,7 @@ import { BinaryHeap } from './BinaryHeap';
 import { Utils } from './Utils.js';
 
 class AStar {
-  static init (graph) {
+  static init(graph) {
     for (let x = 0; x < graph.length; x++) {
       //for(var x in graph) {
       const node = graph[x];
@@ -16,7 +16,7 @@ class AStar {
     }
   }
 
-  static cleanUp (graph) {
+  static cleanUp(graph) {
     for (let x = 0; x < graph.length; x++) {
       const node = graph[x];
       delete node.f;
@@ -29,23 +29,21 @@ class AStar {
     }
   }
 
-  static heap () {
+  static heap() {
     return new BinaryHeap(function (node) {
       return node.f;
     });
   }
 
-  static search (graph, start, end) {
+  static search(graph, start, end) {
     this.init(graph);
     //heuristic = heuristic || astar.manhattan;
-
 
     const openHeap = this.heap();
 
     openHeap.push(start);
 
     while (openHeap.size() > 0) {
-
       // Grab the lowest f(x) to process next.  Heap keeps this sorted for us.
       const currentNode = openHeap.pop();
 
@@ -81,7 +79,6 @@ class AStar {
         const beenVisited = neighbour.visited;
 
         if (!beenVisited || gScore < neighbour.g) {
-
           // Found an optimal (so far) path to this node.  Take score for node to see how good it is.
           neighbour.visited = true;
           neighbour.parent = currentNode;
@@ -105,11 +102,11 @@ class AStar {
     return [];
   }
 
-  static heuristic (pos1, pos2) {
+  static heuristic(pos1, pos2) {
     return Utils.distanceToSquared(pos1, pos2);
   }
 
-  static neighbours (graph, node) {
+  static neighbours(graph, node) {
     const ret = [];
 
     for (let e = 0; e < node.neighbours.length; e++) {

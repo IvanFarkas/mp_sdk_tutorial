@@ -1,11 +1,11 @@
 import { Utils } from './Utils';
 
 class Channel {
-  constructor () {
+  constructor() {
     this.portals = [];
   }
 
-  push (p1, p2) {
+  push(p1, p2) {
     if (p2 === undefined) p2 = p1;
     this.portals.push({
       left: p1,
@@ -13,7 +13,7 @@ class Channel {
     });
   }
 
-  stringPull () {
+  stringPull() {
     const portals = this.portals;
     const pts = [];
     // Init scan state
@@ -80,7 +80,7 @@ class Channel {
       }
     }
 
-    if ((pts.length === 0) || (!Utils.vequal(pts[pts.length - 1], portals[portals.length - 1].left))) {
+    if (pts.length === 0 || !Utils.vequal(pts[pts.length - 1], portals[portals.length - 1].left)) {
       // Append last point to path.
       pts.push(portals[portals.length - 1].left);
     }

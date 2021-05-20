@@ -1,8 +1,10 @@
 import * as THREE from 'three';
 import * as restSamples from './rest';
 import Stats from 'three/examples/jsm/libs/stats.module';
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 import ExportScene from './core/ExportScene';
 import ToggleWireframe from './core/ToggleWireframe';
+import NavigationSystem from './core/NavigationSystem';
 
 // TODO: Fix to work like in Threejs-TS/src/client/client.ts line 6 - https://github.com/IvanFarkas/Threejs-TS/blob/dbb8bc6edde359d612a2b051c9b51b6e5ad8eefa/src/client/client.ts#L6
 // import { GUI } from 'three/examples/jsm/libs/dat.gui.module'
@@ -35,6 +37,8 @@ class App {
   threeRenderer: THREE.WebGLRenderer;
   threeClock: any;
   threeAnimMixer: any;
+  intersectPoint: THREE.Vector3;
+  playerNode: any;
 
   constructor() {
     // Print environment variables
@@ -51,6 +55,7 @@ class App {
 
     this.threeStats = this.createStats(this.showcaseElement);
     this.threeClock = new THREE.Clock();
+    this.intersectPoint = new THREE.Vector3();
 
     this.loadShowcase();
   }
@@ -94,7 +99,7 @@ class App {
         // ToggleWireframe(this.threeScene, true);
         // ExportScene(this.threeScene);
 
-        this.addGLTFModel();
+        // this.addGLTFModel();
         this.addFBXModel();
         this.addNavMesh();
 
@@ -151,14 +156,14 @@ class App {
 
   private getCameraEvent() {
     const callback = (object: any) => {
-      console.log(object);
-      console.log('Camera moved!');
+      // console.log(object);
+      // console.log('Camera moved!');
     };
 
     this.sdk.on(this.sdk.Camera.Event.MOVE, callback);
 
     this.sdk.Camera.pose.subscribe((pose: any) => {
-      console.log('Camera', pose.position, pose.rotation, pose.sweep, pose.mode);
+      // console.log('Camera', pose.position, pose.rotation, pose.sweep, pose.mode);
     });
   }
 
@@ -516,13 +521,14 @@ class App {
 
   private getZoom() {
     this.sdk.Camera.zoom.subscribe((zoom: any) => {
-      console.log('Zoom: ', zoom.level);
+      // console.log('Zoom: ', zoom.level);
     });
   }
 
   private getIntersection() {
     this.sdk.Pointer.intersection.subscribe((intersectionData: any) => {
-      console.log('Intersection', intersectionData);
+      // console.log('Intersection', intersectionData);
+      this.intersectPoint = intersectionData.position;
     });
   }
 
@@ -623,7 +629,8 @@ class App {
   private async addFBXModel() {
     // Add component to the scene node - https://matterport.github.io/showcase-sdk/sdkbundle_tutorials_models.html#add-your-component-to-the-scene-node
     const modelNode = await this.sdk.Scene.createNode();
-    this.addTransformControlToNode(modelNode);
+    this.playerNode = modelNode;
+    // this.addTransformControlToNode(modelNode);
 
     const initial = {
       url: 'http://localhost:8000/assets/models/tester.fbx',
@@ -717,28 +724,36 @@ class App {
   }
 
   private async addNavMesh() {
-    // Model
-    const node = await this.sdk.Scene.createNode();
+    // // Model
+    // const node = await this.sdk.Scene.createNode();
+    // const initial = {
+    //   url: 'http://localhost:8000/assets/models/navMeshes/navMesh.glb',
+    //   visible: true
+    // };
+    // const component = node.addComponent(this.sdk.Scene.Component.GLTF_LOADER, initial);
+    // node.start();
+    // setTimeout(() => {
+    //   node.obj3D.traverse((child: any) => {
+    //     if (child.type === 'Mesh' && child.name === 'navMesh') {
+    //       //Create NavigationSystem
+    //       const navSystem = new NavigationSystem(this.threeClock, this.intersectPoint, this.threeScene, child, this.playerNode, this.showcaseElement);
+    //     }
+    //   });
+    // }, 2000);
 
-    const initial = {
-      url: 'http://localhost:8000/assets/models/navMeshes/navMesh.glb'
-      // visible: true,
-      // localScale: { x: 1, y: 1, z: 1 },
-      // localPosition: { x: 0, y: 0, z: 0 },
-      // localRotation: { x: 0, y: 0, z: 0 }
-    };
-    const component = node.addComponent(this.sdk.Scene.Component.GLTF_LOADER, initial);
-    node.start();
-    setTimeout(() => {
-      node.obj3D.traverse((child: any) => {
-        if (child.type === 'Mesh' && child.name === 'navMesh') {
-          console.log('navMesh', child);
-          child.material.transparent = true;
-          child.material.opacity = 0;
-          child.material.needsUpdate = true;
-        }
-      });
-    }, 2000);
+    const loader = new GLTFLoader();
+    loader.load(
+      'http://localhost:8000/assets/models/navMeshes/navMesh.glb',
+      function (gltf: any) {
+        gltf.scene.traverse((child: any) => {
+          if (child.type === 'Mesh' && child.name === 'navMesh') {
+            //Create NavigationSystem
+            console.log('navMesh', child);
+            const navSystem = new NavigationSystem(this.threeClock, this.intersectPoint, this.threeScene, child, this.playerNode, this.showcaseElement);
+          }
+        });
+      }.bind(this)
+    );
   }
 
   private getMeasurements() {

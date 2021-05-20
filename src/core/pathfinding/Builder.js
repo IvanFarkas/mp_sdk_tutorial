@@ -9,8 +9,7 @@ class Builder {
    * @param  {number} tolerance
    * @return {Zone}
    */
-  static buildZone (geometry, tolerance) {
-
+  static buildZone(geometry, tolerance) {
     const navMesh = this._buildNavigationMesh(geometry, tolerance);
 
     const zone = {};
@@ -30,13 +29,13 @@ class Builder {
     // determining the neighbor graph.
     zone.groups = new Array(groups.length);
     groups.forEach((group, groupIndex) => {
-
       const indexByPolygon = new Map(); // { polygon: index in group }
-      group.forEach((poly, polyIndex) => { indexByPolygon.set(poly, polyIndex); });
+      group.forEach((poly, polyIndex) => {
+        indexByPolygon.set(poly, polyIndex);
+      });
 
       const newGroup = new Array(group.length);
       group.forEach((poly, polyIndex) => {
-
         const neighbourIndices = [];
         poly.neighbours.forEach((n) => neighbourIndices.push(indexByPolygon.get(n)));
 
@@ -44,11 +43,11 @@ class Builder {
         const portals = [];
         poly.neighbours.forEach((n) => portals.push(this._getSharedVerticesInOrder(poly, n)));
 
-        const centroid = new Vector3( 0, 0, 0 );
-        centroid.add( zone.vertices[ poly.vertexIds[0] ] );
-        centroid.add( zone.vertices[ poly.vertexIds[1] ] );
-        centroid.add( zone.vertices[ poly.vertexIds[2] ] );
-        centroid.divideScalar( 3 );
+        const centroid = new Vector3(0, 0, 0);
+        centroid.add(zone.vertices[poly.vertexIds[0]]);
+        centroid.add(zone.vertices[poly.vertexIds[1]]);
+        centroid.add(zone.vertices[poly.vertexIds[2]]);
+        centroid.divideScalar(3);
         centroid.x = Utils.roundNumber(centroid.x, 2);
         centroid.y = Utils.roundNumber(centroid.y, 2);
         centroid.z = Utils.roundNumber(centroid.z, 2);
@@ -73,13 +72,12 @@ class Builder {
    * @param {BufferGeometry} geometry
    * @return {Object}
    */
-  static _buildNavigationMesh (geometry, tolerance) {
+  static _buildNavigationMesh(geometry, tolerance) {
     geometry = Utils.mergeVertices(geometry, tolerance);
     return this._buildPolygonsFromGeometry(geometry);
   }
 
-  static _buildPolygonGroups (navigationMesh) {
-
+  static _buildPolygonGroups(navigationMesh) {
     const polygons = navigationMesh.polygons;
 
     const polygonGroups = [];
@@ -108,7 +106,7 @@ class Builder {
     return polygonGroups;
   }
 
-  static _buildPolygonNeighbours (polygon, vertexPolygonMap) {
+  static _buildPolygonNeighbours(polygon, vertexPolygonMap) {
     const neighbours = new Set();
 
     const groupA = vertexPolygonMap[polygon.vertexIds[0]];
@@ -134,8 +132,7 @@ class Builder {
     return neighbours;
   }
 
-  static _buildPolygonsFromGeometry (geometry) {
-
+  static _buildPolygonsFromGeometry(geometry) {
     const polygons = [];
     const vertices = [];
 
@@ -160,7 +157,7 @@ class Builder {
       const a = index.getX(i);
       const b = index.getX(i + 1);
       const c = index.getX(i + 2);
-      const poly = {vertexIds: [a, b, c], neighbours: null};
+      const poly = { vertexIds: [a, b, c], neighbours: null };
       polygons.push(poly);
       vertexPolygonMap[a].push(poly);
       vertexPolygonMap[b].push(poly);
@@ -178,10 +175,11 @@ class Builder {
     };
   }
 
-  static _getSharedVerticesInOrder (a, b) {
-
+  static _getSharedVerticesInOrder(a, b) {
     const aList = a.vertexIds;
-    const a0 = aList[0], a1 = aList[1], a2 = aList[2];
+    const a0 = aList[0],
+      a1 = aList[1],
+      a2 = aList[2];
 
     const bList = b.vertexIds;
     const shared0 = bList.includes(a0);
@@ -200,7 +198,7 @@ class Builder {
     } else if (shared0 && shared2) {
       return [a2, a0]; // this ordering will affect the string pull algorithm later, not clear if significant
     } else {
-      console.warn("Error processing navigation mesh neighbors; neighbors with <2 shared vertices found.");
+      console.warn('Error processing navigation mesh neighbors; neighbors with <2 shared vertices found.');
       return [];
     }
   }
