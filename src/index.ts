@@ -724,36 +724,41 @@ class App {
   }
 
   private async addNavMesh() {
-    // // Model
-    // const node = await this.sdk.Scene.createNode();
-    // const initial = {
-    //   url: 'http://localhost:8000/assets/models/navMeshes/navMesh.glb',
-    //   visible: true
-    // };
-    // const component = node.addComponent(this.sdk.Scene.Component.GLTF_LOADER, initial);
-    // node.start();
-    // setTimeout(() => {
-    //   node.obj3D.traverse((child: any) => {
-    //     if (child.type === 'Mesh' && child.name === 'navMesh') {
-    //       //Create NavigationSystem
-    //       const navSystem = new NavigationSystem(this.threeClock, this.intersectPoint, this.threeScene, child, this.playerNode, this.showcaseElement);
-    //     }
-    //   });
-    // }, 2000);
+    // Model
+    const node = await this.sdk.Scene.createNode();
+    const initial = {
+      url: 'http://localhost:8000/assets/models/navMeshes/navMesh.glb',
+      visible: true
+    };
+    const component = node.addComponent(this.sdk.Scene.Component.GLTF_LOADER, initial);
+    node.start();
+    setTimeout(() => {
+      node.obj3D.traverse((child: any) => {
+        if (child.type === 'Mesh') {
+          //Create NavigationSystem
+          child.material.color.set("#ff00ff")
+          child.material.transparent = true
+          child.material.opacity = 0.4
+          child.material.needsUpdate = true
+          child.position.y = 0.2
+          const navSystem = new NavigationSystem(this.threeClock, this.intersectPoint, this.threeScene, child, this.playerNode, this.showcaseElement);
+        }
+      });
+    }, 2000);
 
-    const loader = new GLTFLoader();
-    loader.load(
-      'http://localhost:8000/assets/models/navMeshes/navMesh.glb',
-      function (gltf: any) {
-        gltf.scene.traverse((child: any) => {
-          if (child.type === 'Mesh' && child.name === 'navMesh') {
-            //Create NavigationSystem
-            console.log('navMesh', child);
-            const navSystem = new NavigationSystem(this.threeClock, this.intersectPoint, this.threeScene, child, this.playerNode, this.showcaseElement);
-          }
-        });
-      }.bind(this)
-    );
+    // const loader = new GLTFLoader();
+    // loader.load(
+    //   'http://localhost:8000/assets/models/navMeshes/navMesh.glb',
+    //   function (gltf: any) {
+    //     gltf.scene.traverse((child: any) => {
+    //       if (child.type === 'Mesh') {
+    //         //Create NavigationSystem
+    //         console.log('navMesh', child);
+    //         const navSystem = new NavigationSystem(this.threeClock, this.intersectPoint, this.threeScene, child, this.playerNode, this.showcaseElement);
+    //       }
+    //     });
+    //   }.bind(this)
+    // );
   }
 
   private getMeasurements() {
