@@ -736,11 +736,11 @@ class App {
       node.obj3D.traverse((child: any) => {
         if (child.type === 'Mesh') {
           //Create NavigationSystem
-          child.material.color.set("#ff00ff")
-          child.material.transparent = true
-          child.material.opacity = 0.4
-          child.material.needsUpdate = true
-          child.position.y = 0.2
+          child.material.color.set('#ff00ff');
+          child.material.transparent = true;
+          child.material.opacity = 0.4;
+          child.material.needsUpdate = true;
+          child.position.y = 0.2;
           const navSystem = new NavigationSystem(this.threeClock, this.intersectPoint, this.threeScene, child, this.playerNode, this.showcaseElement);
         }
       });

@@ -3,7 +3,6 @@ import { Pathfinding, PathfindingHelper } from './pathfinding';
 
 const ZONE = 'level';
 const SPEED = 50;
-
 export default class NavigationSystem {
   groupID: any;
   path: any;
@@ -19,10 +18,9 @@ export default class NavigationSystem {
   constructor(clock: THREE.Clock, intersectPoint: THREE.Vector3, threeScene: THREE.Scene, navMesh: THREE.Mesh, playerNode: any, showcaseElement: HTMLIFrameElement) {
     this.playerPosition = new THREE.Vector3(0.1519576176984144, -1.6576147965629167, 0.8018497944956335);
     this.targetPosition = new THREE.Vector3(0.1519576176984144, -1.6576147965629167, 0.8018497944956335);
-
     this.pathfinder = new Pathfinding();
-
     this.helper = new PathfindingHelper();
+
     threeScene.add(this.helper);
 
     this.clock = clock;
@@ -31,14 +29,12 @@ export default class NavigationSystem {
     const zone = Pathfinding.createZone(navMesh.geometry);
     this.pathfinder.setZoneData(ZONE, zone);
     this.groupID = this.pathfinder.getGroup(ZONE, this.playerPosition);
-
     this.helper.setPlayerPosition(new THREE.Vector3(0.1519576176984144, -1.6576147965629167, 0.8018497944956335));
     this.helper.setTargetPosition(new THREE.Vector3(0.1519576176984144, -1.6576147965629167, 0.8018497944956335));
 
     showcaseElement.contentDocument.body.addEventListener('click', this.onClick.bind(this), false);
 
     this.playerNode = playerNode;
-
     this.animate();
   }
 

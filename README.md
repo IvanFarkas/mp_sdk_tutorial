@@ -23,6 +23,12 @@ SDK_KEY=[SdkKey]
 SDK_VERSION="3.10"
 ```
 
+## Update packages
+
+```shell
+ncu -u
+```
+
 ## Useful Links
 
 - [SDK Overview](https://matterport.github.io/showcase-sdk/sdkbundle_home.html)

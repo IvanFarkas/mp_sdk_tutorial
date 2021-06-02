@@ -3,8 +3,8 @@ import { BoxBufferGeometry, BufferAttribute, BufferGeometry, Color, Line, LineBa
 const colors = {
   PLAYER: new Color(0xee836f).convertGammaToLinear(2.2).getHex(),
   TARGET: new Color(0xdccb18).convertGammaToLinear(2.2).getHex(),
-  PATH: new Color("#ffec1a"),
-  WAYPOINT: new Color("#ff0000"),
+  PATH: new Color('#ffec1a'),
+  WAYPOINT: new Color('#ff0000'),
   CLAMPED_STEP: new Color(0xdcd3b2).convertGammaToLinear(2.2).getHex(),
   CLOSEST_NODE: new Color(0x43676b).convertGammaToLinear(2.2).getHex()
 };
@@ -19,24 +19,16 @@ class PathfindingHelper extends Object3D {
     super();
 
     this._playerMarker = new Mesh(new SphereBufferGeometry(0.25, 32, 32), new MeshBasicMaterial({ color: colors.PLAYER }));
-
     this._targetMarker = new Mesh(new BoxBufferGeometry(0.3, 0.3, 0.3), new MeshBasicMaterial({ color: colors.TARGET }));
-
     this._nodeMarker = new Mesh(new BoxBufferGeometry(0.1, 0.8, 0.1), new MeshBasicMaterial({ color: colors.CLOSEST_NODE }));
-
     this._stepMarker = new Mesh(new BoxBufferGeometry(0.1, 1, 0.1), new MeshBasicMaterial({ color: colors.CLAMPED_STEP }));
-
     this._pathMarker = new Object3D();
-
     this._pathLineMaterial = new LineBasicMaterial({ color: colors.PATH, linewidth: 5 });
     this._pathPointMaterial = new MeshBasicMaterial({ color: colors.WAYPOINT, depthTest: false });
     this._pathPointGeometry = new SphereBufferGeometry(0.1);
-
     this._markers = [this._playerMarker, this._targetMarker, this._nodeMarker, this._stepMarker, this._pathMarker];
-
     this._markers.forEach((marker) => {
       marker.visible = false;
-
       this.add(marker);
     });
   }
