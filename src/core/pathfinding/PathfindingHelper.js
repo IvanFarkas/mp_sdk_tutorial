@@ -3,8 +3,8 @@ import { BoxBufferGeometry, BufferAttribute, BufferGeometry, Color, Line, LineBa
 const colors = {
   PLAYER: new Color(0xee836f).convertGammaToLinear(2.2).getHex(),
   TARGET: new Color(0xdccb18).convertGammaToLinear(2.2).getHex(),
-  PATH: new Color("#ffec1a"),
-  WAYPOINT: new Color("#ff0000"),
+  PATH: new Color('#ffec1a'),
+  WAYPOINT: new Color('#ff0000'),
   CLAMPED_STEP: new Color(0xdcd3b2).convertGammaToLinear(2.2).getHex(),
   CLOSEST_NODE: new Color(0x43676b).convertGammaToLinear(2.2).getHex()
 };
