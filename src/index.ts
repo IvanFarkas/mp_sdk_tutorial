@@ -1,7 +1,8 @@
-import * as THREE from 'three';
-import * as restSamples from './rest';
+import { Scene, WebGLRenderer, Vector3, Clock, AnimationMixer, Mesh } from 'three';
 import Stats from 'three/examples/jsm/libs/stats.module';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
+import * as restSamples from './rest';
+import { MpSdk, ShowcaseBundleWindow, ConnectOptions, Floor, Label, Model, Scene as MpScene, Sweep, Dictionary } from '../bundle/sdk';
 import ExportScene from './core/ExportScene';
 import ToggleWireframe from './core/ToggleWireframe';
 import NavigationSystem from './core/NavigationSystem';
@@ -10,7 +11,6 @@ import NavigationSystem from './core/NavigationSystem';
 // import { GUI } from 'three/examples/jsm/libs/dat.gui.module'
 
 // Read from .env file
-const NodeEnv = process.env.NODE_ENV;
 const ModelId = process.env.MODEL_ID;
 const SdkKey = process.env.SDK_KEY;
 const SdkVersion = process.env.SDK_VERSION; // https://matterport.github.io/showcase-sdk/sdk_release_notes.html
@@ -23,53 +23,57 @@ declare global {
 }
 
 class App {
-  window: Window;
-  showcaseElement: HTMLIFrameElement;
-  sdk: any;
-  mpFloors: any;
-  mpLabels: any;
-  mpModel: any;
+  showcaseIframe: HTMLIFrameElement;
+  embeddingWindow: ShowcaseBundleWindow;
+  mpSdk?: MpSdk;
+  mpScene?: MpScene;
+  mpFloors?: Floor.Floors;
+  mpLabels?: Label.Label;
+  mpModel?: Model;
   mpSnapshots: any;
   mpModelDetails: any;
   mpCameraPose: any; // get pose using: sdk.Camera.pose.subscribe
-  threeScene: THREE.Scene;
-  threeStats: any;
-  threeRenderer: THREE.WebGLRenderer;
-  threeClock: any;
-  threeAnimMixer: any;
-  intersectPoint: THREE.Vector3;
+  threeScene?: Scene;
+  threeStats: Stats;
+  threeRenderer?: WebGLRenderer;
+  threeClock: Clock;
+  threeAnimMixer?: AnimationMixer;
+  intersectPoint: Vector3;
   playerNode: any;
 
   constructor() {
     // Print environment variables
-    console.log('NodeEnv:', NodeEnv);
     console.log('ModelId:', ModelId);
     console.log('SdkKey:', SdkKey);
     console.log('SdkVersion:', SdkVersion);
 
-    // Set showcase IFrame attributes
-    this.showcaseElement = <HTMLIFrameElement>document.getElementById('showcase');
-    this.showcaseElement.src = `/bundle/showcase.html?m=${ModelId}&applicationKey=${SdkKey}&play=1&qs=1&log=0`;
-    this.showcaseElement.width = '100%';
-    this.showcaseElement.height = '100%';
+    // Getting Started with Type Declarations - https://matterport.github.io/showcase-sdk/sdk_types.html#getting-started-with-type-declarations
+    // A Window type that can be use to cast the bundle's iframe's contentWindow to hint at the existance of the `MP_SDK`.
+    this.showcaseIframe = document.getElementById('showcase-iframe') as HTMLIFrameElement;
+    // this.embeddingWindow = window as ShowcaseEmbedWindow;
+    this.embeddingWindow = this.showcaseIframe.contentWindow as ShowcaseBundleWindow;
 
-    this.threeStats = this.createStats(this.showcaseElement);
-    this.threeClock = new THREE.Clock();
-    this.intersectPoint = new THREE.Vector3();
+    this.showcaseIframe.src = `/bundle/showcase.html?m=${ModelId}&applicationKey=${SdkKey}&play=1&qs=1&log=0`;
+    this.showcaseIframe.width = '100%';
+    this.showcaseIframe.height = '100%';
+
+    this.threeStats = this.createStats(this.showcaseIframe);
+    this.threeClock = new Clock();
+    this.intersectPoint = new Vector3();
 
     this.loadShowcase();
   }
 
   private async loadShowcase(this: App): Promise<void> {
-    this.showcaseElement.addEventListener('load', async () => {
-      try {
-        this.window = this.showcaseElement.contentWindow;
-        // using the latest server-side SDK version in the .connect function - https://matterport.github.io/showcase-sdk/sdk_release_notes.html
-        this.sdk = await this.window.MP_SDK.connect(this.showcaseElement, SdkKey, SdkVersion);
-        console.log('SDK :', this.sdk);
+    this.mpSdk = await this.embeddingWindow.MP_SDK.connect(this.showcaseIframe, SdkKey);
+    this.mpScene = this.mpSdk?.Scene;
+    console.log('MP_SDK :', this.mpSdk);
 
-        const scenes = await this.sdk.Scene.query(['scene']);
-        this.threeScene = scenes[0];
+    this.showcaseIframe.addEventListener('load', async () => {
+      try {
+        // const scenes = await this.mpSdk?.Scene.query(['scene']);
+        // this.threeScene = scenes[0];
+        this.threeScene = new Scene(); // TODO: Fix
 
         await this.configScene();
 
@@ -100,8 +104,8 @@ class App {
         // ExportScene(this.threeScene);
 
         // this.addGLTFModel();
-        this.addFBXModel();
-        this.addNavMesh();
+        // this.addFBXModel();
+        // this.addNavMesh();
 
         // this.restApiTest()
         //   .then((model: any) => {
@@ -125,14 +129,14 @@ class App {
     stats.domElement.style.top = '0';
 
     // TODO: Make stats work. The scene is in the iframe. How do I get iframe stats in main browser window or showcase window?
-    let showcaseDoc = iFarme.contentWindow.document;
-    let statsDiv = showcaseDoc.body.appendChild(stats.domElement);
+    let showcaseDoc = iFarme.contentWindow?.document;
+    let statsDiv = showcaseDoc?.body.appendChild(stats.domElement);
 
     return stats;
   }
 
   private getModelEvent() {
-    this.sdk.Model.getData()
+    this.mpSdk?.Model.getData()
       .then((model: any) => {
         this.mpModel = model;
         console.log('Model', model);
@@ -144,11 +148,11 @@ class App {
     const callback = (object: any) => {
       console.log('>>> New model');
       console.log(object);
-      console.log('>>> New model was loaded!');
+      console.log('>>> New model was loaded.');
     };
 
     // Start listening to the event.
-    this.sdk.on(this.sdk.Model.Event.MODEL_LOADED, callback);
+    this.mpSdk?.on(this.mpSdk?.Model.Event.MODEL_LOADED, callback);
 
     // Stop listening to the event.
     //this.sdk.off(this.sdk.Model.Event.MODEL_LOADED, callback);
@@ -157,12 +161,12 @@ class App {
   private getCameraEvent() {
     const callback = (object: any) => {
       // console.log(object);
-      // console.log('Camera moved!');
+      // console.log('Camera moved.');
     };
 
-    this.sdk.on(this.sdk.Camera.Event.MOVE, callback);
+    this.mpSdk?.on(this.mpSdk?.Camera.Event.MOVE, callback);
 
-    this.sdk.Camera.pose.subscribe((pose: any) => {
+    this.mpSdk?.Camera.pose.subscribe((pose: any) => {
       // console.log('Camera', pose.position, pose.rotation, pose.sweep, pose.mode);
     });
   }
@@ -170,11 +174,11 @@ class App {
   private getFloorEvent() {
     const callback = (object: any) => {
       console.log(object);
-      console.log('Floor event!');
+      console.log('Floor event');
     };
 
-    this.sdk.on(this.sdk.Floor.Event.CHANGE_START, callback);
-    this.sdk.on(this.sdk.Floor.Event.CHANGE_END, callback);
+    this.mpSdk?.on(this.mpSdk?.Floor.Event.CHANGE_START, callback);
+    this.mpSdk?.on(this.mpSdk?.Floor.Event.CHANGE_END, callback);
 
     //TODO: not getting Flooor data
     // this.sdk.Floor.data.subscribe({
@@ -183,7 +187,7 @@ class App {
     //   }
     // });
 
-    this.sdk.Floor.getData()
+    this.mpSdk?.Floor.getData()
       .then((floors: any) => {
         this.mpFloors = floors;
         console.log('Floor:', floors.currentFloor);
@@ -194,7 +198,7 @@ class App {
         console.error('Floors data retrieval error.');
       });
 
-    this.sdk.Floor.current.subscribe((floor: any) => {
+    this.mpSdk?.Floor.current.subscribe((floor: any) => {
       if (floor.sequence === -1) {
         console.log('Viewing all floors');
       } else if (floor.sequence === undefined) {
@@ -209,13 +213,13 @@ class App {
 
         //TODO: BUG: floor.name is empty
         //console.log('Floor name:', floor.name)
-        console.log('Floor name:', this.mpFloors.floorNames[floor.sequence]);
+        console.log('Floor name:', this.mpFloors?.floorNames[floor.sequence]);
       }
     });
   }
 
   private getSweepEvent() {
-    this.sdk.Sweep.current.subscribe((sweep: any) => {
+    this.mpSdk?.Sweep.current.subscribe((sweep: any) => {
       if (sweep.sid === '') {
         console.log('Not currently stationed at a sweep position');
       } else {
@@ -225,14 +229,14 @@ class App {
       }
     });
 
-    this.sdk.Sweep.data.subscribe({
-      onAdded: (index: number, item: any, collection: any) => {
+    this.mpSdk?.Sweep.data.subscribe({
+      onAdded: (index: string, item: MpSdk.Sweep.ObservableSweepData, collection: Dictionary<MpSdk.Sweep.ObservableSweepData>) => {
         // console.log('Sweep added to the collection', index, item, collection);
       },
-      onRemoved: (index: number, item: any, collection: any) => {
+      onRemoved: (index: string, item: MpSdk.Sweep.ObservableSweepData, collection: Dictionary<MpSdk.Sweep.ObservableSweepData>) => {
         console.log('Sweep removed from the collection', index, item, collection);
       },
-      onUpdated: (index: number, item: any, collection: any) => {
+      onUpdated: (index: string, item: MpSdk.Sweep.ObservableSweepData, collection: Dictionary<MpSdk.Sweep.ObservableSweepData>) => {
         console.log('Sweep updated in place in the collection', index, item, collection);
       },
       onCollectionUpdated: (collection: any) => {
@@ -242,43 +246,43 @@ class App {
   }
 
   private getTourEvent() {
-    this.sdk.on(this.sdk.Tour.Event.STARTED, () => {
+    this.mpSdk?.on(this.mpSdk?.Tour.Event.STARTED, () => {
       console.log('Tour started');
     });
-    this.sdk.on(this.sdk.Tour.Event.STEPPED, (index: any) => {
+    this.mpSdk?.on(this.mpSdk?.Tour.Event.STEPPED, (index: any) => {
       console.log('Tour index:', index);
     });
-    this.sdk.on(this.sdk.Tour.Event.STOPPED, () => {
+    this.mpSdk?.on(this.mpSdk?.Tour.Event.STOPPED, () => {
       console.log('Tour stopped');
     });
-    this.sdk.on(this.sdk.Tour.Event.ENDED, () => {
+    this.mpSdk?.on(this.mpSdk?.Tour.Event.ENDED, () => {
       console.log('Tour ended');
     });
 
     //TODO: Find a way to test if Tour exits
     if (false) {
-      this.sdk.Tour.getData()
+      this.mpSdk?.Tour.getData()
         .then((tour: any) => {
           console.log('Tour has:', tour.length, 'stops');
-          return this.sdk.Tour.start(0);
+          return this.mpSdk?.Tour.start(0);
         })
         .then(() => {
           // console 'Tour started'
           // console -> 'Tour index 0'
-          return this.sdk.Tour.next();
+          return this.mpSdk?.Tour.next();
         })
         .then(() => {
           // console -> 'Tour index 1'
-          return this.sdk.Tour.step(3);
+          return this.mpSdk?.Tour.step(3);
         })
         .then(() => {
           // console -> 'Tour index 3'
-          return this.sdk.Tour.prev();
+          return this.mpSdk?.Tour.prev();
         })
         .then(() => {
           // console -> 'Tour index 2'
           // console -> 'Tour stopped'
-          return this.sdk.Tour.stop();
+          return this.mpSdk?.Tour.stop();
         });
     }
   }
@@ -311,7 +315,7 @@ class App {
   }
 
   private keyPressListener(): void {
-    this.window.addEventListener('keydown', (e: any) => {
+    this.embeddingWindow.addEventListener('keydown', (e: any) => {
       var keyStr = ['Control', 'Shift', 'Alt', 'Meta'].includes(e.key) ? '' : e.key + ' ';
       var reportStr = 'The ' + (e.ctrlKey ? 'Control ' : '') + (e.shiftKey ? 'Shift ' : '') + (e.altKey ? 'Alt ' : '') + (e.metaKey ? 'Meta ' : '') + keyStr + 'key was pressed.';
       console.log(reportStr);
@@ -325,7 +329,7 @@ class App {
         switch (e.key) {
           case 'e':
             console.log(`Camera.rotate`);
-            this.sdk.Camera.rotate(10, 0, { speed: 10 })
+            this.mpSdk?.Camera.rotate(10, 0, { speed: 10 })
               .then(() => {})
               .catch((error: any) => {});
             break;
@@ -334,25 +338,26 @@ class App {
             console.log(`Camera.pan`);
 
             // TODO: did not pan
-            this.sdk.Camera.pan({ x: 1, z: 1 })
+            this.mpSdk?.Camera.pan({ x: 1, z: 1 })
               .then(() => {})
               .catch((error: any) => {});
             break;
 
           case 't':
-            var sweepId = this.mpModel.sweeps[1].uuid;
-            var moveToOptions = {
-              rotation: { x: 0, y: 0 }, //x: 30, y: -45
-              transition: this.sdk.Sweep.Transition.INSTANT,
-              transitionTime: 2000 // in milliseconds
-            };
+            // TODO: Fix
+            // var sweepId = this.mpModel?.sweeps[1].uuid;
+            // var moveToOptions = {
+            //   rotation: { x: 0, y: 0 }, //x: 30, y: -45
+            //   transition: this.mpSdk?.Sweep.Transition.INSTANT,
+            //   transitionTime: 2000 // in milliseconds
+            // };
 
-            this.moveToSweep(sweepId, moveToOptions);
+            // this.moveToSweep(sweepId, moveToOptions);
             break;
 
           case 'm':
             console.log(`Camera.lookAtScreenCoords`);
-            this.sdk.Camera.lookAtScreenCoords(500, 320)
+            this.mpSdk?.Camera.lookAtScreenCoords(500, 320)
               .then(() => {})
               .catch((error: any) => {});
             break;
@@ -360,7 +365,7 @@ class App {
           case 'z':
             console.log(`Camera.zoomBy`);
 
-            this.sdk.Camera.zoomBy(0.1).then((newZoom: any) => {
+            this.mpSdk?.Camera.zoomBy(0.1).then((newZoom: any) => {
               console.log('Camera zoomed to', newZoom);
             });
             // sdk.Camera.zoomTo(2.0).then((newZoom: any) => { console.log('Camera zoomed to', newZoom); });
@@ -380,34 +385,34 @@ class App {
   }
 
   private getAppState() {
-    this.sdk.App.state.subscribe((appState: any) => {
+    this.mpSdk?.App.state.subscribe((appState: any) => {
       // app state has changed
       console.log('Application: ', appState.application);
-      console.log('Loaded at: ', appState.phaseTimes[this.sdk.App.Phase.LOADING]);
-      console.log('Started at: ', appState.phaseTimes[this.sdk.App.Phase.STARTING]);
+      console.log('Loaded at: ', appState.phaseTimes[this.mpSdk?.App.Phase.LOADING!]); // TODO: Fix
+      console.log('Started at: ', appState.phaseTimes[this.mpSdk?.App.Phase.STARTING!]); // TODO: Fix
 
       switch (appState.phase) {
-        case this.sdk.App.Phase.LOADING:
+        case this.mpSdk?.App.Phase.LOADING:
           console.log('Phase: ', appState.phase);
           break;
 
-        case this.sdk.App.Phase.STARTING:
+        case this.mpSdk?.App.Phase.STARTING:
           console.log('Phase: ', appState.phase);
           break;
 
-        case this.sdk.App.Phase.PLAYING:
+        case this.mpSdk?.App.Phase.PLAYING:
           console.log('Phase: ', appState.phase);
           break;
 
-        case this.sdk.App.Phase.UNINITIALIZED:
+        case this.mpSdk?.App.Phase.UNINITIALIZED:
           console.log('Phase: ', appState.phase);
           break;
 
-        case this.sdk.App.Phase.WAITING:
+        case this.mpSdk?.App.Phase.WAITING:
           console.log('Phase: ', appState.phase);
           break;
 
-        case this.sdk.App.Phase.ERROR:
+        case this.mpSdk?.App.Phase.ERROR:
           console.log('Phase: ', appState.phase);
           break;
       }
@@ -415,25 +420,25 @@ class App {
   }
 
   private settings() {
-    this.sdk.Settings.update('labels', true)
+    this.mpSdk?.Settings.update('labels', true)
       .then((data: any) => {
         console.log('Labels setting: ' + data);
       })
       .catch((error: any) => {});
 
-    this.sdk.Settings.get('labels')
+    this.mpSdk?.Settings.get() // 'labels'
       .then((data: any) => {
         console.log(`Labels setting: ${data}`);
       })
       .catch((error: any) => {});
 
-    this.sdk.Settings.update('param1', 'param 1')
+    this.mpSdk?.Settings.update('param1', 'param 1')
       .then((data: any) => {
         console.log('Labels setting: ' + data);
       })
       .catch((error: any) => {});
 
-    this.sdk.Settings.get('param1')
+    this.mpSdk?.Settings.get() // 'param1'
       .then((data: any) => {
         console.log(`Labels setting: ${data}`);
       })
@@ -443,7 +448,7 @@ class App {
   }
 
   private getTag() {
-    this.sdk.Mattertag.add([
+    this.mpSdk?.Mattertag.add([
       {
         label: 'tag01',
         description: 'Tag 01',
@@ -460,7 +465,7 @@ class App {
   private getPose() {
     let currentSweep = '';
 
-    this.sdk.Camera.pose.subscribe((pose: any) => {
+    this.mpSdk?.Camera.pose.subscribe((pose: any) => {
       // Changes to the Camera pose have occurred.
       this.mpCameraPose = pose;
       if (pose.sweep != currentSweep && pose.sweep != undefined) {
@@ -471,7 +476,7 @@ class App {
   }
 
   private getLabels(): void {
-    this.sdk.Label.getData()
+    this.mpSdk?.Label.getData()
       .then((labels: any) => {
         this.mpLabels = labels;
         console.log('Labels:');
@@ -483,7 +488,7 @@ class App {
   }
 
   private getMattertag(): void {
-    this.sdk.Mattertag.getData()
+    this.mpSdk?.Mattertag.getData()
       .then((mattertags: any) => {
         console.log('Mattertags:');
         console.log(mattertags);
@@ -494,7 +499,7 @@ class App {
   }
 
   private getModelDetails(): void {
-    this.sdk.Model.getDetails()
+    this.mpSdk?.Model.getDetails()
       .then((modelDetails: any) => {
         this.mpModelDetails = modelDetails;
         console.log('ModelDetails:', modelDetails);
@@ -505,7 +510,7 @@ class App {
   }
 
   private getTour(): void {
-    this.sdk.Tour.getData()
+    this.mpSdk?.Tour.getData()
       .then((snapshots: any) => {
         this.mpSnapshots = snapshots;
         console.log('Tour snapshots:', snapshots);
@@ -520,26 +525,27 @@ class App {
   }
 
   private getZoom() {
-    this.sdk.Camera.zoom.subscribe((zoom: any) => {
+    this.mpSdk?.Camera.zoom.subscribe((zoom: any) => {
       // console.log('Zoom: ', zoom.level);
     });
   }
 
   private getIntersection() {
-    this.sdk.Pointer.intersection.subscribe((intersectionData: any) => {
+    this.mpSdk?.Pointer.intersection.subscribe((intersectionData: any) => {
       // console.log('Intersection', intersectionData);
       this.intersectPoint = intersectionData.position;
     });
   }
 
   private moveMPCamera(): void {
-    const mode = this.sdk.Mode.Mode.FLOORPLAN;
+    const mode = this.mpSdk?.Mode.Mode.FLOORPLAN!; // TODO: Fix
     const position = { x: 0, y: 0, z: 0 };
     const rotation = { x: -90, y: 0 };
-    const transition = this.sdk.Mode.TransitionType.FLY;
+    const transition = this.mpSdk?.Mode.TransitionType.FLY;
     const zoom = 5;
 
-    this.sdk.Mode.moveMPCamera(mode, {
+    // Old: moveMPCamera
+    this.mpSdk?.Mode.moveTo(mode, {
       position: position,
       rotation: rotation,
       transition: transition,
@@ -554,7 +560,8 @@ class App {
   }
 
   private moveToSweep(sweepId: any, moveToOptions: any): void {
-    this.sdk.Sweep.moveMPCamera(sweepId, moveToOptions)
+    // Old: moveMPCamera
+    this.mpSdk?.Sweep.moveTo(sweepId, moveToOptions)
       .then((sweepId: any) => {
         console.log(`Arrived at sweep ${sweepId}`);
       })
@@ -564,7 +571,7 @@ class App {
   }
 
   private async configScene() {
-    await this.sdk.Scene.configure((renderer: THREE.WebGLRenderer, three: any, effectComposer: any) => {
+    await this.mpSdk?.Scene.configure((renderer: THREE.WebGLRenderer, three: any, effectComposer: any) => {
       this.threeRenderer = renderer;
 
       // configure PBR
@@ -582,31 +589,25 @@ class App {
   }
 
   private async addLights() {
-    // Setup your scene - https://matterport.github.io/showcase-sdk/sdkbundle_tutorials_models.html#setup-your-scene
-    const lights = await this.sdk.Scene.createNode();
-    {
-      const initial = {
-        enabled: true,
-        color: { r: 0.85, g: 0.9, b: 0.97 },
-        intensity: 1.5
-      };
-      lights.addComponent('mp.ambientLight', initial);
-    }
-    {
-      const initial = {
-        enabled: true,
-        debug: false,
-        intensity: 2,
-        color: { r: 1, g: 1, b: 1 },
-        position: { x: -0.2, y: 1, z: -0.1 },
-        target: { x: 0, y: 0, z: 0 }
-      };
-      lights.addComponent('mp.directionalLight', initial);
-    }
+    const ambientLightInitial = {
+      enabled: true,
+      color: { r: 0.85, g: 0.9, b: 0.97 },
+      intensity: 1.5
+    };
+    const directionalLightInitial = {
+      enabled: true,
+      debug: false,
+      intensity: 2,
+      color: { r: 1, g: 1, b: 1 },
+      position: { x: -0.2, y: 1, z: -0.1 },
+      target: { x: 0, y: 0, z: 0 }
+    };
+    const [sceneObject] = await this.mpSdk?.Scene.createObjects(1)!;
 
-    // {
-    //   lights.addComponent('mp.lights');
-    // }
+    // Setup your scene - https://matterport.github.io/showcase-sdk/sdkbundle_tutorials_models.html#setup-your-scene
+    const lights = sceneObject.addNode();
+    lights.addComponent('mp.ambientLight', ambientLightInitial);
+    lights.addComponent('mp.directionalLight', directionalLightInitial);
 
     lights.start();
   }
@@ -614,34 +615,40 @@ class App {
   private async addTransformControlToNode(iNode: any) {
     // Transform Control
     // https://matterport.github.io/showcase-sdk/sdkbundle_components_transformcontrols.html
-    const node = await this.sdk.Scene.createNode();
+    const [sceneObject] = await this.mpSdk?.Scene.createObjects(1)!; // TODO: Fix
+    const node = sceneObject.addNode();
     const myControl = node.addComponent('mp.transformControls');
+
     node.start();
 
-    // Make the transform control visible so that the user can manipulate the control selection.
-    myControl.inputs.visible = true;
-    // Attach the model to the transform control
-    myControl.inputs.selection = iNode;
-    // set 'translate' mode to position the selection.
-    myControl.inputs.mode = 'translate';
+    if (myControl.inputs != undefined) {
+      // Make the transform control visible so that the user can manipulate the control selection.
+      myControl.inputs.visible = true;
+
+      // Attach the model to the transform control
+      myControl.inputs.selection = iNode;
+
+      // set 'translate' mode to position the selection.
+      myControl.inputs.mode = 'translate';
+    }
   }
 
   private async addFBXModel() {
-    // Add component to the scene node - https://matterport.github.io/showcase-sdk/sdkbundle_tutorials_models.html#add-your-component-to-the-scene-node
-    const modelNode = await this.sdk.Scene.createNode();
-    this.playerNode = modelNode;
-    // this.addTransformControlToNode(modelNode);
-
+    // TODO: Fix
     const initial = {
-      url: 'http://localhost:8000/assets/models/actor.fbx',
+      url: 'http://localhost:8080/assets/models/actor.fbx',
       visible: true,
       localPosition: { x: 0, y: 0, z: 0 },
       localRotation: { x: 0, y: -90, z: 0 },
       localScale: { x: 1, y: 1, z: 1 }
     };
 
+    // Add component to the scene node - https://matterport.github.io/showcase-sdk/sdkbundle_tutorials_models.html#add-your-component-to-the-scene-node
+    const [sceneObject] = await this.mpSdk?.Scene.createObjects(1)!;
+    const modelNode = sceneObject.addNode();
+
     // Store the fbx component since we will need to adjust it in the next step.
-    const component = modelNode.addComponent(this.sdk.Scene.Component.FBX_LOADER, initial);
+    modelNode.addComponent('mp.fbxLoader', initial);
 
     // Scale model - https://matterport.github.io/showcase-sdk/sdkbundle_tutorials_models.html#scale-your-model
     // component.inputs.localScale = { x: 0.00002, y: 0.00002, z: 0.00002 };
@@ -659,41 +666,49 @@ class App {
     modelNode.start();
 
     setTimeout(() => {
-      const model = modelNode.obj3D.children[0].children[0]; // TODO: please explain in comment what .children[0].children[0] is and provide links to resources
-      const mixer = new THREE.AnimationMixer(model);
-      this.threeAnimMixer = mixer;
-      const animationWalk = model.animations[4]; // Walk
-      const action = mixer.clipAction(animationWalk);
-      action.play();
+      const i = 0;
 
-      const animCtrlDiv = document.createElement('div');
-      animCtrlDiv.style.position = 'absolute';
-      animCtrlDiv.style.top = '200px';
-      animCtrlDiv.style.right = '10px';
-      animCtrlDiv.style.zIndex = '999';
-      animCtrlDiv.style.display = 'flex';
-      animCtrlDiv.style.flexDirection = 'column';
-      document.body.appendChild(animCtrlDiv);
+      // const model = modelNode.obj3D.children[0].children[0]; // TODO: please explain in comment what .children[0].children[0] is and provide links to resources
+      // const mixer = new AnimationMixer(model);
 
-      for (let i in model.animations) {
-        const animation = model.animations[i];
-        const animButton = document.createElement('button');
-        animButton.style.height = '40px';
-        animButton.innerText = model.animations[i].name;
+      // this.threeAnimMixer = mixer;
 
-        animButton.addEventListener('click', (e) => {
-          // Stop all animations
-          for (let k in model.animations) {
-            const animation = model.animations[k];
-            this.threeAnimMixer.clipAction(animation).stop();
-          }
+      // const animationWalk = model.animations[4]; // Walk
+      // const action = mixer.clipAction(animationWalk);
 
-          // Start animation
-          const action = this.threeAnimMixer.clipAction(animation);
-          action.play();
-        });
-        animCtrlDiv.appendChild(animButton);
-      }
+      // action.play();
+
+      // const animCtrlDiv = document.createElement('div');
+
+      // animCtrlDiv.style.position = 'absolute';
+      // animCtrlDiv.style.top = '200px';
+      // animCtrlDiv.style.right = '10px';
+      // animCtrlDiv.style.zIndex = '999';
+      // animCtrlDiv.style.display = 'flex';
+      // animCtrlDiv.style.flexDirection = 'column';
+      // document.body.appendChild(animCtrlDiv);
+
+      // for (let i in model.animations) {
+      //   const animation = model.animations[i];
+      //   const animButton = document.createElement('button');
+
+      //   animButton.style.height = '40px';
+      //   animButton.innerText = model.animations[i].name;
+
+      //   animButton.addEventListener('click', (e) => {
+      //     // Stop all animations
+      //     for (let k in model.animations) {
+      //       const animation = model.animations[k];
+
+      //       this.threeAnimMixer?.clipAction(animation).stop();
+      //     }
+
+      //     // Start animation
+      //     const action = this.threeAnimMixer?.clipAction(animation)!; // TODO: Fix
+      //     action.play();
+      //   });
+      //   animCtrlDiv.appendChild(animButton);
+      // }
     }, 2000);
 
     // Animate it - https://matterport.github.io/showcase-sdk/sdkbundle_tutorials_models.html#animate-it
@@ -707,27 +722,30 @@ class App {
   }
 
   private async addGLTFModel() {
-    // Model
-    const node = await this.sdk.Scene.createNode();
-    this.addTransformControlToNode(node);
-
     const initial = {
-      url: 'http://localhost:8000/assets/models/SheenChair.glb'
+      url: 'http://localhost:8080/assets/models/SheenChair.glb'
       // visible: true,
       // localScale: { x: 1, y: 1, z: 1 },
       // localPosition: { x: 0, y: 0, z: 0 },
       // localRotation: { x: 0, y: 0, z: 0 }
     };
-    const component = node.addComponent(this.sdk.Scene.Component.GLTF_LOADER, initial);
-    node.position.set(1, -1.5, 0.7);
-    node.start();
+    const [sceneObject] = await this.mpSdk?.Scene.createObjects(1)!;
+    const modelNode = sceneObject.addNode();
+
+    this.addTransformControlToNode(modelNode);
+
+    // Store the fbx component since we will need to adjust it in the next step.
+    const component = modelNode.addComponent('mp.gltfLoader', initial);
+
+    modelNode.position.set(1, -1.5, 0.7);
+    modelNode.start();
   }
 
   private async addNavMesh() {
     // Model
     // const node = await this.sdk.Scene.createNode();
     // const initial = {
-    //   url: 'http://localhost:8000/assets/models/navMeshes/navMesh.glb',
+    //   url: 'http://localhost:8080/assets/models/navMeshes/navMesh.glb',
     //   visible: true
     // };
     // const component = node.addComponent(this.sdk.Scene.Component.GLTF_LOADER, initial);
@@ -748,21 +766,23 @@ class App {
 
     const loader = new GLTFLoader();
     loader.load(
-      'http://localhost:8000/assets/models/navMeshes/navMesh.glb',
-      function (gltf: any) {
+      'http://localhost:8080/assets/models/navMeshes/navMesh.glb',
+      (gltf: any) => {
         gltf.scene.traverse((child: any) => {
           if (child.type === 'Mesh') {
             //Create NavigationSystem
             console.log('navMesh', child);
-            const navSystem = new NavigationSystem(this.threeClock, this.intersectPoint, this.threeScene, child, this.playerNode, this.showcaseElement);
+            const childMesh = child as Mesh;
+            const scene = this?.threeScene as Scene;
+            const navSystem = new NavigationSystem(this.threeClock, this.intersectPoint, scene, childMesh, this.playerNode, this?.showcaseIframe!);
           }
         });
-      }.bind(this)
+      } // .bind(this) // TODO: Fix
     );
   }
 
   private getMeasurements() {
-    this.sdk.Measurements.data.subscribe({
+    this.mpSdk?.Measurements.data.subscribe({
       onAdded: (index: any, item: any, collection: any) => {
         console.log('item added to the collection', index, item, collection);
       },
@@ -774,7 +794,7 @@ class App {
       }
     });
 
-    this.sdk.Measurements.mode.subscribe((measurementModeState: any) => {
+    this.mpSdk?.Measurements.mode.subscribe((measurementModeState: any) => {
       console.log('isActive? ', measurementModeState.active);
     });
 

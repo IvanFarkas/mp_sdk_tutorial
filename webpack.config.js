@@ -1,7 +1,7 @@
 const path = require("path");
 const webpack = require("webpack");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
-const {CleanWebpackPlugin} = require("clean-webpack-plugin");
+const { CleanWebpackPlugin } = require("clean-webpack-plugin");
 const CopyPlugin = require("copy-webpack-plugin");
 const DotEnvPlugin = require("dotenv-webpack");
 
@@ -66,7 +66,7 @@ module.exports = {
   },
   devServer: {
     // https: true,
-    port: 8000,
+    port: 8080,
   },
   externals: ["tls", "net", "fs"],
 };

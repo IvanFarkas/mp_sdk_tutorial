@@ -1,59 +1,56 @@
-import * as THREE from 'three';
+import { Scene, Object3D, Event, Mesh, BufferGeometry, MeshPhongMaterial } from 'three';
 import { GLTFExporter } from 'three/examples/jsm/exporters/GLTFExporter';
 
-export default function ExportScene(scene: THREE.Scene) {
+export default function ExportScene(scene: Scene) {
   //Export scene
   setTimeout(() => {
-    let roomObject: THREE.Object3D = null;
-    scene.traverse(function (child: any) {
-      if (child.type === 'Object3D' && child.name.startsWith('ModelMesh')) {
-        roomObject = child.clone();
+    let roomObject: Object3D<Event> | null = null;
+
+    scene.traverse((object: Object3D<Event>) => {
+      if (object.type === 'Object3D' && object.name.startsWith('ModelMesh')) {
+        roomObject = object.clone();
       }
     });
 
     if (roomObject) {
-      const convertedObject = convertMPToThreeMesh(roomObject);
+      const convertedObject: Object3D<Event> = convertMPToThreeMesh(roomObject);
+
       exportToGLTF(convertedObject);
     }
   }, 3000);
 }
 
-function convertMPToThreeMesh(obj: any) {
-  const singleGeometry = new THREE.Geometry();
-  obj.traverse(function (child: any) {
+function convertMPToThreeMesh(obj: Object3D<Event>): Mesh<BufferGeometry, MeshPhongMaterial> {
+  const geometry = new BufferGeometry();
+
+  obj.traverse((child: any) => {
     if (child.type === 'Mesh' && child.name.startsWith('RoomMesh')) {
       child.updateMatrix();
-      singleGeometry.merge(new THREE.Geometry().fromBufferGeometry(child.geometry), child.matrix);
+      geometry.merge(child.geometry, child.matrix);
     }
   });
-
-  const resultMesh = new THREE.Mesh(singleGeometry, new THREE.MeshPhongMaterial());
-  return resultMesh;
+  return new Mesh(geometry, new MeshPhongMaterial());
 }
 
-function exportToGLTF(input: any) {
+function exportToGLTF(input: Object3D<Event>) {
   const link = document.createElement('a');
+
   link.style.display = 'none';
   document.body.appendChild(link); // Firefox workaround, see #6594
 
-  function save(blob: any, filename: any) {
+  const save = (blob: any, filename: string) => {
     link.href = URL.createObjectURL(blob);
     link.download = filename;
     link.click();
-
     // URL.revokeObjectURL( url ); breaks Firefox...
-  }
-
-  function saveString(text: any, filename: any) {
+  };
+  const saveString = (text: string, filename: string) => {
     save(new Blob([text], { type: 'text/plain' }), filename);
-  }
-
-  function saveArrayBuffer(buffer: any, filename: any) {
+  };
+  const saveArrayBuffer = (buffer: any, filename: string) => {
     save(new Blob([buffer], { type: 'application/octet-stream' }), filename);
-  }
-
+  };
   const gltfExporter = new GLTFExporter();
-
   const options = {
     trs: false,
     onlyVisible: true,
@@ -61,13 +58,15 @@ function exportToGLTF(input: any) {
     binary: true,
     maxTextureSize: 1024
   };
+
   gltfExporter.parse(
     input,
-    function (result: any) {
+    (result: object) => {
       if (result instanceof ArrayBuffer) {
         saveArrayBuffer(result, 'scene.glb');
       } else {
         const output = JSON.stringify(result, null, 2);
+
         console.log(output);
         saveString(output, 'scene.gltf');
       }

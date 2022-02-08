@@ -9,7 +9,7 @@ export interface HttpBinData {
 }
 
 export function getEnv(name: string): string {
-  let val = process.env[name];
+  let val = process.env[name]!; // TODO: Fix
   return val;
 }
 

@@ -9,7 +9,7 @@ yarn install
 
 ## Download and extract the latest Bundle SDK
 ```shell
-curl https://static.matterport.com/showcase-sdk/bundle/3.1.41.5-19-g5133fdd3e/showcase-bundle.zip -o bundle.zip
+curl https://static.matterport.com/showcase-sdk/bundle/	3.1.51.7-84-g0dcbe0591/showcase-bundle.zip -o bundle.zip
 unzip bundle.zip -d ./bundle
 rm bundle.zip
 ```

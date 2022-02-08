@@ -26,7 +26,7 @@ export async function run() {
     await get();
     await post();
     await update();
-  } catch (err) {
+  } catch (err: any) {
     console.error('Failed: ' + err.message);
   }
 }
@@ -44,8 +44,10 @@ async function get() {
   // Get Resource: strong typing of resource(s) via generics.
   // In this case httpbin.org has a response structure response.result carries the resource(s)
   cm.heading('REST GET');
-  let response: rm.IRestResponse<cm.HttpBinData> = await client.get<cm.HttpBinData>('get', options);
-  console.log(response.statusCode, response.result['url']);
+
+  let response: rm.IRestResponse<cm.HttpBinData> = await client.get<cm.HttpBinData>('get', options)!;
+
+  // console.log(response.statusCode, response.result['url']); // TODO: Fix
 }
 
 async function post() {
