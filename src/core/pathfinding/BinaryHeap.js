@@ -1,9 +1,11 @@
-// javascript-astar
-// http://github.com/bgrins/javascript-astar
-// Freely distributable under the MIT License.
-// Implements the astar search algorithm in javascript using a binary heap.
+/*eslint no-constant-condition: ["error", { "checkLoops": false }]*/
 
-class BinaryHeap {
+/**
+ * Binary Heap
+ *
+ * @type {Class}
+ */
+export class BinaryHeap {
   constructor(scoreFunction) {
     this.content = [];
     this.scoreFunction = scoreFunction;
@@ -20,10 +22,11 @@ class BinaryHeap {
   pop() {
     // Store the first element so we can return it later.
     const result = this.content[0];
+
     // Get the element at the end of the array.
     const end = this.content.pop();
-    // If there are any elements left, put the end element at the
-    // start, and let it bubble up.
+
+    // If there are any elements left, put the end element at the start, and let it bubble up.
     if (this.content.length > 0) {
       this.content[0] = end;
       this.bubbleUp(0);
@@ -34,13 +37,11 @@ class BinaryHeap {
   remove(node) {
     const i = this.content.indexOf(node);
 
-    // When it is found, the process seen in 'pop' is repeated
-    // to fill up the hole.
+    // When it is found, the process seen in 'pop' is repeated to fill up the hole.
     const end = this.content.pop();
 
     if (i !== this.content.length - 1) {
       this.content[i] = end;
-
       if (this.scoreFunction(end) < this.scoreFunction(node)) {
         this.sinkDown(i);
       } else {
@@ -71,6 +72,7 @@ class BinaryHeap {
         // Swap the elements if the parent is greater.
         this.content[parentN] = element;
         this.content[n] = parent;
+
         // Update 'n' to continue at the new position.
         n = parentN;
       } else {
@@ -82,18 +84,20 @@ class BinaryHeap {
 
   bubbleUp(n) {
     // Look up the target element and its score.
-    const length = this.content.length,
-      element = this.content[n],
-      elemScore = this.scoreFunction(element);
+    const length = this.content.length;
+    const element = this.content[n];
+    const elemScore = this.scoreFunction(element);
 
+    // 
     while (true) {
       // Compute the indices of the child elements.
-      const child2N = (n + 1) << 1,
-        child1N = child2N - 1;
-      // This is used to store the new position of the element,
-      // if any.
+      const child2N = (n + 1) << 1
+      const child1N = child2N - 1;
+
+      // This is used to store the new position of the element, if any.
       let swap = null;
       let child1Score;
+
       // If the first child exists (is inside the array)...
       if (child1N < length) {
         // Look it up and compute its score.
@@ -108,8 +112,8 @@ class BinaryHeap {
 
       // Do the same checks for the other child.
       if (child2N < length) {
-        const child2 = this.content[child2N],
-          child2Score = this.scoreFunction(child2);
+        const child2 = this.content[child2N]
+        const child2Score = this.scoreFunction(child2);
         if (child2Score < (swap === null ? elemScore : child1Score)) {
           swap = child2N;
         }
@@ -129,5 +133,3 @@ class BinaryHeap {
     }
   }
 }
-
-export { BinaryHeap };

@@ -13,8 +13,10 @@ const OFFSET = 0.2;
 
 /**
  * Helper for debugging pathfinding behavior.
+ *
+ * @type {Class}
  */
-class PathfindingHelper extends Object3D {
+ export class PathfindingHelper extends Object3D {
   constructor() {
     super();
 
@@ -122,5 +124,3 @@ class PathfindingHelper extends Object3D {
     return this;
   }
 }
-
-export { PathfindingHelper };

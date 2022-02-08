@@ -1,8 +1,14 @@
 import { BufferAttribute, BufferGeometry } from 'three';
 
-class Utils {
+/**
+ * Utils
+ *
+ * @type {Class}
+ */
+export class Utils {
   static roundNumber(value, decimals) {
     const factor = Math.pow(10, decimals);
+
     return Math.round(value * factor) / factor;
   }
 
@@ -11,9 +17,9 @@ class Utils {
   }
 
   static distanceToSquared(a, b) {
-    var dx = a.x - b.x;
-    var dy = a.y - b.y;
-    var dz = a.z - b.z;
+    const dx = a.x - b.x;
+    const dy = a.y - b.y;
+    const dz = a.z - b.z;
 
     return dx * dx + dy * dy + dz * dz;
   }
@@ -21,18 +27,21 @@ class Utils {
   //+ Jonas Raoni Soares Silva
   //@ http://jsfromhell.com/math/is-point-in-poly [rev. #0]
   static isPointInPoly(poly, pt) {
-    for (var c = false, i = -1, l = poly.length, j = l - 1; ++i < l; j = i)
+    let retrval = false;
+
+    for (let c = false, i = -1, l = poly.length, j = l - 1; ++i < l; j = i) {
       ((poly[i].z <= pt.z && pt.z < poly[j].z) || (poly[j].z <= pt.z && pt.z < poly[i].z)) && pt.x < ((poly[j].x - poly[i].x) * (pt.z - poly[i].z)) / (poly[j].z - poly[i].z) + poly[i].x && (c = !c);
-    return c;
+      retrval = c
+    }
+    return retrval;
   }
 
   static isVectorInPolygon(vector, polygon, vertices) {
-    // reference point will be the centroid of the polygon
+    // Reference point will be the centroid of the polygon
     // We need to rotate the vector as well as all the points which the polygon uses
-
-    var lowestPoint = 100000;
-    var highestPoint = -100000;
-    var polygonVertices = [];
+    let lowestPoint = 100000;
+    let highestPoint = -100000;
+    let polygonVertices = [];
 
     polygon.vertexIds.forEach((vId) => {
       lowestPoint = Math.min(vertices[vId].y, lowestPoint);
@@ -47,10 +56,11 @@ class Utils {
   }
 
   static triarea2(a, b, c) {
-    var ax = b.x - a.x;
-    var az = b.z - a.z;
-    var bx = c.x - a.x;
-    var bz = c.z - a.z;
+    const ax = b.x - a.x;
+    const az = b.z - a.z;
+    const bx = c.x - a.x;
+    const bz = c.z - a.z;
+
     return bx * az - ax * bz;
   }
 
@@ -71,26 +81,26 @@ class Utils {
 
     // Generate an index buffer if the geometry doesn't have one, or optimize it
     // if it's already available.
-    var hashToIndex = {};
-    var indices = geometry.getIndex();
-    var positions = geometry.getAttribute('position');
-    var vertexCount = indices ? indices.count : positions.count;
+    const hashToIndex = {};
+    const indices = geometry.getIndex();
+    const positions = geometry.getAttribute('position');
+    const vertexCount = indices ? indices.count : positions.count;
 
     // Next value for triangle indices.
-    var nextIndex = 0;
+    let nextIndex = 0;
 
-    var newIndices = [];
-    var newPositions = [];
+    const newIndices = [];
+    const newPositions = [];
 
     // Convert the error tolerance to an amount of decimal places to truncate to.
-    var decimalShift = Math.log10(1 / tolerance);
-    var shiftMultiplier = Math.pow(10, decimalShift);
+    const decimalShift = Math.log10(1 / tolerance);
+    const shiftMultiplier = Math.pow(10, decimalShift);
 
-    for (var i = 0; i < vertexCount; i++) {
-      var index = indices ? indices.getX(i) : i;
+    for (let i = 0; i < vertexCount; i++) {
+      const index = indices ? indices.getX(i) : i;
 
       // Generate a hash for the vertex attributes at the current index 'i'.
-      var hash = '';
+      let hash = '';
 
       // Double tilde truncates the decimal value.
       hash += `${~~(positions.getX(index) * shiftMultiplier)},`;
@@ -115,11 +125,10 @@ class Utils {
     // Construct merged BufferGeometry.
     const positionAttribute = new BufferAttribute(new Float32Array(newPositions), positions.itemSize, positions.normalized);
     const result = new BufferGeometry();
+
     result.setAttribute('position', positionAttribute);
     result.setIndex(newIndices);
 
     return result;
   }
 }
-
-export { Utils };

@@ -8,9 +8,8 @@ export interface HttpBinData {
   data: any;
 }
 
-export function getEnv(name: string): string {
-  let val = process.env[name]!; // TODO: Fix
-  return val;
+export function getEnv(name: string): string | undefined {
+  return process.env[name];
 }
 
 export function banner(title: string): void {
@@ -36,7 +35,8 @@ export async function outputHttpBinResponse(body: string, message?: http.Incomin
     }
   }
   if (body) {
-    let obj = JSON.parse(body.toString());
+    const obj = JSON.parse(body.toString());
+
     console.log('response from ' + obj.url);
     if (obj.data) {
       console.log('data:', obj.data);
@@ -49,9 +49,10 @@ export async function outputHttpBinResponse(body: string, message?: http.Incomin
 // It's an artifact of sample service used.
 // But it's useful to note that we do offer a processing function which is invoked on the returned json.
 export function httpBinOptions(): restm.IRequestOptions {
-  let options: restm.IRequestOptions = <restm.IRequestOptions>{};
+  const options: restm.IRequestOptions = {} as restm.IRequestOptions;
+
   options.responseProcessor = (obj: any) => {
-    return obj['data'];
+    return obj.data;
   };
   return options;
 }

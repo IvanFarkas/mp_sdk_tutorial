@@ -1,5 +1,5 @@
-import { Vector3, Scene, Clock, Mesh } from 'three';
-import { Pathfinding, PathfindingHelper } from './pathfinding';
+import {Vector3, Scene, Clock, Mesh} from 'three';
+import {Pathfinding, PathfindingHelper} from './pathfinding';
 
 const ZONE = 'level';
 const SPEED = 50;
@@ -58,7 +58,7 @@ export default class NavigationSystem {
       return;
     }
 
-    const targetGroupID = this.pathfinder.getGroup(ZONE, this.targetPosition, true)!; // TODO: Fix
+    const targetGroupID = this.pathfinder.getGroup(ZONE, this.targetPosition, true);
     const closestTargetNode: any = this.pathfinder.getClosestNode(this.targetPosition, ZONE, targetGroupID, true);
 
     this.helper.setTargetPosition(this.targetPosition);
@@ -89,7 +89,7 @@ export default class NavigationSystem {
       return;
     }
 
-    let targetPosition = this.path[0];
+    const targetPosition = this.path[0];
     const velocity = targetPosition.clone().sub(this.playerPosition);
 
     if (velocity.lengthSq() > 0.05 * 0.05) {

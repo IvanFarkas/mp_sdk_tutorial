@@ -1,10 +1,15 @@
 import { BinaryHeap } from './BinaryHeap';
 import { Utils } from './Utils.js';
 
-class AStar {
+/**
+ * AStar
+ *
+ * @type {Class}
+ */
+ export class AStar {
   static init(graph) {
     for (let x = 0; x < graph.length; x++) {
-      //for(var x in graph) {
+      //for(let x in graph) {
       const node = graph[x];
       node.f = 0;
       node.g = 0;
@@ -37,7 +42,7 @@ class AStar {
 
   static search(graph, start, end) {
     this.init(graph);
-    //heuristic = heuristic || astar.manhattan;
+    // heuristic = heuristic || astar.manhattan;
 
     const openHeap = this.heap();
 
@@ -51,6 +56,7 @@ class AStar {
       if (currentNode === end) {
         let curr = currentNode;
         const ret = [];
+
         while (curr.parent) {
           ret.push(curr);
           curr = curr.parent;
@@ -82,7 +88,10 @@ class AStar {
           // Found an optimal (so far) path to this node.  Take score for node to see how good it is.
           neighbour.visited = true;
           neighbour.parent = currentNode;
-          if (!neighbour.centroid || !end.centroid) throw new Error('Unexpected state');
+          if (!neighbour.centroid || !end.centroid) {
+            throw new Error('Unexpected state');
+          }
+
           neighbour.h = neighbour.h || this.heuristic(neighbour.centroid, end.centroid);
           neighbour.g = gScore;
           neighbour.f = neighbour.g + neighbour.h;
@@ -116,5 +125,3 @@ class AStar {
     return ret;
   }
 }
-
-export { AStar };

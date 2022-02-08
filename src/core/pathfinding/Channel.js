@@ -1,6 +1,11 @@
 import { Utils } from './Utils';
 
-class Channel {
+/**
+ * Channel
+ *
+ * @type {Class}
+ */
+ export class Channel {
   constructor() {
     this.portals = [];
   }
@@ -16,6 +21,7 @@ class Channel {
   stringPull() {
     const portals = this.portals;
     const pts = [];
+
     // Init scan state
     let portalApex, portalLeft, portalRight;
     let apexIndex = 0,
@@ -42,14 +48,17 @@ class Channel {
         } else {
           // Right over left, insert left to path and restart scan from portal left point.
           pts.push(portalLeft);
+
           // Make current left the new apex.
           portalApex = portalLeft;
           apexIndex = leftIndex;
+
           // Reset portal
           portalLeft = portalApex;
           portalRight = portalApex;
           leftIndex = apexIndex;
           rightIndex = apexIndex;
+
           // Restart scan
           i = apexIndex;
           continue;
@@ -65,14 +74,17 @@ class Channel {
         } else {
           // Left over right, insert right to path and restart scan from portal right point.
           pts.push(portalRight);
+
           // Make current right the new apex.
           portalApex = portalRight;
           apexIndex = rightIndex;
+
           // Reset portal
           portalLeft = portalApex;
           portalRight = portalApex;
           leftIndex = apexIndex;
           rightIndex = apexIndex;
+
           // Restart scan
           i = apexIndex;
           continue;
@@ -89,5 +101,3 @@ class Channel {
     return pts;
   }
 }
-
-export { Channel };

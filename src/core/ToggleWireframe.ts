@@ -16,12 +16,12 @@ export default function ToggleWireframe(scene: any, wireframe: boolean) {
     }
   }
 
-  // if (wireframe == false) {
+  // if (wireframe === false) {
   //   // TODO: Why are we getting Error: TypeError: model.traverse is not a function
   //   scene.traverse((child) => {
   //     let mesh: THREE.Mesh = (<THREE.Mesh>child).isMesh ? <THREE.Mesh>child : null;
 
-  //     if (mesh != null) {
+  //     if (mesh !== null) {
   //       // Setup our wireframe
   //       const wireframeGeometry = new THREE.WireframeGeometry(mesh.geometry);
   //       const wireframeMaterial = new THREE.LineBasicMaterial({ color: 0xffffff });
@@ -51,7 +51,7 @@ function logSceneObjects(object: any) {
     case 'Mesh':
       if (object.name.startsWith('RoomMesh:')) {
         // console.log('\t\t', object.name, object);
-        if (object.name == 'RoomMesh:0-4') {
+        if (object.name === 'RoomMesh:0-4') {
           let geometry: THREE.BufferGeometry = object.geometry;
           // console.log('\t\t', geometry.name, geometry);
 
