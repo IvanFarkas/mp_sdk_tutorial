@@ -2,10 +2,10 @@ import {Scene, WebGLRenderer, Vector3, Clock, AnimationMixer, Mesh} from 'three'
 import Stats from 'three/examples/jsm/libs/stats.module';
 import {GLTFLoader} from 'three/examples/jsm/loaders/GLTFLoader';
 import * as restSamples from './rest';
-import {MpSdk, ShowcaseBundleWindow, ConnectOptions, Floor, Label, Model, Scene as MpScene, Sweep, Dictionary} from '../bundle/sdk';
-import ExportScene from './core/ExportScene';
-import ToggleWireframe from './core/ToggleWireframe';
-import NavigationSystem from './core/NavigationSystem';
+import {MpSdk, ShowcaseBundleWindow, ConnectOptions, Floor, Label, Model, Scene as MpScene, Sweep, Dictionary} from '@bundle/sdk';
+import ExportScene from '@core/ExportScene';
+import ToggleWireframe from '@core/ToggleWireframe';
+import NavigationSystem from '@core/NavigationSystem';
 
 // TODO: Fix to work like in Threejs-TS/src/client/client.ts line 6 - https://github.com/IvanFarkas/Threejs-TS/blob/dbb8bc6edde359d612a2b051c9b51b6e5ad8eefa/src/client/client.ts#L6
 // import { GUI } from 'three/examples/jsm/libs/dat.gui.module'

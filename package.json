@@ -75,18 +75,22 @@
       "import/resolver": {
         "node": {
           "extensions": [
+            ".js",
+            ".jsx",
             ".ts",
-            ".tsx"
-          ]
+            ".tsx",
+            ".d.ts"
+          ],
+          "alwaysTryTypes": true
         },
         "typescript": {
+          "alwaysTryTypes": true,
+          "project": "src",
           "extensions": [
             ".ts",
             ".tsx",
-            ".js",
-            ".jsx"
-          ],
-          "alwaysTryTypes": true
+            ".d.ts"
+          ]
         }
       }
     }
@@ -185,7 +189,7 @@
     "postcss-preset-env": "^7.3.1",
     "prettier": "^2.5.1",
     "regenerator-runtime": "^0.13.9",
-    "sass": "~1.49",
+    "sass": "~1.26.11",
     "sass-loader": "^12.4.0",
     "source-map-loader": "^3.0.1",
     "style-loader": "^3.3.1",

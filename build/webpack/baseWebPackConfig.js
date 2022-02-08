@@ -36,7 +36,8 @@ function getPlugins(env) {
     new CopyPlugin({
       patterns: [
         { from: 'src/assets/models', to: 'assets/models' },
-        { from: 'src/assets/images', to: 'assets/images' }
+        { from: 'src/assets/images', to: 'assets/images' },
+        { from: 'src/bundle', to: 'bundle' }
       ],
     }),
   ];
