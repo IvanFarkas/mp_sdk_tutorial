@@ -2,7 +2,7 @@ import {Scene, WebGLRenderer, Vector3, Clock, AnimationMixer, Mesh} from 'three'
 import Stats from 'three/examples/jsm/libs/stats.module';
 import {GLTFLoader} from 'three/examples/jsm/loaders/GLTFLoader';
 import * as restSamples from './rest';
-import {MpSdk, ShowcaseBundleWindow, ConnectOptions, Floor, Label, Model, Scene as MpScene, Sweep, Dictionary} from '@bundle/sdk';
+import {MpSdk, ShowcaseBundleWindow, ConnectOptions, Floor, Label, Model, Scene as MpScene, Sweep, Dictionary} from '../bundle/sdk';
 import ExportScene from '@core/ExportScene';
 import ToggleWireframe from '@core/ToggleWireframe';
 import NavigationSystem from '@core/NavigationSystem';
@@ -11,6 +11,7 @@ import NavigationSystem from '@core/NavigationSystem';
 // import { GUI } from 'three/examples/jsm/libs/dat.gui.module'
 
 // Read from .env file
+const Port = process.env.PORT;
 const ModelId = process.env.MODEL_ID;
 const SdkKey = process.env.SDK_KEY;
 const SdkVersion = process.env.SDK_VERSION; // https://matterport.github.io/showcase-sdk/sdk_release_notes.html
@@ -646,7 +647,7 @@ class App {
 
   private async addFBXModel() {
     const initial = {
-      url: 'http://localhost:8080/assets/models/actor.fbx',
+      url: `http://localhost:${Port}/assets/models/actor.fbx`,
       visible: true,
       localPosition: {x: 0, y: 0, z: 0},
       localRotation: {x: 0, y: -90, z: 0},
@@ -737,7 +738,7 @@ class App {
 
   private async addGLTFModel() {
     const initial = {
-      url: 'http://localhost:8080/assets/models/SheenChair.glb',
+      url: `http://localhost:${Port}/assets/models/SheenChair.glb`,
       // visible: true,
       // localScale: { x: 1, y: 1, z: 1 },
       // localPosition: { x: 0, y: 0, z: 0 },
@@ -763,7 +764,7 @@ class App {
     // Model
     // const node = await this.sdk.Scene.createNode();
     // const initial = {
-    //   url: 'http://localhost:8080/assets/models/navMeshes/navMesh.glb',
+    //   url: `http://localhost:${Port}/assets/models/navMeshes/navMesh.glb`,
     //   visible: true
     // };
     // const component = node.addComponent(this.sdk.Scene.Component.GLTF_LOADER, initial);
@@ -784,7 +785,7 @@ class App {
 
     const loader = new GLTFLoader();
     loader.load(
-      'http://localhost:8080/assets/models/navMeshes/navMesh.glb',
+      `http://localhost:${Port}/assets/models/navMeshes/navMesh.glb`,
       (gltf: any) => {
         gltf.scene.traverse((child: any) => {
           if (child.type === 'Mesh') {

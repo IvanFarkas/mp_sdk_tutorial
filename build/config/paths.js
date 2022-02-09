@@ -2,6 +2,8 @@ import path from 'path'; // path library from node.js
 
 class paths {
   constructor() {
+    this.srcBundle = 'bundle';
+
     this.root = path.resolve(path.join(__dirname), '../../');
     this.src = path.join(this.root, 'src');
 

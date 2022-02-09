@@ -36,8 +36,7 @@ function getPlugins(env) {
     new CopyPlugin({
       patterns: [
         { from: 'src/assets/models', to: 'assets/models' },
-        { from: 'src/assets/images', to: 'assets/images' },
-        { from: 'src/bundle', to: 'bundle' }
+        { from: 'src/assets/images', to: 'assets/images' }
       ],
     }),
   ];
@@ -48,6 +47,7 @@ export function getBaseWebPackConfig(env, argv) {
   let config = {};
   config.mode = 'development'; // We'll set the mode here, you could set this differently pending on the value of env or argv being passed in from command line
   const isLocalDev = argv.env.localdev ? true : false;
+  const Port = process.env.PORT;
 
   // Get the plugins from our getPlugins helper
   config.plugins = getPlugins(env);
@@ -78,7 +78,7 @@ export function getBaseWebPackConfig(env, argv) {
   };
 
   config.resolve = {
-    extensions: ['.scss', '.js', '.jsx', '.tsx', '.ts'],
+    extensions: ['.scss', '.js', '.jsx', '.tsx', '.ts', '.d.ts'],
     plugins: [
       new tsConfigPathPlugin(), // This is the third final piece to using tsConfig as a source of truth for path aliases, it tells webpack to use it to resolve aliases in our actual code during compilation.
     ],
@@ -118,11 +118,16 @@ export function getBaseWebPackConfig(env, argv) {
         ],
       },
       {
+        test: /\.js$/,
+        exclude: /node_modules/,
+        use: ["babel-loader"]
+      },      
+      {
         // This is another webpack 5 feature you don't get with CRA on webpack 4.
         // It can automatically pull any files we reference and spit them out as assets in the output folder.
         // In webpack 4 you had to use file loader, url loader, and so on no more with webpack 5, much simpler.
         test: /\.(woff(2)?|ttf|eot|svg|jpg|jpeg|png|gif|pdf)(\?v=\d+\.\d+\.\d+)?$/, // Here we tell webpack that all fonts, images, pdfs are are asset/resource
-        type: 'asset/resource',
+        type: 'asset/resource'
       },
       {
         test: /\.(scss|sass)$/, // Tell webpack how to process scss and sass files
@@ -200,7 +205,7 @@ export function getBaseWebPackConfig(env, argv) {
     config.devServer = {
       historyApiFallback: true,
       hot: true, // Turns on hot module reloading capability so when we change src it reloads the module we changed, thus causing a react rerender!
-      port: 4000,
+      port: Port,
       client: {
         progress: true,
         overlay: true,
