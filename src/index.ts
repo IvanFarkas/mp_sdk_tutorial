@@ -99,7 +99,7 @@ class App {
         // ToggleWireframe(this.threeScene, true);
         // ExportScene(this.threeScene);
 
-        // this.addGLTFModel();
+        this.addGLTFModel();
         this.addFBXModel();
         this.addNavMesh();
 
@@ -641,7 +641,7 @@ class App {
     };
 
     // Store the fbx component since we will need to adjust it in the next step.
-    const component = modelNode.addComponent(this.sdk.Scene.Component.FBX_LOADER, initial);
+    const component = modelNode.addComponent('mp.fbxLoader', initial);
 
     // Scale model - https://matterport.github.io/showcase-sdk/sdkbundle_tutorials_models.html#scale-your-model
     // component.inputs.localScale = { x: 0.00002, y: 0.00002, z: 0.00002 };
@@ -718,7 +718,7 @@ class App {
       // localPosition: { x: 0, y: 0, z: 0 },
       // localRotation: { x: 0, y: 0, z: 0 }
     };
-    const component = node.addComponent(this.sdk.Scene.Component.GLTF_LOADER, initial);
+    const component = node.addComponent('mp.gltfLoader', initial);
     node.position.set(1, -1.5, 0.7);
     node.start();
   }

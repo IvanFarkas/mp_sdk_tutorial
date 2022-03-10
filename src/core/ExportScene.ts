@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { GLTFExporter } from 'three/examples/jsm/exporters/GLTFExporter';
+import { BufferGeometryUtils } from 'three/examples/jsm/utils/BufferGeometryUtils';
 
 export default function ExportScene(scene: THREE.Scene) {
   //Export scene
@@ -19,11 +20,11 @@ export default function ExportScene(scene: THREE.Scene) {
 }
 
 function convertMPToThreeMesh(obj: any) {
-  const singleGeometry = new THREE.Geometry();
+  let singleGeometry = new THREE.BufferGeometry();
   obj.traverse(function (child: any) {
     if (child.type === 'Mesh' && child.name.startsWith('RoomMesh')) {
       child.updateMatrix();
-      singleGeometry.merge(new THREE.Geometry().fromBufferGeometry(child.geometry), child.matrix);
+      singleGeometry = BufferGeometryUtils.mergeBufferGeometries([child.geometry, singleGeometry]);
     }
   });
 

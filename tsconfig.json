@@ -10,12 +10,8 @@
     "noImplicitReturns": true,
     "noEmitOnError": true,
     "esModuleInterop": true,
-    "lib": ["es2017", "dom"],
-    "typeRoots": ["node_modules/@types"],
-    "paths": {
-      "three/examples/jsm/libs/dat.gui.module": ["../../node_modules/@types/dat.gui"]
-    },
+    "lib": ["es2015", "dom"],
     "allowJs": true
   },
-  "include": ["src/**/*.ts"]
+  "include": ["./src/**/**/*"]
 }
