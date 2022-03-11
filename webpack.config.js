@@ -1,10 +1,11 @@
 const path = require("path");
 const webpack = require("webpack");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
-const {CleanWebpackPlugin} = require("clean-webpack-plugin");
+const { CleanWebpackPlugin } = require("clean-webpack-plugin");
 const CopyPlugin = require("copy-webpack-plugin");
-const DotEnvPlugin = require("dotenv-webpack");
+const Dotenv = require("dotenv-webpack");
 
+console.log('PORT')
 module.exports = {
   stats: {
     //errorDetails: true,
@@ -39,18 +40,14 @@ module.exports = {
       patterns: [
         {
           from: "bundle",
-          to: "dist/bundle",
+          to: "bundle",
         },
       ],
     }),
     new webpack.ProvidePlugin({
       process: "process/browser",
     }),
-    new DotEnvPlugin(),
-    // new webpack.DefinePlugin({
-    //   'process.env.NODE_ENV': JSON.stringify('development')
-    // }),
-    //new webpack.EnvironmentPlugin(['MY_ENV_VAR']), // <--This is shorthand, does the same thing as the DefinePlugin
+    new Dotenv(),
   ],
   module: {
     rules: [
@@ -66,7 +63,10 @@ module.exports = {
   },
   devServer: {
     // https: true,
-    port: 8085,
+    
+    // TODO: It did not take it from the .env file. It used 8080. I do not know why.
+    // port: process.env.PORT,
+    port: 8000,
   },
   externals: ["tls", "net", "fs"],
 };

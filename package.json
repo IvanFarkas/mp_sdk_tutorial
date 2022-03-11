@@ -8,6 +8,8 @@
   "scripts": {
     "start": "webpack serve --config ./webpack.config.js",
     "build-prod": "webpack --mode=production",
+    "build": "webpack-dev-server --env production --mode production",
+    "dev": "webpack-dev-server --env development --mode development",
     "fix": "prettier -w \"src/**/*.{js,jsx,ts,tsx}\"",
     "fetch-bundle": "curl https://static.matterport.com/showcase-sdk/bundle/3.1.51.7-84-g0dcbe0591/showcase-bundle.zip -o bundle.zip",
     "expand-bundle": "unzip -o bundle.zip -d ./bundle",
@@ -39,7 +41,7 @@
     "@types/three": "^0.129.0",
     "clean-webpack-plugin": "^3.0.0",
     "copy-webpack-plugin": "^9.0.0",
-    "dotenv-webpack": "^7.0.3",
+    "dotenv-webpack": "^7.1.0",
     "html-webpack-plugin": "^5.3.1",
     "prettier": "^2.3.1",
     "ts-loader": "^9.2.3",

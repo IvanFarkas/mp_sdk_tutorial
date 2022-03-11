@@ -11,6 +11,7 @@ import NavigationSystem from './core/NavigationSystem';
 
 // Read from .env file
 const NodeEnv = process.env.NODE_ENV;
+const PORT = process.env.PORT;
 const ModelId = process.env.MODEL_ID;
 const SdkKey = process.env.SDK_KEY;
 const SdkVersion = process.env.SDK_VERSION; // https://matterport.github.io/showcase-sdk/sdk_release_notes.html
@@ -43,6 +44,7 @@ class App {
   constructor() {
     // Print environment variables
     console.log('NodeEnv:', NodeEnv);
+    console.log('Port:', PORT);
     console.log('ModelId:', ModelId);
     console.log('SdkKey:', SdkKey);
     console.log('SdkVersion:', SdkVersion);
@@ -633,7 +635,7 @@ class App {
     // this.addTransformControlToNode(modelNode);
 
     const initial = {
-      url: 'http://localhost:8000/assets/models/actor.fbx',
+      url: `http://localhost:${PORT}/assets/models/actor.fbx`,
       visible: true,
       localPosition: { x: 0, y: 0, z: 0 },
       localRotation: { x: 0, y: -90, z: 0 },
@@ -712,7 +714,7 @@ class App {
     this.addTransformControlToNode(node);
 
     const initial = {
-      url: 'http://localhost:8000/assets/models/SheenChair.glb'
+      url: `http://localhost:${PORT}/assets/models/SheenChair.glb`
       // visible: true,
       // localScale: { x: 1, y: 1, z: 1 },
       // localPosition: { x: 0, y: 0, z: 0 },
@@ -727,7 +729,7 @@ class App {
     // Model
     // const node = await this.sdk.Scene.createNode();
     // const initial = {
-    //   url: 'http://localhost:8000/assets/models/navMeshes/navMesh.glb',
+    //   url: `http://localhost:${PORT}/assets/models/navMeshes/navMesh.glb`,
     //   visible: true
     // };
     // const component = node.addComponent(this.sdk.Scene.Component.GLTF_LOADER, initial);
@@ -748,7 +750,7 @@ class App {
 
     const loader = new GLTFLoader();
     loader.load(
-      'http://localhost:8000/assets/models/navMeshes/navMesh.glb',
+      `http://localhost:${PORT}/assets/models/navMeshes/navMesh.glb`,
       function (gltf: any) {
         gltf.scene.traverse((child: any) => {
           if (child.type === 'Mesh') {
