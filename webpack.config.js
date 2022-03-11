@@ -66,7 +66,7 @@ module.exports = {
   },
   devServer: {
     // https: true,
-    port: 8000,
+    port: 8085,
   },
   externals: ["tls", "net", "fs"],
 };
