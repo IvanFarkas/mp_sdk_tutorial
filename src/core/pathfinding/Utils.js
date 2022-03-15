@@ -22,7 +22,10 @@ class Utils {
   //@ http://jsfromhell.com/math/is-point-in-poly [rev. #0]
   static isPointInPoly(poly, pt) {
     for (var c = false, i = -1, l = poly.length, j = l - 1; ++i < l; j = i)
-      ((poly[i].z <= pt.z && pt.z < poly[j].z) || (poly[j].z <= pt.z && pt.z < poly[i].z)) && pt.x < ((poly[j].x - poly[i].x) * (pt.z - poly[i].z)) / (poly[j].z - poly[i].z) + poly[i].x && (c = !c);
+      ((poly[i].z <= pt.z && pt.z < poly[j].z) || (poly[j].z <= pt.z && pt.z < poly[i].z)) &&
+        pt.x <
+          ((poly[j].x - poly[i].x) * (pt.z - poly[i].z)) / (poly[j].z - poly[i].z) + poly[i].x &&
+        (c = !c);
     return c;
   }
 
@@ -40,7 +43,11 @@ class Utils {
       polygonVertices.push(vertices[vId]);
     });
 
-    if (vector.y < highestPoint + 0.5 && vector.y > lowestPoint - 0.5 && this.isPointInPoly(polygonVertices, vector)) {
+    if (
+      vector.y < highestPoint + 0.5 &&
+      vector.y > lowestPoint - 0.5 &&
+      this.isPointInPoly(polygonVertices, vector)
+    ) {
       return true;
     }
     return false;
@@ -113,7 +120,11 @@ class Utils {
     }
 
     // Construct merged BufferGeometry.
-    const positionAttribute = new BufferAttribute(new Float32Array(newPositions), positions.itemSize, positions.normalized);
+    const positionAttribute = new BufferAttribute(
+      new Float32Array(newPositions),
+      positions.itemSize,
+      positions.normalized
+    );
     const result = new BufferGeometry();
     result.setAttribute('position', positionAttribute);
     result.setIndex(newIndices);

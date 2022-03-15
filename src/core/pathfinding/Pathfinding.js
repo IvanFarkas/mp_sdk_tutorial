@@ -79,7 +79,10 @@ class Pathfinding {
     if (nodes) {
       nodes.forEach((node) => {
         const distance = Utils.distanceToSquared(node.centroid, position);
-        if (distance < closestDistance && (!checkPolygon || Utils.isVectorInPolygon(position, node, vertices))) {
+        if (
+          distance < closestDistance &&
+          (!checkPolygon || Utils.isVectorInPolygon(position, node, vertices))
+        ) {
           closestNode = node;
           closestDistance = distance;
         }
@@ -162,9 +165,17 @@ Pathfinding.prototype.getGroup = (function () {
       const group = zone.groups[i];
       for (const node of group) {
         if (checkPolygon) {
-          plane.setFromCoplanarPoints(zone.vertices[node.vertexIds[0]], zone.vertices[node.vertexIds[1]], zone.vertices[node.vertexIds[2]]);
+          plane.setFromCoplanarPoints(
+            zone.vertices[node.vertexIds[0]],
+            zone.vertices[node.vertexIds[1]],
+            zone.vertices[node.vertexIds[2]]
+          );
           if (Math.abs(plane.distanceToPoint(position)) < 0.01) {
-            const poly = [zone.vertices[node.vertexIds[0]], zone.vertices[node.vertexIds[1]], zone.vertices[node.vertexIds[2]]];
+            const poly = [
+              zone.vertices[node.vertexIds[0]],
+              zone.vertices[node.vertexIds[1]],
+              zone.vertices[node.vertexIds[2]],
+            ];
             if (Utils.isPointInPoly(poly, position)) {
               return i;
             }
@@ -218,12 +229,20 @@ Pathfinding.prototype.clampStep = (function () {
     closestDistance = Infinity;
 
     // Project the step along the current node.
-    plane.setFromCoplanarPoints(vertices[node.vertexIds[0]], vertices[node.vertexIds[1]], vertices[node.vertexIds[2]]);
+    plane.setFromCoplanarPoints(
+      vertices[node.vertexIds[0]],
+      vertices[node.vertexIds[1]],
+      vertices[node.vertexIds[2]]
+    );
     plane.projectPoint(endRef, point);
     endPoint.copy(point);
 
     for (let currentNode = nodeQueue.pop(); currentNode; currentNode = nodeQueue.pop()) {
-      triangle.set(vertices[currentNode.vertexIds[0]], vertices[currentNode.vertexIds[1]], vertices[currentNode.vertexIds[2]]);
+      triangle.set(
+        vertices[currentNode.vertexIds[0]],
+        vertices[currentNode.vertexIds[1]],
+        vertices[currentNode.vertexIds[2]]
+      );
 
       triangle.closestPointToPoint(endPoint, point);
 

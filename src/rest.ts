@@ -36,9 +36,9 @@ async function get() {
     queryParameters: {
       params: {
         id: 1,
-        type: 'compact'
-      }
-    }
+        type: 'compact',
+      },
+    },
   };
 
   // Get Resource: strong typing of resource(s) via generics.
@@ -61,7 +61,11 @@ async function update() {
   hello.message += '!';
 
   // Specify a full url (not relative) per request
-  let hres: rm.IRestResponse<HelloObj> = await client.update<HelloObj>(baseUrl + 'patch', hello, options);
+  let hres: rm.IRestResponse<HelloObj> = await client.update<HelloObj>(
+    baseUrl + 'patch',
+    hello,
+    options
+  );
   console.log(hres.result);
 
   cm.heading('REST options');

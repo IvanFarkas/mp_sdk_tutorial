@@ -239,7 +239,7 @@ class App {
       },
       onCollectionUpdated: (collection: any) => {
         // console.log('Sweep entire up-to-date collection', collection);
-      }
+      },
     });
   }
 
@@ -315,7 +315,14 @@ class App {
   private keyPressListener(): void {
     this.window.addEventListener('keydown', (e: any) => {
       var keyStr = ['Control', 'Shift', 'Alt', 'Meta'].includes(e.key) ? '' : e.key + ' ';
-      var reportStr = 'The ' + (e.ctrlKey ? 'Control ' : '') + (e.shiftKey ? 'Shift ' : '') + (e.altKey ? 'Alt ' : '') + (e.metaKey ? 'Meta ' : '') + keyStr + 'key was pressed.';
+      var reportStr =
+        'The ' +
+        (e.ctrlKey ? 'Control ' : '') +
+        (e.shiftKey ? 'Shift ' : '') +
+        (e.altKey ? 'Alt ' : '') +
+        (e.metaKey ? 'Meta ' : '') +
+        keyStr +
+        'key was pressed.';
       console.log(reportStr);
 
       //--- Was a Ctrl-Alt-E combo pressed?
@@ -346,7 +353,7 @@ class App {
             var moveToOptions = {
               rotation: { x: 0, y: 0 }, //x: 30, y: -45
               transition: this.sdk.Sweep.Transition.INSTANT,
-              transitionTime: 2000 // in milliseconds
+              transitionTime: 2000, // in milliseconds
             };
 
             this.moveToSweep(sweepId, moveToOptions);
@@ -454,8 +461,8 @@ class App {
         stemVector: { x: 0, y: 0.3, z: 0 },
         // blue disc
         color: { r: 0.0, g: 0.0, b: 1.0 },
-        floorId: 0 // optional, if not specified the sdk will provide an estimate of the floor id for the anchor position provided.
-      }
+        floorId: 0, // optional, if not specified the sdk will provide an estimate of the floor id for the anchor position provided.
+      },
     ]);
   }
 
@@ -545,7 +552,7 @@ class App {
       position: position,
       rotation: rotation,
       transition: transition,
-      zoom
+      zoom,
     })
       .then((nextMode: any) => {
         console.log(`View mode: ${nextMode}`);
@@ -566,21 +573,23 @@ class App {
   }
 
   private async configScene() {
-    await this.sdk.Scene.configure((renderer: THREE.WebGLRenderer, three: any, effectComposer: any) => {
-      this.threeRenderer = renderer;
+    await this.sdk.Scene.configure(
+      (renderer: THREE.WebGLRenderer, three: any, effectComposer: any) => {
+        this.threeRenderer = renderer;
 
-      // configure PBR
-      renderer.physicallyCorrectLights = true;
+        // configure PBR
+        renderer.physicallyCorrectLights = true;
 
-      // configure shadow mapping
-      renderer.shadowMap.enabled = true;
-      //renderer.shadowMap.bias = 0.0001;
-      renderer.shadowMap.type = three.PCFSoftShadowMap;
+        // configure shadow mapping
+        renderer.shadowMap.enabled = true;
+        //renderer.shadowMap.bias = 0.0001;
+        renderer.shadowMap.type = three.PCFSoftShadowMap;
 
-      if (effectComposer) {
-        // add a custom pass here
+        if (effectComposer) {
+          // add a custom pass here
+        }
       }
-    });
+    );
   }
 
   private async addLights() {
@@ -590,7 +599,7 @@ class App {
       const initial = {
         enabled: true,
         color: { r: 0.85, g: 0.9, b: 0.97 },
-        intensity: 1.5
+        intensity: 1.5,
       };
       lights.addComponent('mp.ambientLight', initial);
     }
@@ -601,7 +610,7 @@ class App {
         intensity: 2,
         color: { r: 1, g: 1, b: 1 },
         position: { x: -0.2, y: 1, z: -0.1 },
-        target: { x: 0, y: 0, z: 0 }
+        target: { x: 0, y: 0, z: 0 },
       };
       lights.addComponent('mp.directionalLight', initial);
     }
@@ -639,7 +648,7 @@ class App {
       visible: true,
       localPosition: { x: 0, y: 0, z: 0 },
       localRotation: { x: 0, y: -90, z: 0 },
-      localScale: { x: 1, y: 1, z: 1 }
+      localScale: { x: 1, y: 1, z: 1 },
     };
 
     // Store the fbx component since we will need to adjust it in the next step.
@@ -714,7 +723,7 @@ class App {
     this.addTransformControlToNode(node);
 
     const initial = {
-      url: `http://localhost:${PORT}/assets/models/SheenChair.glb`
+      url: `http://localhost:${PORT}/assets/models/SheenChair.glb`,
       // visible: true,
       // localScale: { x: 1, y: 1, z: 1 },
       // localPosition: { x: 0, y: 0, z: 0 },
@@ -756,7 +765,14 @@ class App {
           if (child.type === 'Mesh') {
             //Create NavigationSystem
             console.log('navMesh', child);
-            const navSystem = new NavigationSystem(this.threeClock, this.intersectPoint, this.threeScene, child, this.playerNode, this.showcaseElement);
+            const navSystem = new NavigationSystem(
+              this.threeClock,
+              this.intersectPoint,
+              this.threeScene,
+              child,
+              this.playerNode,
+              this.showcaseElement
+            );
           }
         });
       }.bind(this)
@@ -773,7 +789,7 @@ class App {
       },
       onUpdated: (index: any, item: any, collection: any) => {
         console.log('item updated in place in the collection', index, item, collection);
-      }
+      },
     });
 
     this.sdk.Measurements.mode.subscribe((measurementModeState: any) => {

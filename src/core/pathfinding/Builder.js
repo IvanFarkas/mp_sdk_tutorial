@@ -57,7 +57,7 @@ class Builder {
           neighbours: neighbourIndices,
           vertexIds: poly.vertexIds,
           centroid: centroid,
-          portals: portals
+          portals: portals,
         };
       });
 
@@ -171,7 +171,7 @@ class Builder {
 
     return {
       polygons: polygons,
-      vertices: vertices
+      vertices: vertices,
     };
   }
 
@@ -198,7 +198,9 @@ class Builder {
     } else if (shared0 && shared2) {
       return [a2, a0]; // this ordering will affect the string pull algorithm later, not clear if significant
     } else {
-      console.warn('Error processing navigation mesh neighbors; neighbors with <2 shared vertices found.');
+      console.warn(
+        'Error processing navigation mesh neighbors; neighbors with <2 shared vertices found.'
+      );
       return [];
     }
   }

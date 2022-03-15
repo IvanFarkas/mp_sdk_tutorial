@@ -9,7 +9,7 @@ class Channel {
     if (p2 === undefined) p2 = p1;
     this.portals.push({
       left: p1,
-      right: p2
+      right: p2,
     });
   }
 
@@ -35,7 +35,10 @@ class Channel {
 
       // Update right vertex.
       if (Utils.triarea2(portalApex, portalRight, right) <= 0.0) {
-        if (Utils.vequal(portalApex, portalRight) || Utils.triarea2(portalApex, portalLeft, right) > 0.0) {
+        if (
+          Utils.vequal(portalApex, portalRight) ||
+          Utils.triarea2(portalApex, portalLeft, right) > 0.0
+        ) {
           // Tighten the funnel.
           portalRight = right;
           rightIndex = i;
@@ -58,7 +61,10 @@ class Channel {
 
       // Update left vertex.
       if (Utils.triarea2(portalApex, portalLeft, left) >= 0.0) {
-        if (Utils.vequal(portalApex, portalLeft) || Utils.triarea2(portalApex, portalRight, left) < 0.0) {
+        if (
+          Utils.vequal(portalApex, portalLeft) ||
+          Utils.triarea2(portalApex, portalRight, left) < 0.0
+        ) {
           // Tighten the funnel.
           portalLeft = left;
           leftIndex = i;

@@ -60,7 +60,7 @@ function exportToGLTF(input: any) {
     onlyVisible: true,
     truncateDrawRange: true,
     binary: true,
-    maxTextureSize: 1024
+    maxTextureSize: 1024,
   };
   gltfExporter.parse(
     input,
