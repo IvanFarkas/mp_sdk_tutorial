@@ -82,8 +82,10 @@ class AStar {
           // Found an optimal (so far) path to this node.  Take score for node to see how good it is.
           neighbour.visited = true;
           neighbour.parent = currentNode;
-          if (!neighbour.centroid || !end.centroid) throw new Error('Unexpected state');
-          neighbour.h = neighbour.h || this.heuristic(neighbour.centroid, end.centroid);
+          if (!neighbour.centroid || !end.centroid)
+            throw new Error('Unexpected state');
+          neighbour.h =
+            neighbour.h || this.heuristic(neighbour.centroid, end.centroid);
           neighbour.g = gScore;
           neighbour.f = neighbour.g + neighbour.h;
 

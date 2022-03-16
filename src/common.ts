@@ -26,7 +26,10 @@ export function heading(title: string): void {
 }
 
 // Utility functions
-export async function outputHttpBinResponse(body: string, message?: http.IncomingMessage) {
+export async function outputHttpBinResponse(
+  body: string,
+  message?: http.IncomingMessage
+) {
   if (message) {
     if (message.statusCode) {
       console.log('status', message.statusCode);

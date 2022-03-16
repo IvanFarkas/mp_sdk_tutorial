@@ -11,7 +11,10 @@ export async function run() {
   const domain = '';
   const url = '';
 
-  const basicHandler: hm.BasicCredentialHandler = new hm.BasicCredentialHandler(username, password);
+  const basicHandler: hm.BasicCredentialHandler = new hm.BasicCredentialHandler(
+    username,
+    password
+  );
   const patHandler: hm.PersonalAccessTokenCredentialHandler =
     new hm.PersonalAccessTokenCredentialHandler(
       'scbfb44vxzku5l4xgc3qfazn3lpk4awflfryc76esaiq7aypcbhs'

@@ -24,11 +24,17 @@ function convertMPToThreeMesh(obj: any) {
   obj.traverse(function (child: any) {
     if (child.type === 'Mesh' && child.name.startsWith('RoomMesh')) {
       child.updateMatrix();
-      singleGeometry = BufferGeometryUtils.mergeBufferGeometries([child.geometry, singleGeometry]);
+      singleGeometry = BufferGeometryUtils.mergeBufferGeometries([
+        child.geometry,
+        singleGeometry,
+      ]);
     }
   });
 
-  const resultMesh = new THREE.Mesh(singleGeometry, new THREE.MeshPhongMaterial());
+  const resultMesh = new THREE.Mesh(
+    singleGeometry,
+    new THREE.MeshPhongMaterial()
+  );
   return resultMesh;
 }
 

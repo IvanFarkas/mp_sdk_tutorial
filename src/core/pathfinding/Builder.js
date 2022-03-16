@@ -37,11 +37,15 @@ class Builder {
       const newGroup = new Array(group.length);
       group.forEach((poly, polyIndex) => {
         const neighbourIndices = [];
-        poly.neighbours.forEach((n) => neighbourIndices.push(indexByPolygon.get(n)));
+        poly.neighbours.forEach((n) =>
+          neighbourIndices.push(indexByPolygon.get(n))
+        );
 
         // Build a portal list to each neighbour
         const portals = [];
-        poly.neighbours.forEach((n) => portals.push(this._getSharedVerticesInOrder(poly, n)));
+        poly.neighbours.forEach((n) =>
+          portals.push(this._getSharedVerticesInOrder(poly, n))
+        );
 
         const centroid = new Vector3(0, 0, 0);
         centroid.add(zone.vertices[poly.vertexIds[0]]);
@@ -166,7 +170,10 @@ class Builder {
 
     // Build a list of adjacent polygons
     polygons.forEach((polygon) => {
-      polygon.neighbours = this._buildPolygonNeighbours(polygon, vertexPolygonMap);
+      polygon.neighbours = this._buildPolygonNeighbours(
+        polygon,
+        vertexPolygonMap
+      );
     });
 
     return {

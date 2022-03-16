@@ -57,8 +57,13 @@ function logSceneObjects(object: any) {
 
           // Add Wireframe
           const wireframeGeometry = new THREE.WireframeGeometry(geometry);
-          const wireframeMaterial = new THREE.LineBasicMaterial({ color: 0xffffff });
-          const wireframe = new THREE.LineSegments(wireframeGeometry, wireframeMaterial);
+          const wireframeMaterial = new THREE.LineBasicMaterial({
+            color: 0xffffff,
+          });
+          const wireframe = new THREE.LineSegments(
+            wireframeGeometry,
+            wireframeMaterial
+          );
 
           wireframe.name = 'wireframe';
           object.add(wireframe);

@@ -44,7 +44,8 @@ async function get() {
   // Get Resource: strong typing of resource(s) via generics.
   // In this case httpbin.org has a response structure response.result carries the resource(s)
   cm.heading('REST GET');
-  let response: rm.IRestResponse<cm.HttpBinData> = await client.get<cm.HttpBinData>('get', options);
+  let response: rm.IRestResponse<cm.HttpBinData> =
+    await client.get<cm.HttpBinData>('get', options);
   console.log(response.statusCode, response.result['url']);
 }
 
@@ -52,7 +53,11 @@ async function post() {
   // Create and Update Resource(s)
   // Generics <T,R> are the type sent and the type returned in the body.  Ideally the same in REST service
   cm.heading('REST POST');
-  let hres: rm.IRestResponse<HelloObj> = await client.create<HelloObj>('/post', hello, options);
+  let hres: rm.IRestResponse<HelloObj> = await client.create<HelloObj>(
+    '/post',
+    hello,
+    options
+  );
   console.log(hres.result);
 }
 

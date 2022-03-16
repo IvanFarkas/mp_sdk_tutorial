@@ -47,8 +47,14 @@ class PathfindingHelper extends Object3D {
       new MeshBasicMaterial({ color: colors.CLAMPED_STEP })
     );
     this._pathMarker = new Object3D();
-    this._pathLineMaterial = new LineBasicMaterial({ color: colors.PATH, linewidth: 5 });
-    this._pathPointMaterial = new MeshBasicMaterial({ color: colors.WAYPOINT, depthTest: false });
+    this._pathLineMaterial = new LineBasicMaterial({
+      color: colors.PATH,
+      linewidth: 5,
+    });
+    this._pathPointMaterial = new MeshBasicMaterial({
+      color: colors.WAYPOINT,
+      depthTest: false,
+    });
     this._pathPointGeometry = new SphereBufferGeometry(0.1);
     this._markers = [
       this._playerMarker,
@@ -77,9 +83,17 @@ class PathfindingHelper extends Object3D {
 
     // Draw debug lines
     const geometry = new BufferGeometry();
-    geometry.setAttribute('position', new BufferAttribute(new Float32Array(path.length * 3), 3));
+    geometry.setAttribute(
+      'position',
+      new BufferAttribute(new Float32Array(path.length * 3), 3)
+    );
     for (let i = 0; i < path.length; i++) {
-      geometry.attributes.position.setXYZ(i, path[i].x, path[i].y + OFFSET, path[i].z);
+      geometry.attributes.position.setXYZ(
+        i,
+        path[i].x,
+        path[i].y + OFFSET,
+        path[i].z
+      );
     }
     this._pathMarker.add(new Line(geometry, this._pathLineMaterial));
 

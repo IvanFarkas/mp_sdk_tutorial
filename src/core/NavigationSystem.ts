@@ -2,7 +2,7 @@ import * as THREE from 'three';
 import { Pathfinding, PathfindingHelper } from './pathfinding';
 
 const ZONE = 'level';
-const SPEED = 50;
+const SPEED = 80;
 
 export default class NavigationSystem {
   groupID: any;
@@ -46,13 +46,21 @@ export default class NavigationSystem {
     this.pathfinder.setZoneData(ZONE, zone);
     this.groupID = this.pathfinder.getGroup(ZONE, this.playerPosition);
     this.helper.setPlayerPosition(
-      new THREE.Vector3(0.1519576176984144, -1.6576147965629167, 0.8018497944956335)
+      new THREE.Vector3(
+        0.1519576176984144,
+        -1.6576147965629167,
+        0.8018497944956335
+      )
     );
     this.helper.setTargetPosition(
-      new THREE.Vector3(0.1519576176984144, -1.6576147965629167, 0.8018497944956335)
+      new THREE.Vector3(
+        0.1519576176984144,
+        -1.6576147965629167,
+        0.8018497944956335
+      )
     );
 
-    showcaseElement.contentDocument.body.addEventListener('click', this.onClick.bind(this), false);
+    // showcaseElement.contentDocument.body.addEventListener('click', this.onClick.bind(this), false);
 
     this.playerNode = playerNode;
     this.animate();
@@ -63,7 +71,7 @@ export default class NavigationSystem {
     this.helper.reset().setPlayerPosition(this.playerPosition);
 
     // Teleport on ctrl/cmd click or RMB.
-    if (event.ctrlKey) {
+    if (event?.ctrlKey) {
       this.playerNode.position.set(
         this.targetPosition.x,
         this.targetPosition.y,
@@ -77,14 +85,73 @@ export default class NavigationSystem {
         this.groupID,
         true
       );
-      this.helper.setPlayerPosition(this.playerPosition.copy(this.targetPosition));
+      this.helper.setPlayerPosition(
+        this.playerPosition.copy(this.targetPosition)
+      );
       if (closestNode) {
         this.helper.setNodePosition(closestNode.centroid);
       }
       return;
     }
 
-    const targetGroupID = this.pathfinder.getGroup(ZONE, this.targetPosition, true);
+    const targetGroupID = this.pathfinder.getGroup(
+      ZONE,
+      this.targetPosition,
+      true
+    );
+    const closestTargetNode: any = this.pathfinder.getClosestNode(
+      this.targetPosition,
+      ZONE,
+      targetGroupID,
+      true
+    );
+
+    this.helper.setTargetPosition(this.targetPosition);
+    if (closestTargetNode) {
+      this.helper.setNodePosition(closestTargetNode.centroid);
+    }
+
+    // Calculate a path to the target and store it
+    this.path = this.pathfinder.findPath(
+      this.playerPosition,
+      this.targetPosition,
+      ZONE,
+      this.groupID
+    );
+
+    if (this.path && this.path.length) {
+      this.helper.setPath(this.path);
+    } else {
+      const closestPlayerNode = this.pathfinder.getClosestNode(
+        this.playerPosition,
+        ZONE,
+        this.groupID
+      );
+      const clamped = new THREE.Vector3();
+
+      // TODO(donmccurdy): Don't clone targetPosition, fix the bug.
+      this.pathfinder.clampStep(
+        this.playerPosition,
+        this.targetPosition.clone(),
+        closestPlayerNode,
+        ZONE,
+        this.groupID,
+        clamped
+      );
+
+      this.helper.setStepPosition(clamped);
+    }
+  }
+
+  public moveTo(point: THREE.Vector3) {
+    this.targetPosition.copy(point);
+    this.helper.reset().setPlayerPosition(this.playerPosition);
+
+    const targetGroupID = this.pathfinder.getGroup(
+      ZONE,
+      this.targetPosition,
+      true
+    );
     const closestTargetNode: any = this.pathfinder.getClosestNode(
       this.targetPosition,
       ZONE,
@@ -142,7 +209,9 @@ export default class NavigationSystem {
       velocity.normalize();
 
       // Move player to target
-      this.playerPosition.add(velocity.multiplyScalar(this.clock.getDelta() * SPEED));
+      this.playerPosition.add(
+        velocity.multiplyScalar(this.clock.getDelta() * SPEED)
+      );
       this.helper.setPlayerPosition(this.playerPosition);
 
       // Follow helper

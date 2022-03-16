@@ -51,7 +51,10 @@ class Pathfinding {
 
     polygons.forEach((p) => {
       if (nearPosition && nearRange) {
-        if (Utils.distanceToSquared(nearPosition, p.centroid) < nearRange * nearRange) {
+        if (
+          Utils.distanceToSquared(nearPosition, p.centroid) <
+          nearRange * nearRange
+        ) {
           candidates.push(p.centroid);
         }
       } else {
@@ -106,8 +109,18 @@ class Pathfinding {
     const nodes = this.zones[zoneID].groups[groupID];
     const vertices = this.zones[zoneID].vertices;
 
-    const closestNode = this.getClosestNode(startPosition, zoneID, groupID, true);
-    const farthestNode = this.getClosestNode(targetPosition, zoneID, groupID, true);
+    const closestNode = this.getClosestNode(
+      startPosition,
+      zoneID,
+      groupID,
+      true
+    );
+    const farthestNode = this.getClosestNode(
+      targetPosition,
+      zoneID,
+      groupID,
+      true
+    );
 
     // If we can't find any node, just go straight to the target
     if (!closestNode || !farthestNode) {
@@ -181,7 +194,10 @@ Pathfinding.prototype.getGroup = (function () {
             }
           }
         }
-        const measuredDistance = Utils.distanceToSquared(node.centroid, position);
+        const measuredDistance = Utils.distanceToSquared(
+          node.centroid,
+          position
+        );
         if (measuredDistance < distance) {
           closestNodeGroup = i;
           distance = measuredDistance;
@@ -237,7 +253,11 @@ Pathfinding.prototype.clampStep = (function () {
     plane.projectPoint(endRef, point);
     endPoint.copy(point);
 
-    for (let currentNode = nodeQueue.pop(); currentNode; currentNode = nodeQueue.pop()) {
+    for (
+      let currentNode = nodeQueue.pop();
+      currentNode;
+      currentNode = nodeQueue.pop()
+    ) {
       triangle.set(
         vertices[currentNode.vertexIds[0]],
         vertices[currentNode.vertexIds[1]],

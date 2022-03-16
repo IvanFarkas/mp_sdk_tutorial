@@ -40,6 +40,7 @@ class App {
   threeAnimMixer: any;
   intersectPoint: THREE.Vector3;
   playerNode: any;
+  navigationSystem: NavigationSystem;
 
   constructor() {
     // Print environment variables
@@ -50,7 +51,9 @@ class App {
     console.log('SdkVersion:', SdkVersion);
 
     // Set showcase IFrame attributes
-    this.showcaseElement = <HTMLIFrameElement>document.getElementById('showcase');
+    this.showcaseElement = <HTMLIFrameElement>(
+      document.getElementById('showcase')
+    );
     this.showcaseElement.src = `/bundle/showcase.html?m=${ModelId}&applicationKey=${SdkKey}&play=1&qs=1&log=0`;
     this.showcaseElement.width = '100%';
     this.showcaseElement.height = '100%';
@@ -67,7 +70,11 @@ class App {
       try {
         this.window = this.showcaseElement.contentWindow;
         // using the latest server-side SDK version in the .connect function - https://matterport.github.io/showcase-sdk/sdk_release_notes.html
-        this.sdk = await this.window.MP_SDK.connect(this.showcaseElement, SdkKey, SdkVersion);
+        this.sdk = await this.window.MP_SDK.connect(
+          this.showcaseElement,
+          SdkKey,
+          SdkVersion
+        );
         console.log('SDK :', this.sdk);
 
         const scenes = await this.sdk.Scene.query(['scene']);
@@ -232,10 +239,20 @@ class App {
         // console.log('Sweep added to the collection', index, item, collection);
       },
       onRemoved: (index: number, item: any, collection: any) => {
-        console.log('Sweep removed from the collection', index, item, collection);
+        console.log(
+          'Sweep removed from the collection',
+          index,
+          item,
+          collection
+        );
       },
       onUpdated: (index: number, item: any, collection: any) => {
-        console.log('Sweep updated in place in the collection', index, item, collection);
+        console.log(
+          'Sweep updated in place in the collection',
+          index,
+          item,
+          collection
+        );
       },
       onCollectionUpdated: (collection: any) => {
         // console.log('Sweep entire up-to-date collection', collection);
@@ -314,7 +331,9 @@ class App {
 
   private keyPressListener(): void {
     this.window.addEventListener('keydown', (e: any) => {
-      var keyStr = ['Control', 'Shift', 'Alt', 'Meta'].includes(e.key) ? '' : e.key + ' ';
+      var keyStr = ['Control', 'Shift', 'Alt', 'Meta'].includes(e.key)
+        ? ''
+        : e.key + ' ';
       var reportStr =
         'The ' +
         (e.ctrlKey ? 'Control ' : '') +
@@ -392,8 +411,14 @@ class App {
     this.sdk.App.state.subscribe((appState: any) => {
       // app state has changed
       console.log('Application: ', appState.application);
-      console.log('Loaded at: ', appState.phaseTimes[this.sdk.App.Phase.LOADING]);
-      console.log('Started at: ', appState.phaseTimes[this.sdk.App.Phase.STARTING]);
+      console.log(
+        'Loaded at: ',
+        appState.phaseTimes[this.sdk.App.Phase.LOADING]
+      );
+      console.log(
+        'Started at: ',
+        appState.phaseTimes[this.sdk.App.Phase.STARTING]
+      );
 
       switch (appState.phase) {
         case this.sdk.App.Phase.LOADING:
@@ -536,7 +561,7 @@ class App {
 
   private getIntersection() {
     this.sdk.Pointer.intersection.subscribe((intersectionData: any) => {
-      // console.log('Intersection', intersectionData);
+      // console.log('Intersection', intersectionData.position);
       this.intersectPoint = intersectionData.position;
     });
   }
@@ -705,6 +730,37 @@ class App {
         });
         animCtrlDiv.appendChild(animButton);
       }
+
+      // Waypoint controller
+      const waypointDiv = document.createElement('div');
+      waypointDiv.style.position = 'absolute';
+      waypointDiv.style.top = '10px';
+      waypointDiv.style.right = '10px';
+      waypointDiv.style.zIndex = '999';
+      waypointDiv.style.display = 'flex';
+      waypointDiv.style.flexDirection = 'column';
+      document.body.appendChild(waypointDiv);
+
+      const waypoints = [
+        new THREE.Vector3(3.37, -1.66, 2.69),
+        new THREE.Vector3(6.3, 1.76, 9.87),
+        new THREE.Vector3(-1.42, 1.73, 5.61),
+      ];
+
+      for (let i in waypoints) {
+        const waypoint = waypoints[i];
+        const button = document.createElement('button');
+        button.style.height = '40px';
+        button.innerText = 'Point ' + i;
+
+        function moveToWaypoint() {
+          this.intersectPoint = waypoint;
+          this.navigationSystem.moveTo(waypoint);
+        }
+
+        button.addEventListener('click', moveToWaypoint.bind(this));
+        waypointDiv.appendChild(button);
+      }
     }, 2000);
 
     // Animate it - https://matterport.github.io/showcase-sdk/sdkbundle_tutorials_models.html#animate-it
@@ -764,8 +820,7 @@ class App {
         gltf.scene.traverse((child: any) => {
           if (child.type === 'Mesh') {
             //Create NavigationSystem
-            console.log('navMesh', child);
-            const navSystem = new NavigationSystem(
+            this.navigationSystem = new NavigationSystem(
               this.threeClock,
               this.intersectPoint,
               this.threeScene,
@@ -785,10 +840,20 @@ class App {
         console.log('item added to the collection', index, item, collection);
       },
       onRemoved: (index: any, item: any, collection: any) => {
-        console.log('item removed from the collection', index, item, collection);
+        console.log(
+          'item removed from the collection',
+          index,
+          item,
+          collection
+        );
       },
       onUpdated: (index: any, item: any, collection: any) => {
-        console.log('item updated in place in the collection', index, item, collection);
+        console.log(
+          'item updated in place in the collection',
+          index,
+          item,
+          collection
+        );
       },
     });
 

@@ -86,7 +86,10 @@ class Channel {
       }
     }
 
-    if (pts.length === 0 || !Utils.vequal(pts[pts.length - 1], portals[portals.length - 1].left)) {
+    if (
+      pts.length === 0 ||
+      !Utils.vequal(pts[pts.length - 1], portals[portals.length - 1].left)
+    ) {
       // Append last point to path.
       pts.push(portals[portals.length - 1].left);
     }

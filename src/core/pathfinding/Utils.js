@@ -22,9 +22,12 @@ class Utils {
   //@ http://jsfromhell.com/math/is-point-in-poly [rev. #0]
   static isPointInPoly(poly, pt) {
     for (var c = false, i = -1, l = poly.length, j = l - 1; ++i < l; j = i)
-      ((poly[i].z <= pt.z && pt.z < poly[j].z) || (poly[j].z <= pt.z && pt.z < poly[i].z)) &&
+      ((poly[i].z <= pt.z && pt.z < poly[j].z) ||
+        (poly[j].z <= pt.z && pt.z < poly[i].z)) &&
         pt.x <
-          ((poly[j].x - poly[i].x) * (pt.z - poly[i].z)) / (poly[j].z - poly[i].z) + poly[i].x &&
+          ((poly[j].x - poly[i].x) * (pt.z - poly[i].z)) /
+            (poly[j].z - poly[i].z) +
+            poly[i].x &&
         (c = !c);
     return c;
   }
